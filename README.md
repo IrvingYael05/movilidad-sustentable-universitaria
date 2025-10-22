@@ -1,59 +1,53 @@
-# MovilidadSustentableUniversitaria
+# Movilidad Sustentable Universitaria (Ecomovi PWA)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.0.
+PWA para la gestión de movilidad sustentable en el campus universitario. Este proyecto busca implementar un sistema que disminuya la congestión vehicular y la huella de carbono mediante un sistema de carpooling y control de accesos con QR.
 
-## Development server
+## Sobre el Proyecto
 
-To start a local development server, run:
+Este sistema nace como una solución para optimizar el uso de los estacionamientos, reducir el número de vehículos de ocupación individual y establecer un protocolo de acceso eficiente y seguro para la comunidad universitaria.
 
-```bash
-ng serve
-```
+### Funcionalidades Principales
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+* **Registro de Usuarios:** Creación de cuentas para la comunidad universitaria.
+* **Carpooling:** Módulo para publicar, buscar y gestionar viajes compartidos.
+* **Control de Acceso:** Generación y validación de códigos QR para el acceso vehicular.
+* **Asignación de Espacios:** Asignación automatizada de lugares de estacionamiento.
+* **Dashboard de Métricas:** Panel para visualizar indicadores clave como la reducción de CO2 y la ocupación del estacionamiento.
 
-## Code scaffolding
+### Construido Con
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Este proyecto está siendo desarrollado con las siguientes tecnologías:
 
-```bash
-ng generate component component-name
-```
+* **[Angular](https://angular.io/):** Framework de desarrollo frontend.
+* **[PrimeNG](https://primeng.org/):** Biblioteca de componentes UI para Angular.
+* **[Supabase](https://supabase.com/):** Plataforma Backend-as-a-Service de código abierto.
+* **Progressive Web App (PWA):** Para una experiencia de usuario accesible desde cualquier dispositivo sin necesidad de instalación.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Empezando
 
-```bash
-ng generate --help
-```
+Sigue estos pasos para obtener una copia local del proyecto y ponerla en funcionamiento.
 
-## Building
+### Prerrequisitos
 
-To build the project run:
+Asegúrate de tener Node.js (versión 22.x) y Angular CLI instalados.
 
-```bash
-ng build
-```
+* npm
+    ```sh
+    npm install -g @angular/cli
+    ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Instalación
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1.  Clona el repositorio
+    ```sh
+    git clone (https://github.com/IrvingYael05/movilidad-sustentable-universitaria.git)
+    ```
+2.  Navega a la carpeta del proyecto
+    ```sh
+    cd ecomovi-pwa
+    ```
+3.  Instala los paquetes de NPM
+    ```sh
+    npm install
+    ```
+---
