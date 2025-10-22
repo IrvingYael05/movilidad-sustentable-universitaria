@@ -44,7 +44,7 @@ Asegúrate de tener Node.js (versión 22.x) y Angular CLI instalados.
     ```
 2.  Navega a la carpeta del proyecto
     ```sh
-    cd ecomovi-pwa
+    cd movilidad-sustentable-universitaria
     ```
 3.  Instala los paquetes de NPM
     ```sh
