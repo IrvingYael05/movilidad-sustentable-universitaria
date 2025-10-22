@@ -11,7 +11,7 @@ import { MessageService } from 'primeng/api';
   styleUrl: './app.component.scss',
   providers: [MessageService],
 })
-
+  
 export class AppComponent {
   title = 'movilidad-sustentable-universitaria';
   constructor(private messageService: MessageService) {}
