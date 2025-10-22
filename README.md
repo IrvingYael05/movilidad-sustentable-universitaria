@@ -40,7 +40,7 @@ Asegúrate de tener Node.js (versión 22.x) y Angular CLI instalados.
 
 1.  Clona el repositorio
     ```sh
-    git clone (https://github.com/IrvingYael05/movilidad-sustentable-universitaria.git)
+    git clone https://github.com/IrvingYael05/movilidad-sustentable-universitaria.git
     ```
 2.  Navega a la carpeta del proyecto
     ```sh
