@@ -1,6 +1,6 @@
 import {
   CommonModule
-} from "./chunk-YBFO6GTS.js";
+} from "./chunk-OX57FP2E.js";
 import {
   Component,
   Directive,
@@ -18,7 +18,7 @@ import {
   ɵɵdirectiveInject,
   ɵɵprojection,
   ɵɵprojectionDef
-} from "./chunk-V6DCTCG2.js";
+} from "./chunk-NP7A7CDW.js";
 
 // node_modules/primeng/node_modules/@primeuix/utils/dom/index.mjs
 function hasClass(element, className) {
@@ -39,6 +39,24 @@ function addClass(element, className) {
     [className].flat().filter(Boolean).forEach((_classNames) => _classNames.split(" ").forEach(fn));
   }
 }
+function getCSSVariableByRegex(variableRegex) {
+  for (const sheet of document == null ? void 0 : document.styleSheets) {
+    try {
+      for (const rule of sheet == null ? void 0 : sheet.cssRules) {
+        for (const property of rule == null ? void 0 : rule.style) {
+          if (variableRegex.test(property)) {
+            return {
+              name: property,
+              value: rule.style.getPropertyValue(property).trim()
+            };
+          }
+        }
+      }
+    } catch (e) {
+    }
+  }
+  return null;
+}
 function removeClass(element, className) {
   if (element && className) {
     const fn = (_className) => {
@@ -46,6 +64,69 @@ function removeClass(element, className) {
       else element.className = element.className.replace(new RegExp("(^|\\b)" + _className.split(" ").join("|") + "(\\b|$)", "gi"), " ");
     };
     [className].flat().filter(Boolean).forEach((_classNames) => _classNames.split(" ").forEach(fn));
+  }
+}
+function getHiddenElementDimensions(element) {
+  let dimensions = {
+    width: 0,
+    height: 0
+  };
+  if (element) {
+    element.style.visibility = "hidden";
+    element.style.display = "block";
+    dimensions.width = element.offsetWidth;
+    dimensions.height = element.offsetHeight;
+    element.style.display = "none";
+    element.style.visibility = "visible";
+  }
+  return dimensions;
+}
+function getViewport() {
+  let win = window, d = document, e = d.documentElement, g = d.getElementsByTagName("body")[0], w = win.innerWidth || e.clientWidth || g.clientWidth, h = win.innerHeight || e.clientHeight || g.clientHeight;
+  return {
+    width: w,
+    height: h
+  };
+}
+function getWindowScrollLeft() {
+  let doc = document.documentElement;
+  return (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+}
+function getWindowScrollTop() {
+  let doc = document.documentElement;
+  return (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
+}
+function absolutePosition(element, target, gutter = true) {
+  var _a, _b, _c, _d;
+  if (element) {
+    const elementDimensions = element.offsetParent ? {
+      width: element.offsetWidth,
+      height: element.offsetHeight
+    } : getHiddenElementDimensions(element);
+    const elementOuterHeight = elementDimensions.height;
+    const elementOuterWidth = elementDimensions.width;
+    const targetOuterHeight = target.offsetHeight;
+    const targetOuterWidth = target.offsetWidth;
+    const targetOffset = target.getBoundingClientRect();
+    const windowScrollTop = getWindowScrollTop();
+    const windowScrollLeft = getWindowScrollLeft();
+    const viewport = getViewport();
+    let top, left, origin = "top";
+    if (targetOffset.top + targetOuterHeight + elementOuterHeight > viewport.height) {
+      top = targetOffset.top + windowScrollTop - elementOuterHeight;
+      origin = "bottom";
+      if (top < 0) {
+        top = windowScrollTop;
+      }
+    } else {
+      top = targetOuterHeight + targetOffset.top + windowScrollTop;
+    }
+    if (targetOffset.left + elementOuterWidth > viewport.width) left = Math.max(0, targetOffset.left + windowScrollLeft + targetOuterWidth - elementOuterWidth);
+    else left = targetOffset.left + windowScrollLeft;
+    element.style.top = top + "px";
+    element.style.left = left + "px";
+    element.style.transformOrigin = origin;
+    gutter && (element.style.marginTop = origin === "bottom" ? `calc(${(_b = (_a = getCSSVariableByRegex(/-anchor-gutter$/)) == null ? void 0 : _a.value) != null ? _b : "2px"} * -1)` : (_d = (_c = getCSSVariableByRegex(/-anchor-gutter$/)) == null ? void 0 : _c.value) != null ? _d : "");
   }
 }
 function getOuterWidth(element, margin) {
@@ -58,6 +139,39 @@ function getOuterWidth(element, margin) {
     return width;
   }
   return 0;
+}
+function relativePosition(element, target, gutter = true) {
+  var _a, _b, _c, _d;
+  if (element) {
+    const elementDimensions = element.offsetParent ? {
+      width: element.offsetWidth,
+      height: element.offsetHeight
+    } : getHiddenElementDimensions(element);
+    const targetHeight = target.offsetHeight;
+    const targetOffset = target.getBoundingClientRect();
+    const viewport = getViewport();
+    let top, left, origin = "top";
+    if (targetOffset.top + targetHeight + elementDimensions.height > viewport.height) {
+      top = -1 * elementDimensions.height;
+      origin = "bottom";
+      if (targetOffset.top + top < 0) {
+        top = -1 * targetOffset.top;
+      }
+    } else {
+      top = targetHeight;
+    }
+    if (elementDimensions.width > viewport.width) {
+      left = targetOffset.left * -1;
+    } else if (targetOffset.left + elementDimensions.width > viewport.width) {
+      left = (targetOffset.left + elementDimensions.width - viewport.width) * -1;
+    } else {
+      left = 0;
+    }
+    element.style.top = top + "px";
+    element.style.left = left + "px";
+    element.style.transformOrigin = origin;
+    gutter && (element.style.marginTop = origin === "bottom" ? `calc(${(_b = (_a = getCSSVariableByRegex(/-anchor-gutter$/)) == null ? void 0 : _a.value) != null ? _b : "2px"} * -1)` : (_d = (_c = getCSSVariableByRegex(/-anchor-gutter$/)) == null ? void 0 : _c.value) != null ? _d : "");
+  }
 }
 function isElement(element) {
   return typeof HTMLElement === "object" ? element instanceof HTMLElement : element && typeof element === "object" && element !== null && element.nodeType === 1 && typeof element.nodeName === "string";
@@ -140,6 +254,9 @@ function getWidth(element) {
     return width;
   }
   return 0;
+}
+function isTouchDevice() {
+  return "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
 function remove(element) {
   var _a;
@@ -259,6 +376,14 @@ function resolveFieldData(data, field) {
 function equals(obj1, obj2, field) {
   if (field) return resolveFieldData(obj1, field) === resolveFieldData(obj2, field);
   else return deepEquals(obj1, obj2);
+}
+function contains(value, list) {
+  if (value != null && list && list.length) {
+    for (let val of list) {
+      if (equals(value, val)) return true;
+    }
+  }
+  return false;
 }
 function isObject(value, empty = true) {
   return value instanceof Object && value.constructor === Object && (empty || Object.keys(value).length !== 0);
@@ -1314,18 +1439,23 @@ export {
   hasClass,
   addClass,
   removeClass,
+  absolutePosition,
   getOuterWidth,
+  relativePosition,
   setAttributes,
   findSingle,
   getHeight,
   getOffset,
   getOuterHeight,
   getWidth,
+  isTouchDevice,
   remove,
   setAttribute,
   EventBus,
   isEmpty,
   isNotEmpty,
+  equals,
+  contains,
   isObject,
   resolve,
   isString,
@@ -1353,4 +1483,4 @@ export {
   TranslationKeys,
   TreeDragDropService
 };
-//# sourceMappingURL=chunk-GKNSL35P.js.map
+//# sourceMappingURL=chunk-PTWYUEPI.js.map

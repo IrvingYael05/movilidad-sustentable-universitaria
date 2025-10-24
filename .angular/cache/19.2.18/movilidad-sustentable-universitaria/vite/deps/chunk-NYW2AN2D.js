@@ -13,10 +13,10 @@ import {
   setAttributes,
   toKebabCase,
   toTokenKey
-} from "./chunk-GKNSL35P.js";
+} from "./chunk-PTWYUEPI.js";
 import {
   DOCUMENT
-} from "./chunk-YBFO6GTS.js";
+} from "./chunk-OX57FP2E.js";
 import {
   Injectable,
   InjectionToken,
@@ -31,10 +31,10 @@ import {
   untracked,
   ɵɵdefineInjectable,
   ɵɵgetInheritedFactory
-} from "./chunk-V6DCTCG2.js";
+} from "./chunk-NP7A7CDW.js";
 import {
   __spreadValues
-} from "./chunk-WDMUDEB6.js";
+} from "./chunk-S35DAJRX.js";
 
 // node_modules/primeng/node_modules/@primeuix/styled/index.mjs
 var __defProp = Object.defineProperty;
@@ -1480,4 +1480,4 @@ export {
   PRIME_NG_CONFIG,
   providePrimeNG
 };
-//# sourceMappingURL=chunk-SNA6HOES.js.map
+//# sourceMappingURL=chunk-NYW2AN2D.js.map
