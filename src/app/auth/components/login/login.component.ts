@@ -9,6 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -19,7 +20,7 @@ import { PasswordModule } from 'primeng/password';
     InputTextModule,
     ButtonModule,
     PasswordModule
-  ],
+],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })

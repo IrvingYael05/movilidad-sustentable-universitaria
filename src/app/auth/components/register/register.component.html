@@ -1,149 +1,84 @@
 <p-toast></p-toast>
-<div
-  class="flex flex-column align-items-center justify-content-center min-h-screen p-4 surface-ground"
->
-  <div class="w-full md:w-30rem">
-    <h1 class="text-3xl font-bold m-0 text-center">Crear Cuenta</h1>
-    <p class="text-secondary mt-1 text-center">
-      Regístrate para empezar a compartir tus viajes.
-    </p>
+<div class="flex flex-column align-items-center justify-content-center h-screen p-4">
+  <img src="icons/icon-192x192.png" alt="Logo Ecomovi" class="mb-4" style="width: 140px;">
 
-    <form
-      [formGroup]="registerForm"
-      (ngSubmit)="onSubmit()"
-      class="flex flex-column gap-3 mt-4"
-    >
-      <div formGroupName="perfil">
-        <div class="p-float-label">
-          <input
-            id="nombre"
-            type="text"
-            pInputText
-            class="w-full"
-            formControlName="nombre"
-          />
-          <label for="nombre">Nombre(s)</label>
-        </div>
-        <div class="formgrid grid mt-3">
-          <div class="field col">
-            <div class="p-float-label">
-              <input
-                id="apellido_p"
-                type="text"
-                pInputText
-                class="w-full"
-                formControlName="apellido_p"
-              />
-              <label for="apellido_p">Apellido Paterno</label>
-            </div>
+  <h1 class="text-3xl font-bold m-0">Crear Cuenta</h1>
+  <p class="text-secondary mt-1 text-center">Regístrate para empezar a compartir tus viajes.</p>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-3 mt-4 w-full md:w-25rem">
+    
+    <div formGroupName="perfil">
+      <div class="p-float-label">
+        <input id="nombre" type="text" pInputText class="w-full" formControlName="nombre" placeholder=" " />
+        <label for="nombre">Nombre(s)</label>
+      </div>
+
+      <div class="formgrid grid mt-3">
+        <div class="field col">
+          <div class="p-float-label">
+            <input id="apellido_p" type="text" pInputText class="w-full" formControlName="apellido_p" placeholder=" " />
+            <label for="apellido_p">Apellido Paterno</label>
           </div>
-          <div class="field col">
-            <div class="p-float-label">
-              <input
-                id="apellido_m"
-                type="text"
-                pInputText
-                class="w-full"
-                formControlName="apellido_m"
-              />
-              <label for="apellido_m">Apellido Materno</label>
-            </div>
+        </div>
+        <div class="field col">
+          <div class="p-float-label">
+            <input id="apellido_m" type="text" pInputText class="w-full" formControlName="apellido_m" placeholder=" " />
+            <label for="apellido_m">Apellido Materno</label>
           </div>
         </div>
       </div>
+    </div>
 
+    <div class="p-float-label">
+      <input id="email" type="email" pInputText class="w-full" formControlName="email" placeholder=" " />
+      <label for="email">Correo Institucional (&#64;uteq.edu.mx)</label>
+    </div>
+
+    <div class="p-float-label">
+      <p-password
+        inputId="password"
+        formControlName="password"
+        placeholder=" "
+        [feedback]="true"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full">
+      </p-password>
+      <label for="password">Contraseña</label>
+    </div>
+
+    <p-divider></p-divider>
+
+    <div class="field-checkbox">
+      <p-checkbox formControlName="addVehicle" inputId="addVehicle" [binary]="true"></p-checkbox>
+      <label for="addVehicle">Registrar un vehículo ahora</label>
+    </div>
+
+    <div *ngIf="showVehicleForm" formGroupName="vehiculo" class="flex flex-column gap-3 card p-3">
+      <h3 class="mt-0">Datos del Vehículo</h3>
       <div class="p-float-label">
-        <input
-          id="email"
-          type="email"
-          pInputText
-          class="w-full"
-          formControlName="email"
-        />
-        <label for="email">Correo Institucional (&#64;uteq.edu.mx)</label>
+        <input id="placa" type="text" pInputText class="w-full" formControlName="placa" placeholder=" " />
+        <label for="placa">Placa (Requerido)</label>
       </div>
       <div class="p-float-label">
-        <p-password
-          inputId="password"
-          [feedback]="true"
-          [toggleMask]="true"
-          styleClass="w-full"
-          inputStyleClass="w-full"
-          formControlName="password"
-        ></p-password>
-        <label for="password">Contraseña</label>
+        <input id="marca" type="text" pInputText class="w-full" formControlName="marca" placeholder=" " />
+        <label for="marca">Marca</label>
       </div>
-
-      <p-divider></p-divider>
-
-      <div class="field-checkbox">
-        <p-checkbox
-          formControlName="addVehicle"
-          inputId="addVehicle"
-          [binary]="true"
-        ></p-checkbox>
-        <label for="addVehicle">Registrar un vehículo ahora</label>
+      <div class="p-float-label">
+        <input id="modelo" type="text" pInputText class="w-full" formControlName="modelo" placeholder=" " />
+        <label for="modelo">Modelo</label>
       </div>
-
-      <div
-        *ngIf="showVehicleForm"
-        formGroupName="vehiculo"
-        class="flex flex-column gap-3 card p-3"
-      >
-        <h3 class="mt-0">Datos del Vehículo</h3>
-        <div class="p-float-label">
-          <input
-            id="placa"
-            type="text"
-            pInputText
-            class="w-full"
-            formControlName="placa"
-          />
-          <label for="placa">Placa (Requerido)</label>
-        </div>
-        <div class="p-float-label">
-          <input
-            id="marca"
-            type="text"
-            pInputText
-            class="w-full"
-            formControlName="marca"
-          />
-          <label for="marca">Marca</label>
-        </div>
-        <div class="p-float-label">
-          <input
-            id="modelo"
-            type="text"
-            pInputText
-            class="w-full"
-            formControlName="modelo"
-          />
-          <label for="modelo">Modelo</label>
-        </div>
-        <div class="p-float-label">
-          <input
-            id="color"
-            type="text"
-            pInputText
-            class="w-full"
-            formControlName="color"
-          />
-          <label for="color">Color</label>
-        </div>
+      <div class="p-float-label">
+        <input id="color" type="text" pInputText class="w-full" formControlName="color" placeholder=" " />
+        <label for="color">Color</label>
       </div>
+    </div>
 
-      <p-button
-        label="Crear Cuenta"
-        type="submit"
-        [loading]="registerForm.disabled"
-        styleClass="w-full mt-2"
-      ></p-button>
-    </form>
+    <p-button label="Crear Cuenta" type="submit" [loading]="registerForm.disabled" styleClass="w-full mt-2"></p-button>
 
-    <p class="mt-4 text-center">
-      ¿Ya tienes una cuenta?
-      <a routerLink="/" class="font-bold no-underline">Inicia Sesión</a>
-    </p>
-  </div>
+  </form>
+
+  <p class="mt-4 text-center">
+    ¿Ya tienes una cuenta? <a routerLink="/" class="font-bold no-underline">Inicia Sesión</a>
+  </p>
 </div>
