@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { MiPerfilComponent } from './pages/mi-perfil/mi-perfil.component';
+import { MiVehiculoComponent } from './pages/mi-vehiculo/mi-vehiculo.component';
 
 export const routes: Routes = [
   // 1. AÑADE ESTO: Redirige la ruta raíz ('/') a '/auth'
@@ -12,5 +14,15 @@ export const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
+  },
+
+  {
+    path: 'mi-perfil',
+    component: MiPerfilComponent
+  },
+  
+  {
+    path: 'mi-vehiculo',
+    component: MiVehiculoComponent
   }
 ];

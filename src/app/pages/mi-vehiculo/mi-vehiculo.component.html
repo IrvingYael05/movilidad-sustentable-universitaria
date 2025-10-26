@@ -1,0 +1,51 @@
+<div
+  class="flex flex-column align-items-center justify-content-center min-h-screen p-4 surface-ground overflow-auto"
+>
+  <div class="w-full md:w-30rem text-center">
+    <img
+      src="icons/icon-192x192.png"
+      alt="Logo"
+      class="mb-3"
+      style="width: 100px"
+    />
+
+    <h1 class="text-3xl font-bold mb-1">Vehículo</h1>
+    <p class="text-secondary mb-4">
+      Completa los campos para registrar un vehículo y acceder a nuevas funcionalidades
+    </p>
+
+    <div class="flex flex-column gap-3">
+      <input
+        pInputText
+        placeholder="Marca del vehículo"
+        [(ngModel)]="vehiculo.marca"
+        class="w-full"
+      />
+      <input
+        pInputText
+        placeholder="Modelo del vehículo"
+        [(ngModel)]="vehiculo.modelo"
+        class="w-full"
+      />
+      <input
+        pInputText
+        placeholder="Color del vehículo"
+        [(ngModel)]="vehiculo.color"
+        class="w-full"
+      />
+      <input
+        pInputText
+        placeholder="Placa del vehículo"
+        [(ngModel)]="vehiculo.placa"
+        class="w-full"
+      />
+
+      <button
+        pButton
+        label="Registrar"
+        class="w-full mt-2 registrar-btn"
+        (click)="registrarVehiculo()"
+      ></button>
+    </div>
+  </div>
+</div>
