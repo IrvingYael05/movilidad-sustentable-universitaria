@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
-import { InputGroupModule } from 'primeng/inputgroup'; 
+import { InputGroupModule } from 'primeng/inputgroup';
 
 
 @Component({
@@ -27,6 +27,6 @@ export class MiVehiculoComponent {
 
   registrarVehiculo() {
     console.log('Vehículo registrado:', this.vehiculo);
-    // Aquí puedes conectar con tu backend para guardar los datos
+    // Falta conectarlo al back :P
   }
 }
