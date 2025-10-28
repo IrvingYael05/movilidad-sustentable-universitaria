@@ -1,51 +1,34 @@
-<div
-  class="flex flex-column align-items-center justify-content-center min-h-screen p-4 surface-ground overflow-auto"
->
-  <div class="w-full md:w-30rem text-center">
-    <img
-      src="icons/icon-192x192.png"
-      alt="Logo"
-      class="mb-3"
-      style="width: 100px"
-    />
+<div class="flex flex-column align-items-center p-4">
+  <img src="icons/icon-192x192.png" alt="Logo Ecomovi" class="mb-4" style="width: 140px;">
 
-    <h1 class="text-3xl font-bold mb-1">Vehículo</h1>
-    <p class="text-secondary mb-4">
-      Completa los campos para registrar un vehículo y acceder a nuevas funcionalidades
-    </p>
+  <h1 class="text-3xl font-bold m-0">Mi Vehículo</h1>
+  <p class="text-secondary mt-1">Consulta y actualiza la información de tu vehículo</p>
 
-    <div class="flex flex-column gap-3">
-      <input
-        pInputText
-        placeholder="Marca del vehículo"
-        [(ngModel)]="vehiculo.marca"
-        class="w-full"
-      />
-      <input
-        pInputText
-        placeholder="Modelo del vehículo"
-        [(ngModel)]="vehiculo.modelo"
-        class="w-full"
-      />
-      <input
-        pInputText
-        placeholder="Color del vehículo"
-        [(ngModel)]="vehiculo.color"
-        class="w-full"
-      />
-      <input
-        pInputText
-        placeholder="Placa del vehículo"
-        [(ngModel)]="vehiculo.placa"
-        class="w-full"
-      />
-
-      <button
-        pButton
-        label="Registrar"
-        class="w-full mt-2 registrar-btn"
-        (click)="registrarVehiculo()"
-      ></button>
+  <form (ngSubmit)="actualizarVehiculo()" class="flex flex-column gap-3 mt-4 w-full md:w-25rem">
+    <!-- Marca -->
+    <div class="p-float-label">
+      <input id="marca" type="text" pInputText class="w-full" [(ngModel)]="vehiculo.marca" name="marca" placeholder=" " />
+      <label for="marca">Marca</label>
     </div>
-  </div>
+
+    <!-- Modelo -->
+    <div class="p-float-label">
+      <input id="modelo" type="text" pInputText class="w-full" [(ngModel)]="vehiculo.modelo" name="modelo" placeholder=" " />
+      <label for="modelo">Modelo</label>
+    </div>
+
+    <!-- Color -->
+    <div class="p-float-label">
+      <input id="color" type="text" pInputText class="w-full" [(ngModel)]="vehiculo.color" name="color" placeholder=" " />
+      <label for="color">Color</label>
+    </div>
+
+    <!-- Placa -->
+    <div class="p-float-label">
+      <input id="placa" type="text" pInputText class="w-full" [(ngModel)]="vehiculo.placa" name="placa" placeholder=" " />
+      <label for="placa">Placa</label>
+    </div>
+
+    <p-button label="Actualizar" type="submit" styleClass="w-full"></p-button>
+  </form>
 </div>
