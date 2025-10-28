@@ -28,8 +28,8 @@ export class MiVehiculoComponent {
     placa: 'XYZ-1234'
   };
 
-  actualizarVehiculo() {
-    console.log('Vehículo actualizado:', this.vehiculo);
-    // Aquí puedes conectar con tu API o servicio
+  registrarVehiculo() {
+    console.log('Vehículo registrado:', this.vehiculo);
+    // Aquí puedes conectar con tu backend para guardar los datos
   }
 }

@@ -246,6 +246,9 @@ function getOuterHeight(element, margin) {
   }
   return 0;
 }
+function getUserAgent() {
+  return navigator.userAgent;
+}
 function getWidth(element) {
   if (element) {
     let width = element.offsetWidth;
@@ -254,6 +257,9 @@ function getWidth(element) {
     return width;
   }
   return 0;
+}
+function isClient() {
+  return !!(typeof window !== "undefined" && window.document && window.document.createElement);
 }
 function isTouchDevice() {
   return "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
@@ -1447,7 +1453,9 @@ export {
   getHeight,
   getOffset,
   getOuterHeight,
+  getUserAgent,
   getWidth,
+  isClient,
   isTouchDevice,
   remove,
   setAttribute,
@@ -1483,4 +1491,4 @@ export {
   TranslationKeys,
   TreeDragDropService
 };
-//# sourceMappingURL=chunk-PTWYUEPI.js.map
+//# sourceMappingURL=chunk-BD43DTCC.js.map

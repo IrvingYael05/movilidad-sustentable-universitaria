@@ -1,0 +1,127 @@
+:host {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+/* --- TÍTULOS --- */
+h1 {
+  font-size: 2rem;
+  color: #244e7c;
+  font-weight: 700;
+  text-align: center;
+}
+
+p {
+  text-align: center;
+  color: #71706f;
+  font-size: 0.95rem;
+}
+
+.section-header {
+  label {
+    color: #244e7c;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+}
+
+/* --- INPUTS CON EFECTO HOVER --- */
+input[pInputText],
+::ng-deep .p-inputmask,
+::ng-deep .p-inputtext {
+    border: 2px solid #244e7c;
+    border-radius: 12px;
+    padding: 0.8rem;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+
+    /* Efecto hover - cambia el borde */
+    &:hover {
+        border-color: #94a3b8;
+    }
+
+    /* Efecto focus - cambia el borde y agrega sombra */
+    &:focus {
+        border-color: #94a3b8;
+        box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2) !important;
+        outline: none !important;
+    }
+}
+
+/* --- PASAJEROS --- */
+.pasajero-item {
+    padding: 0.8rem;
+    background-color: #f3f4f6;
+    border-radius: 12px;
+    border: 2px solid #244e7c;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    span {
+        color: #244e7c;
+        font-weight: 500;
+    }
+
+    /* Efecto hover en el item de pasajero */
+    &:hover {
+        border-color: #232e56;
+        box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.1);
+    }
+}
+
+.add-btn {
+    background-color: #244e7c;
+    border: none !important;
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+        background-color: #232e56;
+        transform: scale(1.05);
+    }
+}
+
+/* Hace el icono + blanco */
+:host ::ng-deep .add-btn .pi {
+    color: #ffffff;
+}
+
+.remove-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+/* --- BOTÓN PUBLICAR (usando p-button) --- */
+:host ::ng-deep p-button button {
+    background-color: #244e7c !important;
+    border: none !important;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    color: #fff;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+        background-color: #232e56 !important;
+        transform: translateY(-2px);
+    }
+
+    &:disabled {
+        background-color: #71706f;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
