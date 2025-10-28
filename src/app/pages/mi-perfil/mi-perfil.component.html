@@ -1,85 +1,64 @@
-<div
-  class="flex flex-column align-items-center justify-content-center min-h-screen p-4 surface-ground overflow-auto"
->
-  <div class="w-full md:w-30rem text-center">
-    <img
-      src="icons/icon-192x192.png"
-      alt="Logo"
-      class="mb-3"
-      style="width: 100px"
-    />
+<div class="flex flex-column align-items-center p-4">
+  <img src="icons/icon-192x192.png" alt="Logo Ecomovi" class="mb-4" style="width: 140px;">
 
-    <h1 class="text-3xl font-bold mb-1">Perfil</h1>
-    <p class="text-secondary mb-4">
-      Actualiza tu información personal
-    </p>
+  <h1 class="text-3xl font-bold m-0">Mi Perfil</h1>
+  <p class="text-secondary mt-1">Consulta y actualiza tus datos personales</p>
 
-    <div class="flex flex-column gap-3">
-      <input
-        pInputText
-        placeholder="Nombre(s)"
-        [(ngModel)]="perfil.nombre"
-        class="w-full"
-      />
-      <input
-        pInputText
-        placeholder="Apellido Paterno"
-        [(ngModel)]="perfil.apellidoPaterno"
-        class="w-full"
-      />
-      <input
-        pInputText
-        placeholder="Apellido Materno"
-        [(ngModel)]="perfil.apellidoMaterno"
-        class="w-full"
-      />
-      <input
-        pInputText
-        placeholder="Correo"
-        [(ngModel)]="perfil.correo"
-        class="w-full"
-      />
-
-      <div class="p-inputgroup">
-        <input
-          [type]="mostrarActual ? 'text' : 'password'"
-          pInputText
-          placeholder="Contraseña actual"
-          [(ngModel)]="perfil.passwordActual"
-          class="w-full"
-        />
-        <button
-          type="button"
-          pButton
-          icon="{{ mostrarActual ? 'pi pi-eye-slash' : 'pi pi-eye' }}"
-          (click)="mostrarActual = !mostrarActual"
-          class="p-button-text"
-        ></button>
-      </div>
-
-      <div class="p-inputgroup">
-        <input
-          [type]="mostrarNueva ? 'text' : 'password'"
-          pInputText
-          placeholder="Contraseña nueva"
-          [(ngModel)]="perfil.passwordNueva"
-          class="w-full"
-        />
-        <button
-          type="button"
-          pButton
-          icon="{{ mostrarNueva ? 'pi pi-eye-slash' : 'pi pi-eye' }}"
-          (click)="mostrarNueva = !mostrarNueva"
-          class="p-button-text"
-        ></button>
-      </div>
-
-      <button
-        pButton
-        label="Actualizar"
-        class="w-full mt-2 actualizar-btn"
-        (click)="actualizarPerfil()"
-      ></button>
+  <form (ngSubmit)="actualizarPerfil()" class="flex flex-column gap-3 mt-4 w-full md:w-25rem">
+    <!-- Nombre(s) -->
+    <div class="p-float-label">
+      <input id="nombre" type="text" pInputText class="w-full" [(ngModel)]="perfil.nombre" name="nombre" placeholder=" " />
+      <label for="nombre">Nombre(s)</label>
     </div>
-  </div>
+
+    <!-- Apellido Paterno -->
+    <div class="p-float-label">
+      <input id="apellidoPaterno" type="text" pInputText class="w-full" [(ngModel)]="perfil.apellidoPaterno" name="apellidoPaterno" placeholder=" " />
+      <label for="apellidoPaterno">Apellido Paterno</label>
+    </div>
+
+    <!-- Apellido Materno -->
+    <div class="p-float-label">
+      <input id="apellidoMaterno" type="text" pInputText class="w-full" [(ngModel)]="perfil.apellidoMaterno" name="apellidoMaterno" placeholder=" " />
+      <label for="apellidoMaterno">Apellido Materno</label>
+    </div>
+
+    <!-- Correo -->
+    <div class="p-float-label">
+      <input id="correo" type="email" pInputText class="w-full" [(ngModel)]="perfil.correo" name="correo" placeholder=" " />
+      <label for="correo">Correo</label>
+    </div>
+
+    <!-- Contraseña Actual -->
+    <div class="p-float-label">
+      <p-password
+        inputId="passwordActual"
+        [(ngModel)]="perfil.passwordActual"
+        name="passwordActual"
+        placeholder=" "
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full">
+      </p-password>
+      <label for="passwordActual">Contraseña Actual</label>
+    </div>
+
+    <!-- Nueva Contraseña -->
+    <div class="p-float-label">
+      <p-password
+        inputId="passwordNueva"
+        [(ngModel)]="perfil.passwordNueva"
+        name="passwordNueva"
+        placeholder=" "
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full">
+      </p-password>
+      <label for="passwordNueva">Nueva Contraseña</label>
+    </div>
+
+    <p-button label="Actualizar" type="submit" styleClass="w-full"></p-button>
+  </form>
 </div>

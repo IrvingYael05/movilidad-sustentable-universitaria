@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 // --- Módulos de PrimeNG ---
 import { InputTextModule } from 'primeng/inputtext';
@@ -29,7 +29,8 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     // Inicializa el formulario en el constructor
     this.loginForm = this.fb.group({
@@ -64,6 +65,8 @@ export class LoginComponent {
     } else {
       console.log('¡Inicio de sesión exitoso!', user);
       // Si el login es correcto, aquí redirigiremos al dashboard principal.
+      //Provisional
+      this.router.navigate(['/viajes'])
     }
   }
 }

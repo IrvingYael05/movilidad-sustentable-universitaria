@@ -1,38 +1,39 @@
 import { Component } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+// --- PrimeNG ---
 import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
-import { InputGroupModule } from 'primeng/inputgroup'; 
+import { PasswordModule } from 'primeng/password';
 
 @Component({
   selector: 'app-mi-perfil',
+  standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
+    RouterModule,
     InputTextModule,
     ButtonModule,
-    PasswordModule,
-    InputGroupModule
+    PasswordModule
   ],
   templateUrl: './mi-perfil.component.html',
-  styleUrl: './mi-perfil.component.scss'
+  styleUrls: ['./mi-perfil.component.scss']
 })
 export class MiPerfilComponent {
   perfil = {
-    nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
-    correo: '',
+    nombre: 'Raymundo',
+    apellidoPaterno: 'Rodríguez',
+    apellidoMaterno: 'López',
+    correo: 'raymundo@example.com',
     passwordActual: '',
     passwordNueva: ''
   };
 
-  mostrarActual = false;
-  mostrarNueva = false;
-
   actualizarPerfil() {
     console.log('Datos actualizados:', this.perfil);
-    // Aquí irá la lógica de actualización (API o servicio)
+    // Aquí puedes conectar con tu API o servicio
   }
 }

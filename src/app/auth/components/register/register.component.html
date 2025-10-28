@@ -1,5 +1,4 @@
-<p-toast></p-toast>
-<div class="flex flex-column align-items-center justify-content-center h-screen p-4">
+<div class="flex flex-column align-items-center justify-content-center p-4">
   <img src="icons/icon-192x192.png" alt="Logo Ecomovi" class="mb-4" style="width: 140px;">
 
   <h1 class="text-3xl font-bold m-0">Crear Cuenta</h1>
@@ -13,19 +12,14 @@
         <label for="nombre">Nombre(s)</label>
       </div>
 
-      <div class="formgrid grid mt-3">
-        <div class="field col">
-          <div class="p-float-label">
-            <input id="apellido_p" type="text" pInputText class="w-full" formControlName="apellido_p" placeholder=" " />
-            <label for="apellido_p">Apellido Paterno</label>
-          </div>
-        </div>
-        <div class="field col">
-          <div class="p-float-label">
-            <input id="apellido_m" type="text" pInputText class="w-full" formControlName="apellido_m" placeholder=" " />
-            <label for="apellido_m">Apellido Materno</label>
-          </div>
-        </div>
+      <div class="p-float-label mt-3"> 
+        <input id="apellido_p" type="text" pInputText class="w-full" formControlName="apellido_p" placeholder=" " />
+        <label for="apellido_p">Apellido Paterno</label>
+      </div>
+      
+      <div class="p-float-label mt-3"> 
+        <input id="apellido_m" type="text" pInputText class="w-full" formControlName="apellido_m" placeholder=" " />
+        <label for="apellido_m">Apellido Materno</label>
       </div>
     </div>
 

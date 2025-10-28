@@ -1,12 +1,17 @@
+/* register.component.scss */
+
 :host {
   display: flex;
-  align-items: center;
+  /* 💡 CAMBIAR: align-items: center; */
+  align-items: flex-start; /* Alinea el contenido a la parte superior */
   justify-content: center;
   height: 100vh;
   background-color: #ffffff;
   font-family: 'Poppins', sans-serif;
   color: #244e7c;
   padding: 1rem;
+  /* 💡 OPCIONAL: Si el componente principal no debe tener scroll,
+     asegúrese de que el body/página principal lo maneje. */
 }
 
 h1 {
@@ -107,15 +112,6 @@ form {
   }
 }
 
-/* Grids para apellidos */
-.formgrid.grid {
-  display: flex;
-  gap: 1rem;
-
-  .field.col {
-    flex: 1;
-  }
-}
 
 /* Checkbox */
 .field-checkbox {

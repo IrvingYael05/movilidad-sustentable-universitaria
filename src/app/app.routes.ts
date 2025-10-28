@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MiPerfilComponent } from './pages/mi-perfil/mi-perfil.component';
 import { MiVehiculoComponent } from './pages/mi-vehiculo/mi-vehiculo.component';
+import { ViajesComponent } from './pages/viajes/viajes.component';
 
 export const routes: Routes = [
   // 1. AÑADE ESTO: Redirige la ruta raíz ('/') a '/auth'
@@ -20,9 +21,14 @@ export const routes: Routes = [
     path: 'mi-perfil',
     component: MiPerfilComponent
   },
-  
+
   {
     path: 'mi-vehiculo',
     component: MiVehiculoComponent
+  },
+
+  {
+    path: 'viajes',
+    component: ViajesComponent
   }
 ];

@@ -1,32 +1,35 @@
 import { Component } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+// --- PrimeNG ---
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
-import { InputGroupModule } from 'primeng/inputgroup'; 
-
 
 @Component({
   selector: 'app-mi-vehiculo',
-    imports: [
+  standalone: true,
+  imports: [
+    CommonModule,
     FormsModule,
+    RouterModule,
     InputTextModule,
-    ButtonModule,
-    InputGroupModule
+    ButtonModule
   ],
   templateUrl: './mi-vehiculo.component.html',
-  styleUrl: './mi-vehiculo.component.scss'
+  styleUrls: ['./mi-vehiculo.component.scss']
 })
 export class MiVehiculoComponent {
   vehiculo = {
-    marca: '',
-    modelo: '',
-    color: '',
-    placa: ''
+    marca: 'Nissan',
+    modelo: 'Versa 2020',
+    color: 'Gris',
+    placa: 'XYZ-1234'
   };
 
-  registrarVehiculo() {
-    console.log('Vehículo registrado:', this.vehiculo);
-    // Aquí puedes conectar con tu backend para guardar los datos
+  actualizarVehiculo() {
+    console.log('Vehículo actualizado:', this.vehiculo);
+    // Aquí puedes conectar con tu API o servicio
   }
 }

@@ -1,0 +1,32 @@
+<div class="container">
+  <!-- Barra superior -->
+  <div class="header">
+    <img src="icons/favicon2.svg" alt="Logo Ecomovi" class="logo">
+    <div class="tabs">
+      <span class="tab active">Viajes</span>
+      <span class="tab">Estacionamiento</span>
+    </div>
+    <div class="menu-icon">☰</div>
+  </div>
+
+  <!-- Campo de búsqueda -->
+  <div class="search-container">
+    <div class="p-inputgroup">
+      <input type="text" pInputText placeholder="Buscar viaje por usuario/salida..." class="search-input" />
+      <button pButton type="button" class="search-button" (click)="onSearch()">Buscar</button>
+    </div>
+  </div>
+
+  <!-- Lista de viajes -->
+  <div class="trips-list">
+    <div *ngFor="let viaje of viajes" class="trip-card">
+      <div class="trip-details">
+        <div><strong>Nombre cualquiera</strong></div>
+        <div>Calle cualquiera en cualquier lugar</div>
+        <div>Hora cualquiera de cualquier día</div>
+        <div>Lugares disponibles</div>
+      </div>
+      <button pButton label="Solicitar Unirme" class="join-button" (click)="onJoin(viaje)"></button>
+    </div>
+  </div>
+</div>
