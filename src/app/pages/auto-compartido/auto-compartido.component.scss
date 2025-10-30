@@ -1,0 +1,207 @@
+:host {
+  display: block;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+
+.w-full {
+  width: 100%;
+  max-width: 36rem; 
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 16px rgba(26, 39, 65, 0.1);
+}
+
+
+h1,
+h2 {
+  color: #1a2741;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.text-primary {
+  color: #1a2741;
+  text-decoration: underline;
+}
+
+/* Descripción secundaria */
+.text-secondary {
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Sección del viaje */
+.surface-card {
+  background-color: #f3f4f6;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  color: #1a2741;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Lista de pasajeros */
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul li {
+  padding: 0.4rem 0;
+  color: #1a2741;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Botones */
+button[pbutton],
+button {
+  background-color: #1a2741 !important;
+  border: none !important;
+  border-radius: 0.75rem !important;
+  font-weight: bold !important;
+  color: #fff !important;
+  transition: all 0.2s ease;
+}
+
+button[pbutton]:hover,
+button:hover {
+  background-color: #2d3c66 !important;
+  transform: scale(1.03);
+}
+
+/* Eliminar viaje (ya no rojo) */
+button.delete {
+  background-color: #1a2741 !important;
+  color: #fff !important;
+}
+
+/* Sección de solicitudes */
+.solicitudes {
+  margin-top: 2rem;
+}
+
+.solicitudes h3 {
+  color: #1a2741;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Cada solicitud */
+.solicitud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f3f4f6;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  margin-bottom: 0.75rem;
+  transition: background 0.2s ease;
+}
+
+.solicitud:hover {
+  background-color: #e5e7eb;
+}
+
+.solicitud .nombre {
+  font-weight: 600;
+  color: #1a2741;
+  margin-bottom: 0.25rem;
+}
+
+.solicitud .correo {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Botón aceptar */
+.solicitud button {
+  background-color: #1a2741 !important;
+  border: none !important;
+  border-radius: 0.75rem !important;
+  font-weight: bold !important;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+}
+
+.solicitud button:hover {
+  background-color: #2d3c66 !important;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .w-full {
+    padding: 1.5rem;
+    max-width: 95%;
+  }
+
+  h1,
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Barra superior */
+.topbar {
+  background-color: #1a2741;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 0.5rem 0.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.topbar-content {
+  width: 90%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  width: 28px;
+  height: auto;
+  filter: brightness(0) invert(1); /* para hacerlo blanco */
+}
+
+/* Icono menú */
+.menu-icon {
+  font-size: 1.4rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.menu-icon:hover {
+  transform: scale(1.1);
+}
