@@ -1,4 +1,337 @@
-body {
-  font-family: 'Poppins', sans-serif;
-}
+// --- Importaciones ---
 @import "primeflex/primeflex.css";
+
+// --- Variables de CSS ---
+:root {
+  /* Paleta de Colores */
+  --primary-color: #244e7c;
+  --secondary-color: #232e56;
+  --neutral-color: #71706f;
+
+  --text-color: #244e7c;
+  --text-color-secondary: #71706f;
+
+  --surface-ground: #ffffff;
+  --surface-border: #e2e8f0;
+
+  --success-color: #3a8251;
+  --warning-color: #cf6118;
+  --error-color: #a82424;
+
+  /* Tipografía | Poppins */
+  --font-family: "Poppins", sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 0.75rem;
+  --font-size-md: 0.95rem;
+  --font-size-lg: 1rem;
+  --font-size-xl: 2rem;
+
+  /* Bordes */
+  --border-radius: 12px;
+  --border-width: 2px;
+}
+
+// --- Estilos Base Globales ---
+body {
+  font-family: var(--font-family);
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+p {
+  color: var(--text-color-secondary);
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: var(--font-size-md);
+
+  a {
+    color: var(--primary-color);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+  }
+}
+
+// --- Overrides Globales de PrimeNG ---
+
+/* Botones (p-button) */
+p-button button,
+.p-button {
+  background-color: var(--primary-color) !important;
+  border: none !important;
+  border-radius: var(--border-radius) !important;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  width: 100%;
+  color: #fff !important;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: var(--secondary-color) !important;
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    background-color: var(--neutral-color) !important;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+/* Inputs (p-inputtext, p-password) */
+.p-inputtext,
+.p-password-input {
+  width: 100%;
+  border: var(--border-width) solid var(--primary-color) !important;
+  border-radius: var(--border-radius) !important;
+  font-size: var(--font-size-lg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: #ffffff !important;
+  color: var(--text-color) !important;
+
+  &:focus {
+    border-color: var(--secondary-color) !important;
+    box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2) !important;
+    outline: none;
+  }
+}
+
+/* Estructura para Floating Labels (p-float-label) */
+.p-float-label {
+  position: relative;
+
+  .p-inputtext,
+  .p-password-input {
+    padding: 1.25rem 1rem 0.5rem 1rem;
+  }
+
+  > label {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    font-size: var(--font-size-md);
+    color: var(--text-color);
+    pointer-events: none;
+    background: transparent;
+    padding: 0 0.25rem;
+    transition: all 0.2s ease;
+  }
+
+  .p-inputtext:focus + label,
+  .p-inputtext.p-filled + label,
+  .p-password .p-password-input:focus + label,
+  .p-password .p-password-input.p-filled + label {
+    top: 0.25rem;
+    font-size: var(--font-size-sm);
+    color: var(--text-color-secondary);
+    background: var(--surface-ground);
+  }
+}
+
+/* Password component (p-password) */
+.p-password {
+  width: 100%;
+  .p-password-input {
+    border-radius: var(--border-radius) !important;
+  }
+}
+
+.p-float-label:has(p-password .p-inputwrapper-focus) > label,
+.p-float-label:has(p-password .p-inputwrapper-filled) > label {
+  top: 0.25rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-color-secondary);
+  background: var(--surface-ground);
+}
+
+/* Checkbox (p-checkbox) */
+.p-checkbox .p-checkbox-box {
+  border: var(--border-width) solid var(--primary-color) !important;
+  background: var(--surface-ground) !important;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.p-checkbox.p-highlight .p-checkbox-box {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.p-checkbox.p-highlight .p-checkbox-box .p-checkbox-icon {
+  color: #ffffff !important;
+}
+
+.p-checkbox:not(.p-checkbox-disabled):hover .p-checkbox-box {
+  border-color: var(--secondary-color) !important;
+}
+
+/* Toast (p-toast) */
+.p-toast {
+  .p-toast-message {
+    border-radius: var(--border-radius);
+    background: var(--surface-ground);
+    border-right-width: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    margin-bottom: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .p-toast-message-content {
+    align-items: flex-start;
+    padding: 1.25rem 1.5rem;
+    gap: 0.875rem;
+  }
+
+  .p-toast-message-icon {
+    display: none !important;
+  }
+
+  .p-toast-summary {
+    font-weight: 700;
+    font-size: var(--font-size-md);
+    line-height: 1.4;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+  }
+
+  .p-toast-detail {
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    color: var(--text-color-secondary);
+    margin: 0;
+  }
+
+  .p-toast-message.p-toast-message-success {
+    border: 1px solid var(--success-color);
+    border-right-width: 6px;
+    background: rgba(58, 130, 81, 0.05);
+    .p-toast-close-icon {
+      color: var(--success-color);
+    }
+    .p-toast-summary {
+      color: var(--success-color);
+    }
+    .p-toast-detail {
+      color: var(--success-color);
+      opacity: 0.9;
+    }
+  }
+
+  .p-toast-message.p-toast-message-warn {
+    border: 1px solid var(--warning-color);
+    border-right-width: 6px;
+    background: rgba(207, 97, 24, 0.05);
+    .p-toast-close-icon {
+      color: var(--warning-color);
+    }
+    .p-toast-summary {
+      color: var(--warning-color);
+    }
+    .p-toast-detail {
+      color: var(--warning-color);
+      opacity: 0.9;
+    }
+  }
+
+  .p-toast-message.p-toast-message-error {
+    border: 1px solid var(--error-color);
+    border-right-width: 6px;
+    background: rgba(168, 36, 36, 0.05);
+    .p-toast-close-icon {
+      color: var(--error-color);
+    }
+    .p-toast-summary {
+      color: var(--error-color);
+    }
+    .p-toast-detail {
+      color: var(--error-color);
+      opacity: 0.9;
+    }
+  }
+
+  .p-toast-message.p-toast-message-info {
+    border: 1px solid var(--secondary-color);
+    border-right-width: 6px;
+    background: rgba(35, 46, 86, 0.05);
+    .p-toast-close-icon {
+      color: var(--secondary-color);
+    }
+    .p-toast-summary {
+      color: var(--secondary-color);
+    }
+    .p-toast-detail {
+      color: var(--secondary-color);
+      opacity: 0.9;
+    }
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .p-toast {
+    width: 50% !important;
+    min-width: 280px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 1rem;
+
+    .p-toast-message {
+      margin-bottom: 0.75rem;
+    }
+
+    .p-toast-message-content {
+      padding: 1rem 1.25rem;
+      gap: 0.75rem;
+    }
+
+    .p-toast-summary {
+      font-size: var(--font-size-md) !important;
+    }
+
+    .p-toast-detail {
+      font-size: var(--font-size-sm) !important;
+    }
+  }
+}
+
+.p-toast-message + .p-toast-message {
+  margin-top: 0.5rem;
+}
+
+// --- 5. Estilos para Componentes Nativos del Navegador ---
+
+/* Estilos para la barra de scroll (WebKit Browsers) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 10px;
+  border: 2px solid var(--surface-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}

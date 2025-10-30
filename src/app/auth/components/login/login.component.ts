@@ -1,14 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  Validators,
+  ValidationErrors,
+  AbstractControl,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { RouterModule, Router } from '@angular/router';
-
-// --- Módulos de PrimeNG ---
+import { Router, RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
+interface LoginForm {
+  email: FormControl<string | null>;
+  password: FormControl<string | null>;
+}
+
+export function institutionalEmailValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  const email = control.value as string;
+  if (email && !email.toLowerCase().endsWith('@uteq.edu.mx')) {
+    return { institutionalEmail: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-login',
@@ -16,57 +37,98 @@ import { PasswordModule } from 'primeng/password';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule,
+    RouterLink,
     InputTextModule,
     ButtonModule,
-    PasswordModule
-],
+    PasswordModule,
+    ToastModule,
+  ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent {
-  loginForm: FormGroup; // Declara la propiedad para el formulario
+export default class LoginComponent {
+  private _formBuilder = inject(FormBuilder);
+  private _authService = inject(AuthService);
+  private _router = inject(Router);
+  private _messageService = inject(MessageService);
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
+  form = this._formBuilder.group<LoginForm>({
+    email: this._formBuilder.control('', [
+      Validators.required,
+      Validators.email,
+      institutionalEmailValidator,
+    ]),
+    password: this._formBuilder.control('', [Validators.required]),
+  });
+
+  private showToast(
+    severity: 'success' | 'info' | 'warn' | 'error',
+    summary: string,
+    detail: string
   ) {
-    // Inicializa el formulario en el constructor
-    this.loginForm = this.fb.group({
-      // Define los controles: 'email' y 'password'
-      // El valor inicial es '', y luego vienen los validadores.
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
-    });
+    this._messageService.add({ severity, summary, detail });
   }
 
   async onSubmit() {
-    // Si el formulario no es válido, no hagas nada.
-    if (this.loginForm.invalid) {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      const emailErrors = this.form.controls.email.errors;
+
+      if (emailErrors?.['required']) {
+        this.showToast(
+          'warn',
+          'Error en el formulario',
+          'El correo es requerido.'
+        );
+      } else if (emailErrors?.['email']) {
+        this.showToast(
+          'warn',
+          'Error en el formulario',
+          'El formato del correo no es válido.'
+        );
+      } else if (emailErrors?.['institutionalEmail']) {
+        this.showToast(
+          'warn',
+          'Error en el formulario',
+          'El correo debe ser institucional (@uteq.edu.mx).'
+        );
+      } else if (this.form.controls.password.errors) {
+        this.showToast(
+          'warn',
+          'Error en el formulario',
+          'La contraseña es requerida.'
+        );
+      }
       return;
     }
 
-    // Deshabilita el formulario para evitar doble envío
-    this.loginForm.disable();
+    this.form.disable();
 
-    // Extrae los valores del formulario
-    const email = this.loginForm.value.email;
-    const password = this.loginForm.value.password;
+    try {
+      const authResponse = await this._authService.logIn({
+        email: this.form.value.email ?? '',
+        password: this.form.value.password ?? '',
+      });
 
-    // Llama al servicio de autenticación
-    const { user, error } = await this.authService.signInWithEmail(email, password);
+      if (authResponse.error) {
+        throw authResponse.error;
+      }
 
-    if (error) {
-      console.error('Error en el login:', error.message);
-      // Aquí mostraremos un mensaje de error al usuario (ej. con un Toast de PrimeNG)
-      // Vuelve a habilitar el formulario si hay un error
-      this.loginForm.enable();
-    } else {
-      console.log('¡Inicio de sesión exitoso!', user);
-      // Si el login es correcto, aquí redirigiremos al dashboard principal.
-      //Provisional
-      this.router.navigate(['/viajes'])
+      this.showToast(
+        'success',
+        '¡Bienvenido!',
+        'Has iniciado sesión correctamente.'
+      );
+      setTimeout(() => {
+        this._router.navigate(['/']);
+      }, 3000);
+    } catch (error) {
+      this.form.enable();
+      this.showToast(
+        'error',
+        'Error al iniciar sesión',
+        'Credenciales inválidas. Por favor, verifica tu correo y contraseña.'
+      );
     }
   }
 }
