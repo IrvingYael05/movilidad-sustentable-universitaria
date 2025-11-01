@@ -1,11 +1,28 @@
-import { NgModule } from '@angular/core';
+// src/app/pages/pages-routing.module.ts
+
 import { Routes } from '@angular/router';
-import {ViajesComponent} from './viajes/viajes.component';
+import { ViajesComponent } from './viajes/viajes.component';
+import { NuevoViajeComponent } from './nuevo-viaje/nuevo-viaje.component';
+import { MiPerfilComponent } from './mi-perfil/mi-perfil.component';
+import { MiVehiculoComponent } from './mi-vehiculo/mi-vehiculo.component';
+
 
 export default [
   {
     path: '',
-    loadComponent: () => ViajesComponent
+    component: ViajesComponent
+  },
+  {
+    path: 'mi-perfil',
+    component: MiPerfilComponent
+  },
+  {
+    path: 'mi-vehiculo',
+    component: MiVehiculoComponent
+  },
+  {
+    path: 'nuevo-viaje',
+    component: NuevoViajeComponent
   },
   {
     path: '**',

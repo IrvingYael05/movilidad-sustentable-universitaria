@@ -1,14 +1,15 @@
 // --- Importaciones ---
+@import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
 
 // --- Variables de CSS ---
 :root {
   /* Paleta de Colores */
-  --primary-color: #244e7c;
-  --secondary-color: #232e56;
+  --primary-color: #232e56;
+  --secondary-color: #244e7c;
   --neutral-color: #71706f;
 
-  --text-color: #244e7c;
+  --text-color: #232e56;
   --text-color-secondary: #71706f;
 
   --surface-ground: #ffffff;
@@ -37,7 +38,11 @@ body {
   background-color: var(--surface-ground);
   color: var(--text-color);
   margin: 0;
-  padding: 20px;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
 }
 
 h1 {
@@ -221,7 +226,7 @@ p-button button,
   .p-toast-message.p-toast-message-success {
     border: 1px solid var(--success-color);
     border-right-width: 6px;
-    background: rgba(58, 130, 81, 0.05);
+    background: #e8f3ec;
     .p-toast-close-icon {
       color: var(--success-color);
     }
@@ -237,7 +242,7 @@ p-button button,
   .p-toast-message.p-toast-message-warn {
     border: 1px solid var(--warning-color);
     border-right-width: 6px;
-    background: rgba(207, 97, 24, 0.05);
+    background: #fdf2ea;
     .p-toast-close-icon {
       color: var(--warning-color);
     }
@@ -253,7 +258,7 @@ p-button button,
   .p-toast-message.p-toast-message-error {
     border: 1px solid var(--error-color);
     border-right-width: 6px;
-    background: rgba(168, 36, 36, 0.05);
+    background: #f7e8e8;
     .p-toast-close-icon {
       color: var(--error-color);
     }
@@ -269,7 +274,7 @@ p-button button,
   .p-toast-message.p-toast-message-info {
     border: 1px solid var(--secondary-color);
     border-right-width: 6px;
-    background: rgba(35, 46, 86, 0.05);
+    background: #e8eaf2;
     .p-toast-close-icon {
       color: var(--secondary-color);
     }
@@ -314,7 +319,7 @@ p-button button,
   margin-top: 0.5rem;
 }
 
-// --- 5. Estilos para Componentes Nativos del Navegador ---
+// --- Estilos para Componentes Nativos del Navegador ---
 
 /* Estilos para la barra de scroll (WebKit Browsers) */
 ::-webkit-scrollbar {

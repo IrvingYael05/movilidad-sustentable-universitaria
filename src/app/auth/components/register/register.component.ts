@@ -114,6 +114,7 @@ export default class RegisterComponent {
   private _router = inject(Router);
   private _messageService = inject(MessageService);
   showVehicleForm = false;
+  isLoading = false;
 
   form = this._formBuilder.group<RegisterForm>({
     perfil: this._formBuilder.group({
@@ -190,7 +191,6 @@ export default class RegisterComponent {
   async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      const errors = this.form.errors;
       const controls = this.form.controls;
 
       if (controls.perfil.get('nombre')?.errors?.['lettersOnly']) {
@@ -234,6 +234,7 @@ export default class RegisterComponent {
     }
 
     this.form.disable();
+    this.isLoading = true;
 
     try {
       const formValue = this.form.getRawValue();
@@ -245,7 +246,12 @@ export default class RegisterComponent {
 
       if (error) throw error;
 
-      if (data.user && data.user.identities && data.user.identities.length === 0) {
+      if (
+        data.user &&
+        data.user.identities &&
+        data.user.identities.length === 0
+      ) {
+        this.isLoading = false;
         this.form.enable();
         this._messageService.add({
           severity: 'error',
@@ -275,6 +281,7 @@ export default class RegisterComponent {
         this._router.navigate(['/auth/login']);
       }, 3000);
     } catch (error) {
+      this.isLoading = false;
       this.form.enable();
       this._messageService.add({
         severity: 'error',

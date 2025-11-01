@@ -1,0 +1,57 @@
+<p-toolbar>
+  <div class="p-toolbar-group-start">
+    <img src="icons/favicon2.svg" alt="Logo Ecomovi" class="header-logo" [routerLink]="['/']" />
+  </div>
+
+  <div class="p-toolbar-group-center"></div>
+
+  <div class="p-toolbar-group-end">
+    <p-button
+      icon="pi pi-bars"
+      (click)="toggleSidebar()"
+      styleClass="p-button-secondary p-button-text"
+    />
+  </div>
+</p-toolbar>
+
+<nav class="custom-menubar">
+  <a
+    *ngFor="let item of menuBarItems"
+    class="menubar-item"
+    [routerLink]="item.routerLink"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: item.routerLink === '/' }"
+  >
+    <span>{{ item.label }}</span>
+  </a>
+</nav>
+
+<div
+  class="sidebar-overlay"
+  [class.active]="sidebarVisible"
+  (click)="closeSidebar()"
+></div>
+
+<aside class="custom-sidebar" [class.active]="sidebarVisible">
+  <nav class="sidebar-menu">
+    <a
+      *ngFor="let item of sidebarItems"
+      class="menu-item"
+      (click)="onSidebarItemClick(item)"
+    >
+      <i [class]="item.icon"></i>
+      <span>{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <div class="menu-footer">
+    <p class="version">V1.0 - EcoMovi 2025</p>
+    <a class="privacy-link">Aviso de Privacidad</a>
+  </div>
+</aside>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<p-toast></p-toast>
