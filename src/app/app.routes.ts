@@ -5,9 +5,9 @@ import { MainLayoutComponent } from './core/layout/main-layout/main-layout.compo
 export const routes: Routes = [
   {
     path: 'auth',
-    canActivate: [publicGuard], 
-    
-    loadChildren: () => import('./auth/auth-routing.module').then(m => m.default)
+    canActivate: [publicGuard],
+    loadChildren: () =>
+      import('./auth/auth-routing.module').then((m) => m.default),
   },
   {
     path: '',
