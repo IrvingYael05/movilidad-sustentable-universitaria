@@ -1,150 +1,211 @@
-.container {
-  height: 100vh;
+/* ===================================
+   VIAJES COMPONENT - MISMO ESTILO QUE MI PERFIL
+   =================================== */
+:host {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff; /* Fondo blanco */
+  min-height: 100vh;
+  background-color: #ffffff;
   font-family: 'Poppins', sans-serif;
-  color: #244e7c; /* Texto primario */
+  color: #244e7c;
 }
 
+/* HEADER (azul marino como en el diseño) */
 .header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background-color: #244e7c; /* Azul marino */
+  align-items: center;
+  background-color: #244e7c;
   color: white;
-  padding: 10px 15px;
-  border-bottom: 1px solid #d1d5db;
+  padding: 1rem;
+  font-weight: 600;
 
   .logo {
-    width: 30px;
-    height: 30px;
-  }
-
-  .tabs {
-    display: flex;
-    gap: 20px;
-
-    .tab {
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-
-      &.active {
-        color: #fff;
-        border-bottom: 2px solid #fff;
-      }
-
-      &:not(.active) {
-        color: #cbd5e1; /* gris claro */
-      }
-    }
+    width: 32px;
+    height: 32px;
   }
 
   .menu-icon {
-    font-size: 24px;
+    font-size: 1.5rem;
     cursor: pointer;
   }
 }
 
-.search-container {
-  padding: 15px;
+/* TABS */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 1rem 0;
   background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
 
-  .p-inputgroup {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    border: 2px solid #244e7c; /* Azul marino */
-    border-radius: 12px;
-    overflow: hidden;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  .tab {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #71706f;
+    position: relative;
+    cursor: pointer;
+    padding-bottom: 0.5rem;
 
-    &:focus-within {
-      border-color: #232e56; /* Azul institucional */
-      box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2);
-    }
-
-    .search-input {
-      flex: 1;
-      border: none;
-      padding: 8px 12px;
-      font-size: 14px;
-      outline: none;
+    &.active {
       color: #244e7c;
-
-      &::placeholder {
-        color: #71706f; /* gris neutro */
-      }
-    }
-
-    .search-button {
-      background-color: #244e7c;
-      border: none;
-      color: white;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-left: 1px solid #d1d5db;
-      flex-shrink: 0;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-
-      &:hover {
-        background-color: #232e56; /* Azul institucional */
-        transform: translateY(-1px);
+      &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #244e7c;
+        border-radius: 2px;
       }
     }
   }
 }
 
-.trips-list {
-  flex: 1;
-  padding: 0 15px;
-  overflow-y: auto;
+/* SEARCH BAR */
+.search-container {
+  padding: 1rem;
+  background-color: #fff;
 
-  .trip-card {
+  .search-input-group {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: #fff;
-    padding: 15px;
-    margin-bottom: 10px;
+    border: 2px solid #244e7c;
     border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(36, 78, 124, 0.1); /* sombra azul suave */
-    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
-    .trip-details {
+    &:focus-within {
+      border-color: #232e56;
+      box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2);
+    }
+
+    input {
       flex: 1;
+      border: none;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      outline: none;
+      color: #244e7c;
 
-      div {
-        font-size: 14px;
-        color: #71706f; /* gris neutro */
-
-        strong {
-          color: #244e7c; /* azul marino */
-        }
+      &::placeholder {
+        color: #71706f;
       }
     }
 
-    .join-button {
-      background-color: #244e7c;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-
-      &:hover {
-        background-color: #232e56;
-        transform: translateY(-2px);
-      }
-
-      &:disabled {
-        background-color: #71706f;
-        cursor: not-allowed;
-      }
+    .search-icon {
+      padding: 0 1rem;
+      color: #71706f;
+      font-size: 1.2rem;
     }
   }
+}
+
+/* LISTA DE VIAJES */
+.trips-list {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+/* TARJETA DE VIAJE */
+.trip-card {
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(36, 78, 124, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(36, 78, 124, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .trip-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    .conductor-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #244e7c;
+    }
+
+    .detail {
+      font-size: 0.9rem;
+      color: #71706f;
+    }
+
+    .seats {
+      font-weight: 600;
+      color: #244e7c;
+    }
+  }
+}
+
+/* BOTÓN */
+:host ::ng-deep .join-button {
+  background-color: #244e7c !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  min-width: 120px;
+  transition: all 0.3s ease !important;
+
+  &:hover {
+    background-color: #232e56 !important;
+    transform: translateY(-2px) !important;
+  }
+
+  &:disabled {
+    background-color: #71706f !important;
+    cursor: not-allowed !important;
+  }
+}
+
+/* ESTADO VACÍO */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #71706f;
+  font-size: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  border: 1px dashed #d1d5db;
+}
+
+/* LOADER */
+.loader {
+  text-align: center;
+  padding: 3rem 1rem;
+
+  i {
+    font-size: 2.5rem;
+    color: #244e7c;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    margin-top: 1rem;
+    color: #71706f;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
