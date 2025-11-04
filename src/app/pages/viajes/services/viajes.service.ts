@@ -29,7 +29,7 @@ export class ViajesService {
           apellido
         )
       `)
-      .eq('estado_viaje', 'scheduled') // Solo viajes programados
+      .eq('estado_viaje', 'activo') // Solo viajes programados
       .order('hora_salida', { ascending: true });
 
     if (error) throw error;
