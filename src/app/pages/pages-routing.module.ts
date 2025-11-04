@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { ViajesComponent } from './viajes/viajes.component';
-import { NuevoViajeComponent } from './nuevo-viaje/nuevo-viaje.component';
+import NuevoViajeComponent from './nuevo-viaje/nuevo-viaje.component';
 import { MiPerfilComponent } from './mi-perfil/mi-perfil.component';
 import { MiVehiculoComponent } from './mi-vehiculo/mi-vehiculo.component';
 
