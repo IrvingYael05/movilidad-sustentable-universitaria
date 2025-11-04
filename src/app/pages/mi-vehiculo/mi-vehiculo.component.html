@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <div class="flex flex-column align-items-center p-4">
   <img src="icons/icon-192x192.png" alt="Logo Ecomovi" class="mb-4" style="width: 140px;">
 
@@ -15,6 +16,20 @@
     <div class="p-float-label">
       <input id="modelo" type="text" pInputText class="w-full" [(ngModel)]="vehiculo.modelo" name="modelo" placeholder=" " />
       <label for="modelo">Modelo</label>
+    </div>
+
+    <!-- Año -->
+    <div class="p-float-label">
+      <input
+        id="ano"
+        type="number"
+        pInputText
+        class="w-full"
+        [(ngModel)]="vehiculo.ano"
+        name="ano"
+        placeholder=" "
+      />
+      <label for="ano">Año</label>
     </div>
 
     <!-- Color -->
