@@ -47,17 +47,32 @@ export class PerfilService {
     if (error) throw error;
     return data;
   }
-
-  // 🔹 Cambiar contraseña
+  
   async cambiarPassword(actual: string, nueva: string) {
-    const { data: sessionData } = await this._supabase.auth.getSession();
-    if (!sessionData.session?.user) throw new Error('No hay sesión activa');
+    // 1. Obtener sesión
+    const { data: sessionData, error: sessionError } = await this._supabase.auth.getSession();
+    if (sessionError || !sessionData.session?.user) throw new Error('No hay sesión activa');
 
-    const { data, error } = await this._supabase.auth.updateUser({
+    const user = sessionData.session.user;
+
+    // 2. Reautenticar (verificar contraseña actual)
+    const { error: signInError } = await this._supabase.auth.signInWithPassword({
+      email: user.email,
+      password: actual,
+    });
+
+    if (signInError) {
+      throw new Error('La contraseña actual es incorrecta');
+    }
+
+    // 3. Si pasa la verificación, actualizar la contraseña
+    const { error: updateError } = await this._supabase.auth.updateUser({
       password: nueva,
     });
 
-    if (error) throw error;
-    return data;
+    if (updateError) throw updateError;
+
+    // 4. Éxito
+    return { success: true };
   }
 }
