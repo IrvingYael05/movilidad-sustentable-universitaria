@@ -29,12 +29,9 @@ export interface Viaje {
 export class ViajesService {
   private _supabase = inject(SupabaseService).supabaseClient;
 
-  /**
-   * Crea un nuevo viaje en la base de datos
-   */
+  /** 🟢 Crea un nuevo viaje en la base de datos */
   async crearViaje(viajeData: NuevoViajeData) {
     try {
-      // Convertir hora a timestamptz (agregar fecha de hoy)
       const today = new Date();
       const [hours, minutes] = viajeData.hora_salida.split(':');
       today.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
@@ -54,7 +51,6 @@ export class ViajesService {
         .single();
 
       if (error) throw error;
-
       return { data, error: null };
     } catch (error) {
       console.error('Error al crear viaje:', error);
@@ -62,15 +58,12 @@ export class ViajesService {
     }
   }
 
-  /**
-   * Obtiene todos los viajes activos
-   */
+  /** 🟢 Obtiene todos los viajes activos (para vista general o admin) */
   async obtenerViajesActivos() {
     try {
       const { data, error } = await this._supabase
         .from('viajes')
-        .select(
-          `
+        .select(`
           *,
           conductor:usuarios!conductor_id (
             usuario_id,
@@ -86,13 +79,11 @@ export class ViajesService {
             color,
             ano
           )
-        `
-        )
+        `)
         .eq('estado_viaje', 'activo')
         .order('hora_salida', { ascending: true });
 
       if (error) throw error;
-
       return { data, error: null };
     } catch (error) {
       console.error('Error al obtener viajes:', error);
@@ -100,9 +91,7 @@ export class ViajesService {
     }
   }
 
-  /**
-   * Obtiene los viajes de un conductor específico
-   */
+  /** 🟢 Obtiene todos los viajes de un conductor (historial) */
   async obtenerViajesConductor(conductorId: string) {
     try {
       const { data, error } = await this._supabase
@@ -112,7 +101,6 @@ export class ViajesService {
         .order('creado_en', { ascending: false });
 
       if (error) throw error;
-
       return { data, error: null };
     } catch (error) {
       console.error('Error al obtener viajes del conductor:', error);
@@ -120,9 +108,27 @@ export class ViajesService {
     }
   }
 
-  /**
-   * Actualiza el estado de un viaje
-   */
+  /** 🟢 Obtiene SOLO el viaje activo del conductor actual */
+  async obtenerViajeActivoConductor(conductorId: string) {
+    try {
+      const { data, error } = await this._supabase
+        .from('viajes')
+        .select('*')
+        .eq('conductor_id', conductorId)
+        .eq('estado_viaje', 'activo')
+        .order('creado_en', { ascending: false })
+        .limit(1)
+        .single(); // Solo devuelve uno
+
+      if (error && error.code !== 'PGRST116') throw error; // Ignorar "no rows found"
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener viaje activo:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** 🟡 Actualiza el estado de un viaje (activo/inactivo) */
   async actualizarEstadoViaje(viajeId: string, nuevoEstado: string) {
     try {
       const { data, error } = await this._supabase
@@ -133,7 +139,6 @@ export class ViajesService {
         .single();
 
       if (error) throw error;
-
       return { data, error: null };
     } catch (error) {
       console.error('Error al actualizar estado del viaje:', error);

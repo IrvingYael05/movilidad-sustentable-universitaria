@@ -1,0 +1,91 @@
+<div
+  class="flex flex-column align-items-center justify-content-center min-h-screen p-4 surface-ground overflow-auto"
+>
+  <div class="w-full md:w-30rem">
+    <!-- Título -->
+    <div class="text-center mb-4">
+      <p class="text-secondary mb-4 mt-2">
+        Aquí puedes ver los detalles del viaje que publicaste
+      </p>
+    </div>
+
+    <!-- Si no hay viaje activo -->
+    <div *ngIf="!viajeActivo" class="text-center">
+      <p class="text-secondary">
+        No tienes ningún viaje activo por el momento.
+      </p>
+
+      <p-button
+        label="Publicar un nuevo viaje"
+        styleClass="publish-btn mt-3"
+        (click)="irANuevoViaje()"
+      ></p-button>
+    </div>
+
+    <!-- Si hay un viaje activo -->
+    <div *ngIf="viajeActivo" class="viaje-card mt-3">
+      <div class="section-header mb-2">
+        <label class="font-semibold">Punto de partida</label>
+        <p>{{ viajeActivo.lugar_salida }}</p>
+      </div>
+
+      <div class="section-header mb-2">
+        <label class="font-semibold">Destino</label>
+        <p>{{ viajeActivo.lugar_llegada }}</p>
+      </div>
+
+      <div class="section-header mb-2">
+        <label class="font-semibold">Hora de salida</label>
+        <p>{{ viajeActivo.hora_salida | date: 'shortTime' }}</p>
+      </div>
+
+      <div class="section-header mb-3">
+        <label class="font-semibold">Lugares disponibles</label>
+        <p>{{ viajeActivo.asientos_disponibles }}</p>
+      </div>
+
+      <div class="flex justify-content-end mt-3">
+        <p-button
+          label="Eliminar viaje"
+          styleClass="delete-btn"
+          (click)="eliminarViaje(viajeActivo.viaje_id)"
+        ></p-button>
+      </div>
+    </div>
+
+    <!-- 🔹 Tus Solicitudes -->
+    <div *ngIf="viajeActivo" class="solicitudes-card mt-5">
+      <h3 class="text-center text-xl font-bold mb-3">Tus Solicitudes</h3>
+
+      <div
+        class="solicitud-item mb-3 p-3 border-round surface-card shadow-1 flex justify-content-between align-items-center"
+      >
+        <div>
+          <p class="font-semibold m-0">Nombre cualquiera</p>
+          <small class="text-secondary">correo&#64;ejemplo.com</small>
+        </div>
+        <p-button label="Aceptar" styleClass="accept-btn"></p-button>
+      </div>
+
+      <div
+        class="solicitud-item mb-3 p-3 border-round surface-card shadow-1 flex justify-content-between align-items-center"
+      >
+        <div>
+          <p class="font-semibold m-0">Nombre cualquiera</p>
+          <small class="text-secondary">correo&#64;ejemplo.com</small>
+        </div>
+        <p-button label="Aceptar" styleClass="accept-btn"></p-button>
+      </div>
+
+      <div
+        class="solicitud-item mb-3 p-3 border-round surface-card shadow-1 flex justify-content-between align-items-center"
+      >
+        <div>
+          <p class="font-semibold m-0">Nombre cualquiera</p>
+          <small class="text-secondary">correo&#64;ejemplo.com</small>
+        </div>
+        <p-button label="Aceptar" styleClass="accept-btn"></p-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -212,7 +212,7 @@ export default class NuevoViajeComponent implements OnInit {
         conductor_id: this.usuarioId,
         vehiculo_id: this.vehiculoId,
         lugar_salida: direccionCompleta,
-        lugar_llegada: 'UTEQ', // Puedes hacer esto dinámico si lo necesitas
+        lugar_llegada: 'UTEQ', // Puedes hacerlo dinámico después
         hora_salida: this.viaje.hora,
         asientos_disponibles: this.viaje.lugaresDisponibles,
         estado_viaje: 'activo',
@@ -240,9 +240,9 @@ export default class NuevoViajeComponent implements OnInit {
       };
       this.pasajeros = [1];
 
-      // Redirigir después de 2 segundos
+      // ✅ Redirigir correctamente a lista-viajes
       setTimeout(() => {
-        this.router.navigate(['/']); // O la ruta que prefieras
+        this.router.navigate(['/lista-viajes']);
       }, 2000);
     } catch (error) {
       console.error('Error al publicar viaje:', error);

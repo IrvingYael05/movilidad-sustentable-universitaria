@@ -1,0 +1,92 @@
+/* Contenedor general */
+.viaje-card,
+.solicitudes-card {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.viaje-card:hover,
+.solicitudes-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* Secciones del viaje */
+.section-header label {
+  color: #1b2559;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.section-header p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+/* Botones */
+.publish-btn {
+  background-color: #1b2559;
+  border: none;
+  color: #fff;
+  border-radius: 0.6rem;
+  transition: background-color 0.3s ease;
+}
+
+.publish-btn:hover {
+  background-color: #293377;
+}
+
+.delete-btn {
+  background-color: #c81e1e;
+  border: none;
+  color: #fff;
+  border-radius: 0.6rem;
+  transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #a51b1b;
+}
+
+/* Solicitudes */
+.solicitud-item {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.solicitud-item:hover {
+  background-color: #f3f4f6;
+  transform: translateY(-2px);
+}
+
+.accept-btn {
+  background-color: #1b2559;
+  border: none;
+  color: #fff;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.accept-btn:hover {
+  background-color: #293377;
+}
+
+/* Texto */
+.text-secondary {
+  color: #6b7280;
+}
+
+/* Animación sutil de entrada */
+:host ::ng-deep .p-button {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}

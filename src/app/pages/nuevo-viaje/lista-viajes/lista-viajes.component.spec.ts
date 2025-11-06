@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AutoCompartidoComponent } from './auto-compartido.component';
+import { ListaViajesComponent } from './lista-viajes.component';
 
-describe('AutoCompartidoComponent', () => {
-  let component: AutoCompartidoComponent;
-  let fixture: ComponentFixture<AutoCompartidoComponent>;
+describe('ListaViajesComponent', () => {
+  let component: ListaViajesComponent;
+  let fixture: ComponentFixture<ListaViajesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AutoCompartidoComponent]
+      imports: [ListaViajesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AutoCompartidoComponent);
+    fixture = TestBed.createComponent(ListaViajesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
