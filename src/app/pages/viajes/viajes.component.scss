@@ -76,6 +76,7 @@
     border-radius: 12px;
     overflow: hidden;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fff;
 
     &:focus-within {
       border-color: #232e56;
@@ -89,9 +90,11 @@
       font-size: 1rem;
       outline: none;
       color: #244e7c;
+      background-color: #fff;
 
       &::placeholder {
         color: #71706f;
+        
       }
     }
 
@@ -99,6 +102,7 @@
       padding: 0 1rem;
       color: #71706f;
       font-size: 1.2rem;
+      
     }
   }
 }
