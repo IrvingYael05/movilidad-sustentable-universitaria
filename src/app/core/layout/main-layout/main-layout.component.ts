@@ -72,8 +72,9 @@ export class MainLayoutComponent {
     if (roles.includes('conductor')) {
       items.push({ label: 'Viajes', routerLink: '/' });
       items.push({ label: 'Nuevo Viaje', routerLink: '/nuevo-viaje' });
+      items.push({ label: 'Auto Compartido', routerLink: '/lista-viajes' });
     }
-
+ 
     // Opciones para el rol 'guardia'
     if (roles.includes('guardia')) {
       items.push({ label: 'Validación de Acceso', routerLink: '/escanear-qr' });
