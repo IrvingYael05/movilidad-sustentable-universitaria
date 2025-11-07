@@ -1,52 +1,37 @@
-
-<!-- SEARCH -->
+<!-- viajes.component.html -->
 <div class="search-container">
   <div class="search-input-group">
-    <input
-      type="text"
-      placeholder="Buscar viaje por usuario/salida..."
-      [(ngModel)]="searchTerm"
-      (keyup.enter)="onSearch()">
+    <input type="text" placeholder="Buscar viaje..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
     <i class="pi pi-search search-icon"></i>
   </div>
 </div>
-<!-- ... header, tabs, search ... -->
 
-<!-- CONTENIDO -->
 <div class="trips-list">
-  <!-- Loader -->
   <div *ngIf="cargando" class="loader">
     <i class="pi pi-spin pi-spinner"></i>
     <p>Cargando viajes...</p>
   </div>
 
-  <!-- Sin resultados -->
   <div *ngIf="!cargando && viajesFiltrados.length === 0" class="empty-state">
     <p *ngIf="searchTerm">No se encontraron viajes para "{{ searchTerm }}"</p>
     <p *ngIf="!searchTerm">No hay viajes disponibles en este momento.</p>
   </div>
 
-  <!-- Viajes -->
   <div *ngFor="let viaje of viajesFiltrados" class="trip-card">
     <div class="trip-details">
-      <div class="conductor-name">
-        {{ viaje.usuarios.nombre }} {{ viaje.usuarios.apellido }}
-      </div>
-      <div class="detail">{{ viaje.lugar_salida }}</div>
+      <div class="conductor-name">{{ viaje.usuarios.nombre }} {{ viaje.usuarios.apellido }}</div>
+      <div class="detail">{{ viaje.lugar_salida }} → {{ viaje.lugar_llegada }}</div>
       <div class="detail">{{ viaje.hora_salida }}</div>
-      <div class="detail seats">
-        {{ viaje.asientos_disponibles }} lugares disponibles
-      </div>
+      <div class="detail seats">{{ viaje.asientos_disponibles }} lugares</div>
     </div>
 
-    <!-- viajes.component.html -->
-<button
-  pButton
-  [label]="viaje.solicitud_pendiente ? 'Pendiente' : (viaje.asientos_disponibles === 0 ? 'Sin asientos' : 'Solicitar Unirme')"
-  class="join-button"
-  [disabled]="viaje.asientos_disponibles === 0 || viaje.solicitud_pendiente"
-  (click)="onJoin(viaje)">
-</button>
+    <button
+      pButton
+      [label]="getBotonLabel(viaje)"
+      [disabled]="!getBotonEnabled(viaje)"
+      class="join-button"
+      (click)="onJoin(viaje)">
+    </button>
   </div>
 </div>
 

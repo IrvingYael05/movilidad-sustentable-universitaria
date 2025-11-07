@@ -164,9 +164,8 @@
   font-weight: 600 !important;
   color: #fff !important;
   min-width: 120px;
-  transition: all 0.3s ease !important;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: #232e56 !important;
     transform: translateY(-2px) !important;
   }
@@ -174,6 +173,21 @@
   &:disabled {
     background-color: #71706f !important;
     cursor: not-allowed !important;
+    opacity: 0.7;
+  }
+
+  &[ng-reflect-label="Pendiente"] {
+    background-color: #b1b1b1 !important;
+    &:hover { background-color: #cfcfcf !important; }
+  }
+
+  &[ng-reflect-label="Viaje en curso"] {
+    background-color: #dc2626 !important;
+    &:hover { background-color: #b91c1c !important; }
+  }
+
+  &[ng-reflect-label="Sin asientos"] {
+    background-color: #6b7280 !important;
   }
 }
 

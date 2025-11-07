@@ -8,9 +8,7 @@ import { SupabaseService } from '../../../shared/data-access/supabase.service';
 export class ViajesService {
   private _supabase = inject(SupabaseService).supabaseClient;
 
-  constructor() {}
-
-  // Obtener todos los viajes disponibles con datos del conductor
+  // Obtener viajes disponibles (solo 'activo')
   async obtenerViajes() {
     const { data, error } = await this._supabase
       .from('viajes')
@@ -29,55 +27,56 @@ export class ViajesService {
           apellido
         )
       `)
-      .eq('estado_viaje', 'activo') // Solo viajes programados
+      .eq('estado_viaje', 'activo')
       .order('hora_salida', { ascending: true });
 
     if (error) throw error;
     return data;
   }
 
-  // Solicitar unirse a un viaje
+  // ¿El usuario tiene un viaje activo?
+  async usuarioTieneViajeActivo(usuarioId: string): Promise<boolean> {
+    const { data, error } = await this._supabase
+      .rpc('usuario_tiene_viaje_activo', { uid: usuarioId })
+      .single();
+
+    if (error) {
+      console.error('Error RPC:', error);
+      throw error;
+    }
+    return data;
+  }
+
+  // ¿Ya tiene solicitud pendiente?
+  async tieneSolicitudPendiente(viajeId: string, usuarioId: string): Promise<boolean> {
+    const { data, error } = await this._supabase
+      .from('solicitudesviaje')
+      .select('solicitud_id')
+      .eq('viaje_id', viajeId)
+      .eq('pasajero_id', usuarioId)
+      .eq('estado_solicitud', 'pendiente')
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return !!data;
+  }
+
+  // Solicitar unirse
   async solicitarUnirse(viajeId: string, usuarioId: string) {
-  const { data: { user }, error: authError } = await this._supabase.auth.getUser();
+    const { data: { user }, error: authError } = await this._supabase.auth.getUser();
+    if (!user) throw new Error('Debes iniciar sesión');
 
-  if (!user) {
-    console.error('⚠️ Usuario no autenticado');
-    throw new Error('Debes iniciar sesión para solicitar un viaje');
+    const { data, error } = await this._supabase
+      .from('solicitudesviaje')
+      .insert({
+        viaje_id: viajeId,
+        pasajero_id: user.id,
+        estado_solicitud: 'pendiente',
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
-
-  console.log('UID autenticado:', user.id);
-
-  const { data, error } = await this._supabase
-    .from('solicitudesviaje')
-    .insert({
-      viaje_id: viajeId,
-      pasajero_id: user.id, // UUID del usuario autenticado
-      estado_solicitud: 'pendiente',
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error insertando solicitud:', error);
-    throw error;
-  }
-
-  return data;
-}
-
-async tieneSolicitudPendiente(viajeId: string, usuarioId: string) {
-  const { data, error } = await this._supabase
-    .from('solicitudesviaje')
-    .select('solicitud_id')
-    .eq('viaje_id', viajeId)
-    .eq('pasajero_id', usuarioId)
-    .eq('estado_solicitud', 'pendiente')
-    .maybeSingle();
-
-  if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
-    throw error;
-  }
-
-  return !!data; // true si existe, false si no
-}
 }
