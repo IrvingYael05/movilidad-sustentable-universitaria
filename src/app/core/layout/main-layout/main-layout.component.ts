@@ -66,13 +66,14 @@ export class MainLayoutComponent {
     // Opciones para roles 'usuario''
     if (roles.includes('usuario')) {
       items.push({ label: 'Viajes', routerLink: '/' });
+      items.push({ label: 'Mi Viaje', routerLink: '/lista-viajes' });
     }
 
     // Opciones para roles 'conductor'
     if (roles.includes('conductor')) {
       items.push({ label: 'Viajes', routerLink: '/' });
       items.push({ label: 'Nuevo Viaje', routerLink: '/nuevo-viaje' });
-      items.push({ label: 'Auto Compartido', routerLink: '/lista-viajes' });
+      items.push({ label: 'Mi Viaje', routerLink: '/lista-viajes' });
     }
  
     // Opciones para el rol 'guardia'
