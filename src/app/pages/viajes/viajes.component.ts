@@ -19,6 +19,7 @@ interface Viaje {
   estado_viaje: string;
   usuarios: { nombre: string; apellido: string };
   solicitud_pendiente: boolean;
+  es_mio: boolean; // ← NUEVO
 }
 
 @Component({
@@ -69,48 +70,50 @@ export class ViajesComponent implements OnInit {
   }
 
   private async cargarViajes() {
-    try {
-      this.cargando = true;
-      const data = await this.viajesService.obtenerViajes();
+  try {
+    this.cargando = true;
+    const data = await this.viajesService.obtenerViajes();
 
-      const viajesProcesados = await Promise.all(
-        data.map(async (v: any) => {
-          const viaje: Viaje = {
-            viaje_id: v.viaje_id,
-            conductor_id: v.conductor_id,
-            lugar_salida: v.lugar_salida,
-            lugar_llegada: v.lugar_llegada,
-            hora_salida: new Date(v.hora_salida).toLocaleString('es-MX', {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit'
-            }),
-            asientos_disponibles: v.asientos_disponibles,
-            estado_viaje: v.estado_viaje,
-            usuarios: v.usuarios || { nombre: 'Conductor', apellido: '' },
-            solicitud_pendiente: false
-          };
+    const viajesProcesados = await Promise.all(
+      data.map(async (v: any) => {
+        const viaje: Viaje = {
+          viaje_id: v.viaje_id,
+          conductor_id: v.conductor_id,
+          lugar_salida: v.lugar_salida,
+          lugar_llegada: v.lugar_llegada,
+          hora_salida: new Date(v.hora_salida).toLocaleString('es-MX', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          asientos_disponibles: v.asientos_disponibles,
+          estado_viaje: v.estado_viaje,
+          usuarios: v.usuarios || { nombre: 'Conductor', apellido: '' },
+          solicitud_pendiente: false,
+          es_mio: v.conductor_id === this.usuarioId // ← NUEVO: saber si es del conductor
+        };
 
-          if (this.usuarioId && viaje.conductor_id !== this.usuarioId) {
-            viaje.solicitud_pendiente = await this.viajesService.tieneSolicitudPendiente(viaje.viaje_id, this.usuarioId);
-          }
+        // Solo verificar solicitud si NO es su propio viaje
+        if (this.usuarioId && viaje.conductor_id !== this.usuarioId) {
+          viaje.solicitud_pendiente = await this.viajesService.tieneSolicitudPendiente(viaje.viaje_id, this.usuarioId);
+        }
 
-          return viaje;
-        })
-      );
+        return viaje;
+      })
+    );
 
-      // Excluir viajes propios del conductor
-      this.viajes = viajesProcesados.filter(v => v.conductor_id !== this.usuarioId);
-      this.viajesFiltrados = [...this.viajes];
+    // NO FILTRAR AQUÍ → EL CONDUCTOR VE TODOS LOS VIAJES
+    this.viajes = viajesProcesados;
+    this.viajesFiltrados = [...this.viajes];
 
-    } catch (error: any) {
-      this.msg.add({ severity: 'error', summary: 'Error', detail: error.message || 'No se pudieron cargar los viajes' });
-    } finally {
-      this.cargando = false;
-    }
+  } catch (error: any) {
+    this.msg.add({ severity: 'error', summary: 'Error', detail: error.message });
+  } finally {
+    this.cargando = false;
   }
+}
 
   onSearch() {
     const term = this.searchTerm.toLowerCase().trim();
