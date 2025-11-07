@@ -22,6 +22,7 @@ interface Viaje {
     nombre: string;
     apellido: string;
   };
+  solicitud_pendiente?: boolean;
 }
 
 @Component({
@@ -63,40 +64,57 @@ export class ViajesComponent implements OnInit {
     this.usuarioId = session?.user?.id || null;
   }
 
-  private async cargarViajes() {
-    try {
-      this.cargando = true;
-      const data = await this.viajesService.obtenerViajes();
+  // viajes.component.ts → modificar cargarViajes()
 
-      this.viajes = data.map((v: any) => ({
-        viaje_id: v.viaje_id,
-        conductor_id: v.conductor_id,
-        vehiculo_id: v.vehiculo_id,
-        lugar_salida: v.lugar_salida,
-        lugar_llegada: v.lugar_llegada,
-        hora_salida: new Date(v.hora_salida).toLocaleString('es-MX', {
-          weekday: 'short',
-          day: 'numeric',
-          month: 'short',
-          hour: '2-digit',
-          minute: '2-digit'
-        }),
-        asientos_disponibles: v.asientos_disponibles,
-        estado_viaje: v.estado_viaje,
-        usuarios: v.usuarios || { nombre: 'Conductor', apellido: '' }
-      }));
+private async cargarViajes() {
+  try {
+    this.cargando = true;
+    const data = await this.viajesService.obtenerViajes();
 
-      this.viajesFiltrados = [...this.viajes]; // Inicializa filtrados
-    } catch (error: any) {
-      this.msg.add({ 
-        severity: 'error', 
-        summary: 'Error', 
-        detail: error.message || 'No se pudieron cargar los viajes' 
-      });
-    } finally {
-      this.cargando = false;
-    }
+    const viajesProcesados = await Promise.all(
+      data.map(async (v: any) => {
+        const viaje = {
+          viaje_id: v.viaje_id,
+          conductor_id: v.conductor_id,
+          vehiculo_id: v.vehiculo_id,
+          lugar_salida: v.lugar_salida,
+          lugar_llegada: v.lugar_llegada,
+          hora_salida: new Date(v.hora_salida).toLocaleString('es-MX', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          asientos_disponibles: v.asientos_disponibles,
+          estado_viaje: v.estado_viaje,
+          usuarios: v.usuarios || { nombre: 'Conductor', apellido: '' },
+          solicitud_pendiente: false
+        };
+
+        // Verificar si ya hay solicitud pendiente
+        if (this.usuarioId) {
+          const tiene = await this.viajesService.tieneSolicitudPendiente(viaje.viaje_id, this.usuarioId);
+          viaje.solicitud_pendiente = tiene;
+        }
+
+        return viaje;
+      })
+    );
+
+    this.viajes = viajesProcesados;
+    this.viajesFiltrados = [...this.viajes];
+
+  } catch (error: any) {
+    this.msg.add({ 
+      severity: 'error', 
+      summary: 'Error', 
+      detail: error.message || 'No se pudieron cargar los viajes' 
+    });
+  } finally {
+    this.cargando = false;
   }
+}
 
   // ← NUEVO: Método de búsqueda
   onSearch() {
@@ -113,26 +131,41 @@ export class ViajesComponent implements OnInit {
     );
   }
 
-  async onJoin(viaje: Viaje) {
-    if (!this.usuarioId) {
-      this.msg.add({ severity: 'warn', summary: 'Acceso', detail: 'Inicia sesión para solicitar unirte' });
-      return;
-    }
+  // viajes.component.ts
 
-    if (viaje.asientos_disponibles <= 0) {
-      this.msg.add({ severity: 'info', summary: 'No disponible', detail: 'No hay asientos disponibles' });
-      return;
-    }
-
-    try {
-      await this.viajesService.solicitarUnirse(viaje.viaje_id, this.usuarioId);
-      this.msg.add({ severity: 'success', summary: 'Solicitud enviada', detail: 'Tu solicitud ha sido enviada al conductor' });
-    } catch (error: any) {
-      this.msg.add({ 
-        severity: 'error', 
-        summary: 'Error', 
-        detail: error.message || 'No se pudo enviar la solicitud' 
-      });
-    }
+async onJoin(viaje: Viaje) {
+  if (!this.usuarioId) {
+    this.msg.add({ severity: 'warn', summary: 'Acceso', detail: 'Inicia sesión para solicitar unirte' });
+    return;
   }
+
+  if (viaje.asientos_disponibles <= 0) {
+    this.msg.add({ severity: 'info', summary: 'No disponible', detail: 'No hay asientos disponibles' });
+    return;
+  }
+
+  if (viaje.solicitud_pendiente) {
+    this.msg.add({ severity: 'info', summary: 'Ya solicitaste', detail: 'Tu solicitud está pendiente' });
+    return;
+  }
+
+  try {
+    await this.viajesService.solicitarUnirse(viaje.viaje_id, this.usuarioId);
+    
+    // Actualizar el viaje en la lista
+    const index = this.viajesFiltrados.findIndex(v => v.viaje_id === viaje.viaje_id);
+    if (index !== -1) {
+      this.viajesFiltrados[index].solicitud_pendiente = true;
+      this.viajesFiltrados = [...this.viajesFiltrados]; // Forzar detección de cambios
+    }
+
+    this.msg.add({ severity: 'success', summary: 'Solicitud enviada', detail: 'Tu solicitud ha sido enviada al conductor' });
+  } catch (error: any) {
+    this.msg.add({ 
+      severity: 'error', 
+      summary: 'Error', 
+      detail: error.message || 'No se pudo enviar la solicitud' 
+    });
+  }
+}
 }

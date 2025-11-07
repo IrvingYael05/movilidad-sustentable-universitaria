@@ -39,13 +39,14 @@
       </div>
     </div>
 
-    <button
-      pButton
-      label="Solicitar Unirme"
-      class="join-button"
-      [disabled]="viaje.asientos_disponibles === 0"
-      (click)="onJoin(viaje)">
-    </button>
+    <!-- viajes.component.html -->
+<button
+  pButton
+  [label]="viaje.solicitud_pendiente ? 'Pendiente' : (viaje.asientos_disponibles === 0 ? 'Sin asientos' : 'Solicitar Unirme')"
+  class="join-button"
+  [disabled]="viaje.asientos_disponibles === 0 || viaje.solicitud_pendiente"
+  (click)="onJoin(viaje)">
+</button>
   </div>
 </div>
 

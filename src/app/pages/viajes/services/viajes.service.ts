@@ -38,26 +38,46 @@ export class ViajesService {
 
   // Solicitar unirse a un viaje
   async solicitarUnirse(viajeId: string, usuarioId: string) {
-    const { data, error } = await this._supabase
-      .from('solicitudesviaje')
-      .insert({
-        viaje_id: viajeId,
-        pasajero_id: usuarioId,
-        estado_solicitud: 'pending',
-      })
-      .select()
-      .single();
+  const { data: { user }, error: authError } = await this._supabase.auth.getUser();
 
-    if (error) {
-      // Manejo específico de errores comunes
-      if (error.code === '23505') {
-        throw new Error('Ya has solicitado unirte a este viaje');
-      }
-      if (error.code === '23503') {
-        throw new Error('El viaje ya no existe');
-      }
-      throw error;
-    }
-    return data;
+  if (!user) {
+    console.error('⚠️ Usuario no autenticado');
+    throw new Error('Debes iniciar sesión para solicitar un viaje');
   }
+
+  console.log('UID autenticado:', user.id);
+
+  const { data, error } = await this._supabase
+    .from('solicitudesviaje')
+    .insert({
+      viaje_id: viajeId,
+      pasajero_id: user.id, // UUID del usuario autenticado
+      estado_solicitud: 'pendiente',
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error insertando solicitud:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+async tieneSolicitudPendiente(viajeId: string, usuarioId: string) {
+  const { data, error } = await this._supabase
+    .from('solicitudesviaje')
+    .select('solicitud_id')
+    .eq('viaje_id', viajeId)
+    .eq('pasajero_id', usuarioId)
+    .eq('estado_solicitud', 'pendiente')
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
+    throw error;
+  }
+
+  return !!data; // true si existe, false si no
+}
 }
