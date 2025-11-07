@@ -23,13 +23,39 @@ export interface Viaje {
   creado_en: string;
 }
 
+export interface SolicitudViaje {
+  solicitud_id: string;
+  viaje_id: string;
+  pasajero_id: string;
+  estado_solicitud: string;
+  solicitado_en: string;
+  pasajero: {
+    usuario_id: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+  };
+}
+
+export interface PasajeroViaje {
+  viaje_id: string;
+  pasajero_id: string;
+  unido_en: string;
+  pasajero: {
+    usuario_id: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ViajesService {
   private _supabase = inject(SupabaseService).supabaseClient;
 
-  /** 🟢 Crea un nuevo viaje en la base de datos */
+  /** Crea un nuevo viaje en la base de datos */
   async crearViaje(viajeData: NuevoViajeData) {
     try {
       const today = new Date();
@@ -58,7 +84,7 @@ export class ViajesService {
     }
   }
 
-  /** 🟢 Obtiene todos los viajes activos (para vista general o admin) */
+  /** Obtiene todos los viajes activos (para vista general o admin) */
   async obtenerViajesActivos() {
     try {
       const { data, error } = await this._supabase
@@ -91,7 +117,7 @@ export class ViajesService {
     }
   }
 
-  /** 🟢 Obtiene todos los viajes de un conductor (historial) */
+  /** Obtiene todos los viajes de un conductor (historial) */
   async obtenerViajesConductor(conductorId: string) {
     try {
       const { data, error } = await this._supabase
@@ -108,7 +134,7 @@ export class ViajesService {
     }
   }
 
-  /** 🟢 Obtiene SOLO el viaje activo del conductor actual */
+  /** Obtiene SOLO el viaje activo del conductor actual */
   async obtenerViajeActivoConductor(conductorId: string) {
     try {
       const { data, error } = await this._supabase
@@ -128,7 +154,7 @@ export class ViajesService {
     }
   }
 
-  /** 🟡 Actualiza el estado de un viaje (activo/inactivo) */
+  /** Actualiza el estado de un viaje (activo/inactivo) */
   async actualizarEstadoViaje(viajeId: string, nuevoEstado: string) {
     try {
       const { data, error } = await this._supabase
@@ -142,6 +168,109 @@ export class ViajesService {
       return { data, error: null };
     } catch (error) {
       console.error('Error al actualizar estado del viaje:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** Obtiene las solicitudes pendientes de un viaje específico */
+  async obtenerSolicitudesViaje(viajeId: string) {
+    try {
+      const { data, error } = await this._supabase
+        .from('solicitudesviaje')
+        .select(`
+          *,
+          pasajero:usuarios!pasajero_id (
+            usuario_id,
+            nombre,
+            apellido,
+            email
+          )
+        `)
+        .eq('viaje_id', viajeId)
+        .eq('estado_solicitud', 'pendiente')
+        .order('solicitado_en', { ascending: true });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener solicitudes:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** Acepta una solicitud de viaje */
+  async aceptarSolicitud(solicitudId: string, viajeId: string, pasajeroId: string) {
+    try {
+      // 1. Actualizar estado de la solicitud a 'aceptada'
+      const { error: updateError } = await this._supabase
+        .from('solicitudesviaje')
+        .update({ estado_solicitud: 'aceptada' })
+        .eq('solicitud_id', solicitudId);
+
+      if (updateError) throw updateError;
+
+      // 2. Agregar pasajero a la tabla pasajerosviaje
+      const { error: insertError } = await this._supabase
+        .from('pasajerosviaje')
+        .insert({
+          viaje_id: viajeId,
+          pasajero_id: pasajeroId,
+        });
+
+      if (insertError) throw insertError;
+
+      // 3. Decrementar asientos disponibles usando la función de Postgres
+      const { error: rpcError } = await this._supabase
+        .rpc('decrementar_asientos', { viaje_id: viajeId });
+
+      if (rpcError) throw rpcError;
+
+      return { data: true, error: null };
+    } catch (error) {
+      console.error('Error al aceptar solicitud:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** Rechaza una solicitud de viaje */
+  async rechazarSolicitud(solicitudId: string) {
+    try {
+      const { data, error } = await this._supabase
+        .from('solicitudesviaje')
+        .update({ estado_solicitud: 'rechazada' })
+        .eq('solicitud_id', solicitudId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al rechazar solicitud:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** Obtiene los pasajeros que ya están confirmados en el viaje */
+  async obtenerPasajerosViaje(viajeId: string) {
+    try {
+      const { data, error } = await this._supabase
+        .from('pasajerosviaje')
+        .select(`
+          *,
+          pasajero:usuarios!pasajero_id (
+            usuario_id,
+            nombre,
+            apellido,
+            email
+          )
+        `)
+        .eq('viaje_id', viajeId)
+        .order('unido_en', { ascending: true });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener pasajeros:', error);
       return { data: null, error };
     }
   }
