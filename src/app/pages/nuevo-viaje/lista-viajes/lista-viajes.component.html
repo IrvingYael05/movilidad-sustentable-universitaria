@@ -2,21 +2,20 @@
   class="flex flex-column align-items-center justify-content-center min-h-screen p-4 surface-ground overflow-auto"
 >
   <div class="w-full md:w-30rem">
-    <!-- Título -->
+    
     <div class="text-center mb-4">
       <p class="text-secondary mb-4 mt-2">
         Aquí puedes ver los detalles de tu viaje
       </p>
     </div>
 
-    <!-- Si no hay viaje activo -->
     <div *ngIf="!viajeActivo && !isLoading" class="text-center">
       <p class="text-secondary">
         No tienes ningún viaje activo por el momento.
       </p>
     </div>
 
-    <!-- Loading state -->
+    
     <div *ngIf="isLoading" class="text-center">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       <p class="text-secondary mt-2">Cargando...</p>
@@ -161,7 +160,8 @@
         ></p-button>
       </div>
 
-      <!-- 🔹 Datos del Conductor -->
+      
+      <div class="driver-container"></div>
       <div class="driver-card">
   <h3 class="section-title">Tu Conductor</h3>
 
@@ -173,19 +173,19 @@
 
     <div class="vehicle-info">
       <div class="vehicle-row">
-        <span class="label">Placa</span>
+        <span class="label">Placa :</span>
         <span class="value">{{ viajeActivo.vehiculo?.placa || 'N/A' }}</span>
       </div>
       <div class="vehicle-row">
-        <span class="label">Marca</span>
+        <span class="label">Marca :</span>
         <span class="value">{{ viajeActivo.vehiculo?.marca || 'N/A' }}</span>
       </div>
       <div class="vehicle-row">
-        <span class="label">Modelo</span>
+        <span class="label">Modelo :</span>
         <span class="value">{{ viajeActivo.vehiculo?.modelo || 'N/A' }}</span>
       </div>
       <div class="vehicle-row">
-        <span class="label">Color</span>
+        <span class="label">Color :</span>
         <span class="value">{{ viajeActivo.vehiculo?.color || 'N/A' }}</span>
       </div>
     </div>

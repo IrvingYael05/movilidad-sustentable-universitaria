@@ -1,9 +1,36 @@
+/* ===================================
+   DETALLES DEL VIAJE - ESTILO FINAL
+   =================================== */
+
+/* 🔹 Fondo global blanco (quita el gris de PrimeNG o surface-ground) */
+:host,
+:host ::ng-deep body,
+:host ::ng-deep .surface-ground,
+:host ::ng-deep .min-h-screen,
+:host ::ng-deep .p-component,
+.flex,
+.flex-column,
+.align-items-center,
+.justify-content-center {
+  background-color: #ffffff !important;
+}
+
+html,
+body {
+  background-color: #ffffff !important;
+}
+
+/* ===================================
+   SECCIONES Y ESTRUCTURA
+   =================================== */
+
 .viaje-card {
-  background: #fff;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(36, 78, 124, 0.1);
+  padding: 1.5rem;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
 }
 
 .viaje-card:hover {
@@ -15,12 +42,13 @@
 }
 
 .section-title {
-  font-weight: 600;
-  color: #264653;
-  font-size: 1.1rem;
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 0.3rem;
-  margin-bottom: 0.8rem;
+  font-weight: 700;
+  color: #244e7c;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #dbe3ec;
+  padding-bottom: 0.4rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .info-row {
@@ -43,45 +71,6 @@
   color: #333;
 }
 
-.conductor-card {
-  background: #f8f9fa;
-  border-radius: 12px;
-}
-
-.conductor-info {
-  text-align: center;
-}
-
-.conductor-info .nombre {
-  font-weight: 700;
-  color: #1d3557;
-  margin-bottom: 0.2rem;
-}
-
-.conductor-info .correo {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.vehiculo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem 1rem;
-  text-align: left;
-  font-size: 0.9rem;
-  color: #444;
-}
-
-.vehiculo-grid label {
-  font-weight: 600;
-  color: #264653;
-  display: block;
-}
-
-.vehiculo-grid span {
-  display: block;
-}
-
 .text-primary {
   color: #1d3557;
 }
@@ -90,18 +79,180 @@
   color: #6c757d;
 }
 
-/* 🔹 Responsive */
+
+
+.driver-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.driver-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem 1.8rem;
+  box-shadow: 0 2px 8px rgba(36, 78, 124, 0.1);
+  color: #244e7c;
+  width: 100%;
+  max-width: 420px;
+  margin: 2rem auto 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.driver-card:hover {
+  box-shadow: 0 6px 14px rgba(36, 78, 124, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ===== Información general del conductor ===== */
+.driver-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.driver-header {
+  text-align: center;
+}
+
+.driver-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0;
+  color: #244e7c;
+}
+
+.driver-email {
+  font-size: 0.9rem;
+  color: #71706f;
+  margin-top: 0.2rem;
+}
+
+
+.vehicle-info {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  border: 1px solid #e2e8f0;
+  width: 100%;
+  max-width: 350px;
+  box-shadow: 0 2px 4px rgba(36, 78, 124, 0.05);
+  text-align: left;
+}
+
+.vehicle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.vehicle-row .label {
+  font-weight: 600;
+  color: #244e7c;
+  font-size: 0.9rem;
+}
+
+.vehicle-row .value {
+  color: #71706f;
+  font-size: 0.9rem;
+}
+
+.vehicle-row:last-child {
+  margin-bottom: 0;
+}
+
+
+.solicitudes-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(36, 78, 124, 0.1);
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+
+:host ::ng-deep .p-button-danger {
+  background-color: #244e7c !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 0.45rem 1.2rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  width: auto !important;
+  min-width: 140px;
+  text-align: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(36, 78, 124, 0.2);
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .p-button-danger:hover {
+  background-color: #1e3d63 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(36, 78, 124, 0.25);
+}
+
+:host ::ng-deep .p-button-danger:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(36, 78, 124, 0.2);
+}
+
+
 @media (max-width: 600px) {
   .viaje-card {
-    padding: 1.5rem;
+    padding: 1.2rem;
   }
 
-  .vehiculo-grid {
-    grid-template-columns: 1fr;
+  .driver-card {
+    padding: 1.2rem;
   }
 
-  .info-row {
+  .vehicle-info {
+    padding: 0.9rem;
+  }
+
+  .vehicle-row {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .vehicle-row .label {
+    margin-bottom: 0.1rem;
+  }
+}
+
+:host ::ng-deep .delete-btn {
+  background-color: #244e7c !important; /* azul marino */
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 0.45rem 1.2rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: #ffffff !important; /* texto blanco */
+  width: auto !important;
+  min-width: 140px;
+  text-align: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(36, 78, 124, 0.2);
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .delete-btn:hover {
+  background-color: #1e3d63 !important; 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(36, 78, 124, 0.25);
+}
+
+:host ::ng-deep .delete-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(36, 78, 124, 0.2);
 }
