@@ -35,6 +35,7 @@ export class ListaViajesComponent implements OnInit {
   pasajerosConfirmados: PasajeroViaje[] = [];
   isLoading = true;
   isLoadingSolicitudes = false;
+  esPasajero = false; // 🔹 Bandera para distinguir si es pasajero
 
   constructor(
     private viajesService: ViajesService,
@@ -50,7 +51,8 @@ export class ListaViajesComponent implements OnInit {
     this.usuarioId = user?.id || null;
 
     if (this.usuarioId) {
-      await this.cargarViajeActivo();
+      await this.cargarViajeComoPasajero();
+      if (!this.viajeActivo) await this.cargarViajeActivo();
     } else {
       this.isLoading = false;
       this.messageService.add({
@@ -68,6 +70,7 @@ export class ListaViajesComponent implements OnInit {
       this.isLoading = true;
       const { data, error } = await this.viajesService.obtenerViajeActivoConductor(this.usuarioId!);
       this.viajeActivo = data || null;
+      this.esPasajero = false;
 
       if (error) {
         this.messageService.add({
@@ -78,7 +81,6 @@ export class ListaViajesComponent implements OnInit {
         });
       }
 
-      // Si hay viaje activo, cargar sus solicitudes y pasajeros
       if (this.viajeActivo) {
         await this.cargarSolicitudes();
         await this.cargarPasajeros();
@@ -96,22 +98,90 @@ export class ListaViajesComponent implements OnInit {
     }
   }
 
+  /** 🔹 Cargar el viaje activo del usuario como PASAJERO */
+  async cargarViajeComoPasajero() {
+    try {
+      this.isLoading = true;
+
+      const { data, error } = await this.supabase.supabaseClient
+        .from('solicitudesviaje')
+        .select(`
+          solicitud_id,
+          estado_solicitud,
+          viaje_id,
+          viajes (
+            viaje_id,
+            lugar_salida,
+            lugar_llegada,
+            hora_salida,
+            asientos_disponibles,
+            conductor:conductor_id (
+              usuario_id,
+              nombre,
+              apellido,
+              email
+            ),
+            vehiculo_id
+          )
+        `)
+        .eq('pasajero_id', this.usuarioId)
+        .eq('estado_solicitud', 'aceptada')
+        .maybeSingle();
+
+      if (error) throw error;
+
+      console.log('🚗 Resultado Supabase:', data);
+
+      if (data && data.viajes) {
+        const viaje = data.viajes;
+
+        // 🔹 Si no vienen datos del vehículo, los obtenemos manualmente
+        if (!viaje.vehiculo && viaje.vehiculo_id) {
+          const { data: vehiculoData, error: vehiculoError } = await this.supabase.supabaseClient
+            .from('vehiculos')
+            .select('placa, marca, modelo, color')
+            .eq('vehiculo_id', viaje.vehiculo_id)
+            .maybeSingle();
+
+          if (vehiculoError) {
+            console.warn('No se pudo obtener datos del vehículo:', vehiculoError);
+          } else if (vehiculoData) {
+            viaje.vehiculo = vehiculoData;
+            console.log('Vehículo cargado manualmente:', vehiculoData);
+          }
+        }
+
+        this.viajeActivo = viaje;
+        this.esPasajero = true;
+        console.log('Viaje del pasajero cargado:', this.viajeActivo);
+        await this.cargarPasajeros();
+      } else {
+        this.viajeActivo = null;
+        this.esPasajero = false;
+        console.warn('No se encontró viaje activo como pasajero.');
+      }
+    } catch (error) {
+      console.error(' Error al cargar viaje como pasajero:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error al cargar viaje',
+        detail: 'No se pudo obtener el viaje como pasajero.',
+        life: 3000,
+      });
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   /** Cargar solicitudes pendientes del viaje activo */
   async cargarSolicitudes() {
     if (!this.viajeActivo) return;
-
     try {
       this.isLoadingSolicitudes = true;
       const { data, error } = await this.viajesService.obtenerSolicitudesViaje(
         this.viajeActivo.viaje_id
       );
-
-      if (error) {
-        console.error('Error al cargar solicitudes:', error);
-        this.solicitudesPendientes = [];
-      } else {
-        this.solicitudesPendientes = data || [];
-      }
+      this.solicitudesPendientes = error ? [] : data || [];
     } catch (err) {
       console.error('Error al cargar solicitudes:', err);
       this.solicitudesPendientes = [];
@@ -123,18 +193,9 @@ export class ListaViajesComponent implements OnInit {
   /** Cargar pasajeros confirmados del viaje activo */
   async cargarPasajeros() {
     if (!this.viajeActivo) return;
-
     try {
-      const { data, error } = await this.viajesService.obtenerPasajerosViaje(
-        this.viajeActivo.viaje_id
-      );
-
-      if (error) {
-        console.error('Error al cargar pasajeros:', error);
-        this.pasajerosConfirmados = [];
-      } else {
-        this.pasajerosConfirmados = data || [];
-      }
+      const { data, error } = await this.viajesService.obtenerPasajerosViaje(this.viajeActivo.viaje_id);
+      this.pasajerosConfirmados = error ? [] : data || [];
     } catch (err) {
       console.error('Error al cargar pasajeros:', err);
       this.pasajerosConfirmados = [];
@@ -143,7 +204,6 @@ export class ListaViajesComponent implements OnInit {
 
   /** Aceptar una solicitud */
   async aceptarSolicitud(solicitud: SolicitudViaje) {
-    // Verificar si aún hay asientos disponibles
     if (this.viajeActivo.asientos_disponibles <= 0) {
       this.messageService.add({
         severity: 'warn',
@@ -177,8 +237,6 @@ export class ListaViajesComponent implements OnInit {
               detail: `${solicitud.pasajero.nombre} ha sido agregado al viaje.`,
               life: 3000,
             });
-            
-            // Recargar datos
             await this.cargarViajeActivo();
           } else {
             this.messageService.add({
@@ -213,10 +271,7 @@ export class ListaViajesComponent implements OnInit {
       rejectButtonStyleClass: 'p-button-text',
       accept: async () => {
         try {
-          const { data, error } = await this.viajesService.rechazarSolicitud(
-            solicitud.solicitud_id
-          );
-
+          const { data, error } = await this.viajesService.rechazarSolicitud(solicitud.solicitud_id);
           if (!error && data) {
             this.messageService.add({
               severity: 'info',
@@ -224,8 +279,6 @@ export class ListaViajesComponent implements OnInit {
               detail: 'La solicitud ha sido rechazada.',
               life: 3000,
             });
-            
-            // Recargar solicitudes
             await this.cargarSolicitudes();
           } else {
             this.messageService.add({
@@ -266,7 +319,6 @@ export class ListaViajesComponent implements OnInit {
   async eliminarViaje(viajeId: string) {
     try {
       const { data, error } = await this.viajesService.actualizarEstadoViaje(viajeId, 'inactivo');
-
       if (!error && data) {
         this.messageService.add({
           severity: 'success',
@@ -296,8 +348,62 @@ export class ListaViajesComponent implements OnInit {
     }
   }
 
-  /** Navega al formulario de nuevo viaje */
   irANuevoViaje() {
     this.router.navigate(['/nuevo-viaje']);
+  }
+
+  /** 🔹 Permite que el pasajero salga del viaje actual */
+  async salirDelViaje() {
+    if (!this.viajeActivo || !this.usuarioId) return;
+
+    this.confirmationService.confirm({
+      message: '¿Seguro que deseas salir de este viaje?',
+      header: 'Salir del viaje',
+      icon: 'pi pi-sign-out',
+      acceptLabel: 'Sí, salir',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: async () => {
+        try {
+          const { error } = await this.supabase.supabaseClient
+            .from('pasajerosviaje')
+            .delete()
+            .eq('viaje_id', this.viajeActivo.viaje_id)
+            .eq('pasajero_id', this.usuarioId);
+
+          if (error) throw error;
+
+          await this.supabase.supabaseClient
+            .from('solicitudesviaje')
+            .update({ estado_solicitud: 'cancelada' })
+            .eq('viaje_id', this.viajeActivo.viaje_id)
+            .eq('pasajero_id', this.usuarioId);
+
+          const nuevosAsientos = (this.viajeActivo.asientos_disponibles || 0) + 1;
+          await this.supabase.supabaseClient
+            .from('viajes')
+            .update({ asientos_disponibles: nuevosAsientos })
+            .eq('viaje_id', this.viajeActivo.viaje_id);
+
+          this.viajeActivo = null;
+          this.esPasajero = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Has salido del viaje',
+            detail: 'Tu lugar ha sido liberado correctamente.',
+            life: 3000,
+          });
+        } catch (error) {
+          console.error('Error al salir del viaje:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo salir del viaje. Inténtalo de nuevo.',
+            life: 3000,
+          });
+        }
+      },
+    });
   }
 }

@@ -1,92 +1,107 @@
-/* Contenedor general */
-.viaje-card,
-.solicitudes-card {
-  background-color: #ffffff;
-  padding: 1.5rem;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.viaje-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
 }
 
-.viaje-card:hover,
-.solicitudes-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+.viaje-card:hover {
+  transform: translateY(-3px);
 }
 
-/* Secciones del viaje */
-.section-header label {
-  color: #1b2559;
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
   font-weight: 600;
+  color: #264653;
+  font-size: 1.1rem;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #f1f1f1;
   font-size: 0.95rem;
 }
 
-.section-header p {
+.info-row label {
+  font-weight: 600;
+  color: #1d3557;
+}
+
+.lista-pasajeros {
+  list-style-type: disc;
   margin: 0;
-  color: #4b5563;
-  font-size: 0.95rem;
+  padding-left: 1.5rem;
+  color: #333;
 }
 
-/* Botones */
-.publish-btn {
-  background-color: #1b2559;
-  border: none;
-  color: #fff;
-  border-radius: 0.6rem;
-  transition: background-color 0.3s ease;
+.conductor-card {
+  background: #f8f9fa;
+  border-radius: 12px;
 }
 
-.publish-btn:hover {
-  background-color: #293377;
+.conductor-info {
+  text-align: center;
 }
 
-.delete-btn {
-  background-color: #c81e1e;
-  border: none;
-  color: #fff;
-  border-radius: 0.6rem;
-  transition: background-color 0.3s ease;
+.conductor-info .nombre {
+  font-weight: 700;
+  color: #1d3557;
+  margin-bottom: 0.2rem;
 }
 
-.delete-btn:hover {
-  background-color: #a51b1b;
+.conductor-info .correo {
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 
-/* Solicitudes */
-.solicitud-item {
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+.vehiculo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #444;
 }
 
-.solicitud-item:hover {
-  background-color: #f3f4f6;
-  transform: translateY(-2px);
+.vehiculo-grid label {
+  font-weight: 600;
+  color: #264653;
+  display: block;
 }
 
-.accept-btn {
-  background-color: #1b2559;
-  border: none;
-  color: #fff;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
-  transition: background-color 0.3s ease;
+.vehiculo-grid span {
+  display: block;
 }
 
-.accept-btn:hover {
-  background-color: #293377;
+.text-primary {
+  color: #1d3557;
 }
 
-/* Texto */
 .text-secondary {
-  color: #6b7280;
+  color: #6c757d;
 }
 
-/* Animación sutil de entrada */
-:host ::ng-deep .p-button {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
+/* 🔹 Responsive */
+@media (max-width: 600px) {
+  .viaje-card {
+    padding: 1.5rem;
+  }
+
+  .vehiculo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

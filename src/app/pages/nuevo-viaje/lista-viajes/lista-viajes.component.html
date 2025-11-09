@@ -22,8 +22,8 @@
       <p class="text-secondary mt-2">Cargando...</p>
     </div>
 
-    <!-- Si hay un viaje activo -->
-    <div *ngIf="viajeActivo && !isLoading" class="viaje-card mt-3">
+   
+    <div *ngIf="viajeActivo && !esPasajero && !isLoading" class="viaje-card mt-3">
       <div class="section-header mb-2">
         <label class="font-semibold">Punto de partida</label>
         <p>{{ viajeActivo.lugar_salida }}</p>
@@ -65,23 +65,23 @@
       </div>
     </div>
 
-    <!-- 🔹 Tus Solicitudes -->
-    <div *ngIf="viajeActivo && !isLoading" class="solicitudes-card mt-5">
+  
+    <div *ngIf="viajeActivo && !esPasajero && !isLoading" class="solicitudes-card mt-5">
       <h3 class="text-center text-xl font-bold mb-3">Tus Solicitudes</h3>
 
-      <!-- Loading solicitudes -->
       <div *ngIf="isLoadingSolicitudes" class="text-center py-4">
         <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
         <p class="text-secondary mt-2">Cargando solicitudes...</p>
       </div>
 
-      <!-- Sin solicitudes -->
-      <div *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length === 0" class="text-center py-4">
+      <div
+        *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length === 0"
+        class="text-center py-4"
+      >
         <i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
         <p class="text-secondary mt-2">No tienes solicitudes pendientes</p>
       </div>
 
-      <!-- Lista de solicitudes -->
       <div *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length > 0">
         <div
           *ngFor="let solicitud of solicitudesPendientes"
@@ -94,7 +94,7 @@
                 {{ solicitud.pasajero.nombre }} {{ solicitud.pasajero.apellido }}
               </p>
               <small class="text-secondary">{{ solicitud.pasajero.email }}</small>
-              <br>
+              <br />
               <small class="text-secondary">
                 Solicitado: {{ solicitud.solicitado_en | date: 'short' }}
               </small>
@@ -117,9 +117,85 @@
         </div>
       </div>
     </div>
+
+    
+    <div *ngIf="viajeActivo && esPasajero && !isLoading" class="viaje-card mt-3 p-3 border-round surface-card shadow-2">
+      <h2 class="text-center text-lg font-bold mb-3">Auto compartido</h2>
+      <h3 class="text-center text-base mb-4">Mi viaje</h3>
+
+      <div class="section mb-3">
+        <label class="font-semibold">Punto de Partida</label>
+        <p>{{ viajeActivo.lugar_salida }}</p>
+      </div>
+
+      <div class="section mb-3">
+        <label class="font-semibold">Hora</label>
+        <p>{{ viajeActivo.hora_salida | date: 'short' }}</p>
+      </div>
+
+      <div class="section mb-3">
+        <label class="font-semibold">Lugares disponibles</label>
+        <p>{{ viajeActivo.asientos_disponibles }}</p>
+      </div>
+
+      <div class="section mb-3">
+        <label class="font-semibold">Pasajeros</label>
+        <div *ngIf="pasajerosConfirmados.length === 0">
+          <p class="text-secondary">Aún no hay otros pasajeros</p>
+        </div>
+        <div *ngIf="pasajerosConfirmados.length > 0">
+          <ul class="m-0 pl-3">
+            <li *ngFor="let pasajero of pasajerosConfirmados">
+              {{ pasajero.pasajero.nombre }} {{ pasajero.pasajero.apellido }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <p-button
+          label="Salir del Viaje"
+          icon="pi pi-sign-out"
+          styleClass="p-button-danger"
+          (click)="salirDelViaje()"
+        ></p-button>
+      </div>
+
+      <!-- 🔹 Datos del Conductor -->
+      <div class="driver-card">
+  <h3 class="section-title">Tu Conductor</h3>
+
+  <div class="driver-info">
+    <div class="driver-header">
+      <p class="driver-name">{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
+      <p class="driver-email">{{ viajeActivo.conductor.email }}</p>
+    </div>
+
+    <div class="vehicle-info">
+      <div class="vehicle-row">
+        <span class="label">Placa</span>
+        <span class="value">{{ viajeActivo.vehiculo?.placa || 'N/A' }}</span>
+      </div>
+      <div class="vehicle-row">
+        <span class="label">Marca</span>
+        <span class="value">{{ viajeActivo.vehiculo?.marca || 'N/A' }}</span>
+      </div>
+      <div class="vehicle-row">
+        <span class="label">Modelo</span>
+        <span class="value">{{ viajeActivo.vehiculo?.modelo || 'N/A' }}</span>
+      </div>
+      <div class="vehicle-row">
+        <span class="label">Color</span>
+        <span class="value">{{ viajeActivo.vehiculo?.color || 'N/A' }}</span>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Toast y Confirm Dialog -->
+    </div>
+  </div>
+</div>
+
+
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
