@@ -1,41 +1,37 @@
 <p-toast></p-toast>
+
 <div class="flex flex-column align-items-center p-4">
-  <img src="icons/icon-192x192.png" alt="Logo Ecomovi" class="mb-4" style="width: 140px;">
+  <img src="icons/icon-192x192.png" alt="Logo Ecomovi" class="mb-4" style="width: 140px;" />
 
   <h1 class="text-3xl font-bold m-0">Mi Perfil</h1>
   <p class="text-secondary mt-1">Consulta y actualiza tus datos personales</p>
 
-  <form (ngSubmit)="actualizarPerfil()" class="flex flex-column gap-3 mt-4 w-full md:w-25rem">
-    <!-- Nombre(s) -->
+  <form [formGroup]="form" (ngSubmit)="actualizarPerfil()" class="flex flex-column gap-3 mt-4 w-full md:w-25rem">
+
     <div class="p-float-label">
-      <input id="nombre" type="text" pInputText class="w-full" [(ngModel)]="perfil.nombre" name="nombre" placeholder=" " />
+      <input id="nombre" type="text" pInputText class="w-full" formControlName="nombre" placeholder=" " [readonly]="true" />
       <label for="nombre">Nombre(s)</label>
     </div>
 
-    <!-- Apellido Paterno -->
     <div class="p-float-label">
-      <input id="apellidoPaterno" type="text" pInputText class="w-full" [(ngModel)]="perfil.apellidoPaterno" name="apellidoPaterno" placeholder=" " />
+      <input id="apellidoPaterno" type="text" pInputText class="w-full" formControlName="apellidoPaterno" placeholder=" " [readonly]="true" />
       <label for="apellidoPaterno">Apellido Paterno</label>
     </div>
 
-    <!-- Apellido Materno -->
     <div class="p-float-label">
-      <input id="apellidoMaterno" type="text" pInputText class="w-full" [(ngModel)]="perfil.apellidoMaterno" name="apellidoMaterno" placeholder=" " />
+      <input id="apellidoMaterno" type="text" pInputText class="w-full" formControlName="apellidoMaterno" placeholder=" " [readonly]="true" />
       <label for="apellidoMaterno">Apellido Materno</label>
     </div>
 
-    <!-- Correo -->
     <div class="p-float-label">
-      <input id="correo" type="email" pInputText class="w-full" [(ngModel)]="perfil.correo" name="correo" placeholder=" " />
-      <label for="correo">Correo</label>
+      <input id="correo" type="email" pInputText class="w-full" formControlName="correo" placeholder=" " />
+      <label for="correo">Correo *</label>
     </div>
 
-    <!-- Contraseña Actual -->
     <div class="p-float-label">
       <p-password
         inputId="passwordActual"
-        [(ngModel)]="perfil.passwordActual"
-        name="passwordActual"
+        formControlName="passwordActual"
         placeholder=" "
         [feedback]="false"
         [toggleMask]="true"
@@ -45,12 +41,10 @@
       <label for="passwordActual">Contraseña Actual</label>
     </div>
 
-    <!-- Nueva Contraseña -->
     <div class="p-float-label">
       <p-password
         inputId="passwordNueva"
-        [(ngModel)]="perfil.passwordNueva"
-        name="passwordNueva"
+        formControlName="passwordNueva"
         placeholder=" "
         [feedback]="false"
         [toggleMask]="true"
@@ -60,6 +54,7 @@
       <label for="passwordNueva">Nueva Contraseña</label>
     </div>
 
-    <p-button label="Actualizar" type="submit" styleClass="w-full"></p-button>
+    <p-button label="Actualizar" type="submit" styleClass="w-full" [disabled]="cargando"></p-button>
+
   </form>
 </div>
