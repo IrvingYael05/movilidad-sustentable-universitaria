@@ -21,6 +21,8 @@
     "@angular/service-worker": "^19.0.0",
     "@primeng/themes": "^20.2.0",
     "@supabase/supabase-js": "^2.76.1",
+    "angularx-qrcode": "^19.0.0",
+    "ngx-scanner-qrcode": "^1.7.6",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.1.4",

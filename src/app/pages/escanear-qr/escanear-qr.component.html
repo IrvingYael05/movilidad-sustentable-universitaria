@@ -1,0 +1,29 @@
+<div class="scanner-container">
+  <h1>Validación de Acceso</h1>
+  <p>Apunta la cámara al código QR del usuario.</p>
+  
+  <div class="scanner-viewport">
+    <div *ngIf="isLoading" class="scanner-overlay">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Validando...</p>
+    </div>
+    
+    <ngx-scanner-qrcode
+      #action="scanner"
+      [config]="config"
+      (event)="onEvent($event)">
+    </ngx-scanner-qrcode>
+    </div>
+</div>
+
+<p-dialog [(visible)]="showResultDialog" [modal]="true" [style]="{width: '90vw', 'max-width': '400px'}"
+  [closable]="false" [draggable]="false" [resizable]="false">
+  
+  <div *ngIf="scanResult?.aprobado" class="result-modal approved">
+    <button pButton label="Cerrar" (click)="closeDialog()"></button>
+  </div>
+
+  <div *ngIf="scanResult && !scanResult.aprobado" class="result-modal denied">
+     <button pButton label="Cerrar" (click)="closeDialog()" class="p-button-danger"></button>
+  </div>
+</p-dialog>

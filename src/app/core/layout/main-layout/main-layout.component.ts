@@ -49,8 +49,8 @@ export class MainLayoutComponent {
     this.userSubscription = this._authService.currentUserProfile$.subscribe(
       (profile) => {
         if (profile) {
-          this.buildSidebarItems();
           this.buildMenuBarItems(profile.roles);
+          this.buildSidebarItems(profile.roles);
         }
       }
     );
@@ -63,40 +63,40 @@ export class MainLayoutComponent {
   buildMenuBarItems(roles: string[]) {
     const items: MenuBarItem[] = [];
 
-    // Opciones para roles 'usuario''
-    if (roles.includes('usuario')) {
+    if (roles.includes('usuario') || roles.includes('conductor')) {
       items.push({ label: 'Viajes', routerLink: '/' });
       items.push({ label: 'Mi Viaje', routerLink: '/lista-viajes' });
-    }
+      items.push({ label: 'Acceso', routerLink: '/acceso-qr' });
 
-    // Opciones para roles 'conductor'
-    if (roles.includes('conductor')) {
-      items.push({ label: 'Viajes', routerLink: '/' });
-      items.push({ label: 'Nuevo Viaje', routerLink: '/nuevo-viaje' });
-      items.push({ label: 'Mi Viaje', routerLink: '/lista-viajes' });
-    }
- 
-    // Opciones para el rol 'guardia'
-    if (roles.includes('guardia')) {
-      items.push({ label: 'Validación de Acceso', routerLink: '/escanear-qr' });
+      if (roles.includes('conductor')) {
+        items.push({ label: 'Nuevo Viaje', routerLink: '/nuevo-viaje' });
+      }
+    } 
+    else if (roles.includes('guardia')) {
+      items.push({ label: 'Escaner', routerLink: '/escanear-qr' });
+    } 
+    else if (roles.includes('administrador')) {
+      // items.push({ label: 'Métricas', routerLink: '/metricas' });
     }
 
     this.menuBarItems = items;
   }
 
-  buildSidebarItems() {
+  buildSidebarItems(roles: string[]) {
     const items: SideMenuItem[] = [];
 
-    items.push({
-      label: 'Tu Perfil',
-      icon: 'pi pi-user',
-      route: '/mi-perfil',
-    });
-    items.push({
-      label: 'Tu Vehículo',
-      icon: 'pi pi-car',
-      route: '/mi-vehiculo',
-    });
+    if (roles.includes('usuario') || roles.includes('conductor')) {
+      items.push({
+        label: 'Tu Perfil',
+        icon: 'pi pi-user',
+        route: '/mi-perfil',
+      });
+      items.push({
+        label: 'Tu Vehículo',
+        icon: 'pi pi-car',
+        route: '/mi-vehiculo',
+      });
+    }
 
     items.push({
       label: 'Cerrar Sesión',

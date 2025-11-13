@@ -4,32 +4,63 @@ import NuevoViajeComponent from './nuevo-viaje/nuevo-viaje.component';
 import { MiPerfilComponent } from './mi-perfil/mi-perfil.component';
 import { MiVehiculoComponent } from './mi-vehiculo/mi-vehiculo.component';
 import { ListaViajesComponent } from './nuevo-viaje/lista-viajes/lista-viajes.component';
+import { AccesoQrComponent } from './acceso-qr/acceso-qr.component';
+import { roleGuard } from '../shared/guards/role.guard';
+import { EscanearQrComponent } from './escanear-qr/escanear-qr.component';
 
-
+// import { MetricasComponent } from './metricas/metricas.component';
 
 export default [
   {
     path: '',
-    component: ViajesComponent
+    component: ViajesComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['usuario', 'conductor'] },
   },
   {
     path: 'mi-perfil',
-    component: MiPerfilComponent
+    component: MiPerfilComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['usuario', 'conductor'] },
   },
   {
     path: 'mi-vehiculo',
-    component: MiVehiculoComponent
+    component: MiVehiculoComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['usuario', 'conductor'] },
+  },
+  {
+    path: 'lista-viajes',
+    component: ListaViajesComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['usuario', 'conductor'] },
   },
   {
     path: 'nuevo-viaje',
-    component: NuevoViajeComponent
+    component: NuevoViajeComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['conductor'] },
   },
   {
-  path: 'lista-viajes',
-  component: ListaViajesComponent
+    path: 'acceso-qr',
+    component: AccesoQrComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['usuario', 'conductor'] },
   },
+  {
+    path: 'escanear-qr',
+    component: EscanearQrComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['guardia'] },
+  },
+  // {
+  //   path: 'metricas',
+  //   component: MetricasComponent,
+  //   canActivate: [roleGuard],
+  //   data: { roles: ['administrador'] }
+  // },
   {
     path: '**',
     redirectTo: '',
-  }
+  },
 ] as Routes;

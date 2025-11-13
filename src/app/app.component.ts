@@ -9,11 +9,12 @@ import {
 } from '@angular/router';
 import { LoadingService } from './shared/data-access/loading.service';
 import { LoadingComponent } from './shared/components/loading/loading.component';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LoadingComponent],
+  imports: [RouterOutlet, LoadingComponent, ToastModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

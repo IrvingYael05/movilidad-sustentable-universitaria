@@ -1,0 +1,32 @@
+<div class="qr-container">
+  <h1 class="text-3xl font-bold m-0">Acceso QR</h1>
+  <p class="text-secondary mt-1">
+    Muestra este código al guardia para validar tu acceso.
+  </p>
+
+  <div *ngIf="isLoading" class="state-box loading">
+    <i class="pi pi-spin pi-spinner"></i>
+    <p>Generando tu QR de acceso...</p>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="state-box error">
+    <i class="pi pi-exclamation-triangle"></i>
+    <p class="font-semibold">Error al generar el QR</p>
+    <small>{{ errorMessage }}</small>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && tokenQR" class="qr-box">
+    <qrcode
+      [qrdata]="tokenQR"
+      [width]="280"
+      [errorCorrectionLevel]="'H'"
+      [colorDark]="'#232e56'"
+      [colorLight]="'#ffffff'"
+      [margin]="2"
+    >
+    </qrcode>
+  </div>
+
+    <h1 class="text-3xl font-bold m-0">Acceso QR</h1>
+
+</div>

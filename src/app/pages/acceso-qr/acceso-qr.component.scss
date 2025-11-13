@@ -1,0 +1,74 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #244e7c;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+p {
+  color: #71706f;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  margin-top: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &.loading {
+    color: #244e7c;
+  }
+  
+  &.error {
+    color: #a82424;
+    background-color: #f7e8e8;
+    border: 1px solid #a82424;
+  }
+}
+
+.qr-box {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(36, 78, 124, 0.05);
+
+  .qr-footer {
+    font-size: 0.85rem;
+    color: #71706f;
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
+
+  // La regla .qr-code-canvas ya no es necesaria
+  // porque [width] lo maneja
+}
