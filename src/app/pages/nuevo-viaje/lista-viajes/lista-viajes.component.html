@@ -1,196 +1,157 @@
-<div
-  class="flex flex-column align-items-center justify-content-center min-h-screen p-4 surface-ground overflow-auto"
->
+<div class="flex flex-column align-items-center justify-content-center min-h-screen p-4 overflow-auto">
   <div class="w-full md:w-30rem">
-    
-    <div class="text-center mb-4">
-      <p class="text-secondary mb-4 mt-2">
-        Aquí puedes ver los detalles de tu viaje
-      </p>
-    </div>
-
-    <div *ngIf="!viajeActivo && !isLoading" class="text-center">
-      <p class="text-secondary">
-        No tienes ningún viaje activo por el momento.
-      </p>
-    </div>
-
     
     <div *ngIf="isLoading" class="text-center">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       <p class="text-secondary mt-2">Cargando...</p>
     </div>
 
-   
-    <div *ngIf="viajeActivo && !esPasajero && !isLoading" class="viaje-card mt-3">
-      <div class="section-header mb-2">
-        <label class="font-semibold">Punto de partida</label>
-        <p>{{ viajeActivo.lugar_salida }}</p>
-      </div>
-
-      <div class="section-header mb-2">
-        <label class="font-semibold">Destino</label>
-        <p>{{ viajeActivo.lugar_llegada }}</p>
-      </div>
-
-      <div class="section-header mb-2">
-        <label class="font-semibold">Hora de salida</label>
-        <p>{{ viajeActivo.hora_salida | date: 'shortTime' }}</p>
-      </div>
-
-      <div class="section-header mb-3">
-        <label class="font-semibold">Lugares disponibles</label>
-        <p>{{ viajeActivo.asientos_disponibles }}</p>
-      </div>
-
-      <div class="section-header mb-3">
-        <label class="font-semibold">Pasajeros</label>
-        <div *ngIf="pasajerosConfirmados.length === 0">
-          <p class="text-secondary">No hay pasajeros confirmados aún</p>
+    <div *ngIf="!isLoading && !viajeActivo">
+      
+      <div *ngIf="esConductor">
+        <div class="text-center mb-4">
+          <h1 class="text-3xl font-bold m-0">Nuevo Viaje</h1>
+          <p class="text-secondary mb-4 mt-2">Completa los campos para publicar tu viaje</p>
         </div>
-        <div *ngIf="pasajerosConfirmados.length > 0">
-          <p *ngFor="let pasajero of pasajerosConfirmados; let i = index" class="m-0 mb-1">
-            {{ i + 1 }}. {{ pasajero.pasajero.nombre }} {{ pasajero.pasajero.apellido }}
-          </p>
+
+        <div class="flex flex-column gap-3 p-4 border-round shadow-1">
+          <div class="section-header">
+            <label class="font-semibold">Punto de partida</label>
+          </div>
+          <input pInputText placeholder="Calle" [(ngModel)]="viajeForm.calle" class="w-full" />
+          
+          <div class="flex gap-2">
+            <input pInputText placeholder="No. Exterior" [(ngModel)]="viajeForm.numeroExterior" class="flex-1" />
+            <input pInputText placeholder="C.P." [(ngModel)]="viajeForm.codigoPostal" class="flex-1" />
+          </div>
+          
+          <input pInputText placeholder="Colonia" [(ngModel)]="viajeForm.colonia" class="w-full" />
+
+          <div class="section-header mt-2">
+            <label class="font-semibold">Hora de Salida</label>
+            <p-calendar 
+              [(ngModel)]="viajeForm.hora" 
+              [timeOnly]="true" 
+              [showTime]="true" 
+              [showSeconds]="false" 
+              inputId="hora"
+              placeholder="Selecciona una hora"
+              styleClass="w-full" 
+              [inputStyle]="{'width':'100%'}"
+              dataType="date">
+            </p-calendar>
+          </div>
+          <div class="section-header mt-2">
+            <label class="font-semibold">Lugares disponibles: {{ viajeForm.lugaresDisponibles }}</label>
+          </div>
+          <div class="flex flex-column gap-2">
+            <div *ngFor="let p of pasajerosList; let i = index" class="flex align-items-center justify-content-between pasajero-item">
+              <span>Pasajero {{ p }}</span>
+              <div class="flex gap-2">
+                <button pButton label="+" class="p-button-rounded p-button-sm add-btn" (click)="agregarPasajeroForm()" *ngIf="i === pasajerosList.length - 1"></button>
+                <button pButton label="-" class="p-button-rounded p-button-sm p-button-danger remove-btn" (click)="eliminarPasajeroForm(i)" *ngIf="pasajerosList.length > 1"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-content-end mt-4">
+            <p-button label="Publicar Viaje" [loading]="isPublishing" (click)="publicarViaje()" styleClass="w-full"></p-button>
+          </div>
         </div>
       </div>
 
-      <div class="flex justify-content-end mt-3">
-        <p-button
-          label="Eliminar viaje"
-          styleClass="delete-btn"
-          (click)="confirmarEliminar(viajeActivo.viaje_id)"
-        ></p-button>
+      <div *ngIf="!esConductor" class="text-center mt-5">
+        <i class="pi pi-car" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+        <p class="text-secondary mt-3">No tienes ningún viaje activo por el momento.</p>
+        <p class="text-sm text-secondary">Busca un viaje disponible en la sección de "Viajes".</p>
+        <p-button label="Buscar Viajes" routerLink="/" styleClass="mt-3 p-button-outlined"></p-button>
       </div>
+
     </div>
 
-  
-    <div *ngIf="viajeActivo && !esPasajero && !isLoading" class="solicitudes-card mt-5">
-      <h3 class="text-center text-xl font-bold mb-3">Tus Solicitudes</h3>
-
-      <div *ngIf="isLoadingSolicitudes" class="text-center py-4">
-        <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
-        <p class="text-secondary mt-2">Cargando solicitudes...</p>
+    <div *ngIf="!isLoading && viajeActivo">
+      
+      <div class="text-center mb-4">
+        <h1 class="text-2xl font-bold m-0">Mi Viaje</h1>
+        <p class="text-secondary mt-1">{{ esPasajero ? 'Detalles de tu transporte' : 'Gestiona tu viaje publicado' }}</p>
       </div>
 
-      <div
-        *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length === 0"
-        class="text-center py-4"
-      >
-        <i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
-        <p class="text-secondary mt-2">No tienes solicitudes pendientes</p>
+      <div class="viaje-card">
+        <div class="section-header mb-2">
+          <label class="font-semibold">Punto de partida</label>
+          <p>{{ viajeActivo.lugar_salida }}</p>
+        </div>
+
+        <div class="section-header mb-2">
+          <label class="font-semibold">Destino</label>
+          <p>{{ viajeActivo.lugar_llegada }}</p>
+        </div>
+
+        <div class="section-header mb-2">
+          <label class="font-semibold">Hora de salida</label>
+          <p>{{ viajeActivo.hora_salida | date: 'shortTime' }}</p>
+        </div>
+
+        <div class="section-header mb-3">
+          <label class="font-semibold">Lugares disponibles</label>
+          <p>{{ viajeActivo.asientos_disponibles }}</p>
+        </div>
+
+        <div class="section-header mb-3">
+          <label class="font-semibold">Pasajeros</label>
+          <div *ngIf="pasajerosConfirmados.length === 0">
+            <p class="text-secondary text-sm">Aún no hay pasajeros confirmados.</p>
+          </div>
+          <ul *ngIf="pasajerosConfirmados.length > 0" class="m-0 pl-3">
+            <li *ngFor="let p of pasajerosConfirmados">
+              {{ p.pasajero.nombre }} {{ p.pasajero.apellido }}
+            </li>
+          </ul>
+        </div>
+
+        <div class="flex justify-content-center mt-4">
+          <p-button *ngIf="!esPasajero" label="Eliminar viaje" styleClass="delete-btn" (click)="confirmarEliminar(viajeActivo.viaje_id)"></p-button>
+          <p-button *ngIf="esPasajero" label="Salir del Viaje" icon="pi pi-sign-out" styleClass="p-button-danger" (click)="salirDelViaje()"></p-button>
+        </div>
       </div>
 
-      <div *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length > 0">
-        <div
-          *ngFor="let solicitud of solicitudesPendientes"
-          class="solicitud-item mb-3 p-3 border-round surface-card shadow-1"
-          [@fadeSlide]
-        >
+      <div *ngIf="esPasajero" class="driver-card mt-4">
+        <h3 class="section-title">Tu Conductor</h3>
+        <div class="driver-info">
+          <div class="driver-header">
+            <p class="driver-name">{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
+            <p class="driver-email">{{ viajeActivo.conductor.email }}</p>
+          </div>
+          <div class="vehicle-info">
+            <div class="vehicle-row"><span class="label">Placa :</span><span class="value">{{ viajeActivo.vehiculo?.placa || 'N/A' }}</span></div>
+            <div class="vehicle-row"><span class="label">Marca :</span><span class="value">{{ viajeActivo.vehiculo?.marca || 'N/A' }}</span></div>
+            <div class="vehicle-row"><span class="label">Color :</span><span class="value">{{ viajeActivo.vehiculo?.color || 'N/A' }}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!esPasajero" class="mt-5">
+        <h3 class="text-center text-xl font-bold mb-3">Solicitudes Pendientes</h3>
+        
+        <div *ngIf="isLoadingSolicitudes" class="text-center"><i class="pi pi-spin pi-spinner"></i></div>
+        
+        <div *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length === 0" class="text-center py-3 border-round border-1 surface-border">
+          <p class="text-secondary m-0">No tienes solicitudes pendientes.</p>
+        </div>
+
+        <div *ngFor="let s of solicitudesPendientes" class="solicitud-item mb-3 p-3 border-round shadow-1" [@fadeSlide]>
           <div class="flex justify-content-between align-items-center">
-            <div class="flex-1">
-              <p class="font-semibold m-0">
-                {{ solicitud.pasajero.nombre }} {{ solicitud.pasajero.apellido }}
-              </p>
-              <small class="text-secondary">{{ solicitud.pasajero.email }}</small>
-              <br />
-              <small class="text-secondary">
-                Solicitado: {{ solicitud.solicitado_en | date: 'short' }}
-              </small>
+            <div>
+              <p class="font-semibold m-0">{{ s.pasajero.nombre }} {{ s.pasajero.apellido }}</p>
+              <small class="text-secondary">{{ s.pasajero.email }}</small>
             </div>
             <div class="flex gap-2">
-              <p-button
-                label="Rechazar"
-                icon="pi pi-times"
-                styleClass="p-button-danger p-button-text"
-                (click)="rechazarSolicitud(solicitud)"
-              ></p-button>
-              <p-button
-                label="Aceptar"
-                icon="pi pi-check"
-                styleClass="accept-btn"
-                (click)="aceptarSolicitud(solicitud)"
-              ></p-button>
+              <p-button icon="pi pi-times" styleClass="p-button-danger p-button-text p-button-rounded" (click)="rechazarSolicitud(s)"></p-button>
+              <p-button icon="pi pi-check" styleClass="p-button-success p-button-rounded" (click)="aceptarSolicitud(s)"></p-button>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-    
-    <div *ngIf="viajeActivo && esPasajero && !isLoading" class="viaje-card mt-3 p-3 border-round surface-card shadow-2">
-      <h2 class="text-center text-lg font-bold mb-3">Auto compartido</h2>
-      <h3 class="text-center text-base mb-4">Mi viaje</h3>
-
-      <div class="section mb-3">
-        <label class="font-semibold">Punto de Partida</label>
-        <p>{{ viajeActivo.lugar_salida }}</p>
-      </div>
-
-      <div class="section mb-3">
-        <label class="font-semibold">Hora</label>
-        <p>{{ viajeActivo.hora_salida | date: 'short' }}</p>
-      </div>
-
-      <div class="section mb-3">
-        <label class="font-semibold">Lugares disponibles</label>
-        <p>{{ viajeActivo.asientos_disponibles }}</p>
-      </div>
-
-      <div class="section mb-3">
-        <label class="font-semibold">Pasajeros</label>
-        <div *ngIf="pasajerosConfirmados.length === 0">
-          <p class="text-secondary">Aún no hay otros pasajeros</p>
-        </div>
-        <div *ngIf="pasajerosConfirmados.length > 0">
-          <ul class="m-0 pl-3">
-            <li *ngFor="let pasajero of pasajerosConfirmados">
-              {{ pasajero.pasajero.nombre }} {{ pasajero.pasajero.apellido }}
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="text-center mt-4">
-        <p-button
-          label="Salir del Viaje"
-          icon="pi pi-sign-out"
-          styleClass="p-button-danger"
-          (click)="salirDelViaje()"
-        ></p-button>
-      </div>
-
-      
-      <div class="driver-container"></div>
-      <div class="driver-card">
-  <h3 class="section-title">Tu Conductor</h3>
-
-  <div class="driver-info">
-    <div class="driver-header">
-      <p class="driver-name">{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
-      <p class="driver-email">{{ viajeActivo.conductor.email }}</p>
-    </div>
-
-    <div class="vehicle-info">
-      <div class="vehicle-row">
-        <span class="label">Placa :</span>
-        <span class="value">{{ viajeActivo.vehiculo?.placa || 'N/A' }}</span>
-      </div>
-      <div class="vehicle-row">
-        <span class="label">Marca :</span>
-        <span class="value">{{ viajeActivo.vehiculo?.marca || 'N/A' }}</span>
-      </div>
-      <div class="vehicle-row">
-        <span class="label">Modelo :</span>
-        <span class="value">{{ viajeActivo.vehiculo?.modelo || 'N/A' }}</span>
-      </div>
-      <div class="vehicle-row">
-        <span class="label">Color :</span>
-        <span class="value">{{ viajeActivo.vehiculo?.color || 'N/A' }}</span>
-      </div>
-    </div>
-  </div>
-</div>
 
     </div>
   </div>

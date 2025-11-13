@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Subscription } from 'rxjs';
@@ -35,7 +35,7 @@ interface MenuBarItem {
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.scss'],
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit, OnDestroy {
   private _authService = inject(AuthService);
   private _messageService = inject(MessageService);
   private route = inject(Router);
@@ -65,19 +65,13 @@ export class MainLayoutComponent {
 
     if (roles.includes('usuario') || roles.includes('conductor')) {
       items.push({ label: 'Viajes', routerLink: '/' });
+      // Ahora "Mi Viaje" maneja tanto la vista del viaje como la creación
       items.push({ label: 'Mi Viaje', routerLink: '/lista-viajes' });
       items.push({ label: 'Acceso', routerLink: '/acceso-qr' });
-
-      if (roles.includes('conductor')) {
-        items.push({ label: 'Nuevo Viaje', routerLink: '/nuevo-viaje' });
-      }
     } 
     else if (roles.includes('guardia')) {
       items.push({ label: 'Escaner', routerLink: '/escanear-qr' });
     } 
-    else if (roles.includes('administrador')) {
-      // items.push({ label: 'Métricas', routerLink: '/metricas' });
-    }
 
     this.menuBarItems = items;
   }
@@ -133,7 +127,7 @@ export class MainLayoutComponent {
       this._messageService.add({
         severity: 'success',
         summary: 'Cerrando Sesión...',
-        detail: 'Haz cerrado sesión con éxito.',
+        detail: 'Has cerrado sesión con éxito.',
       });
 
       this.closeSidebar();

@@ -30,16 +30,10 @@ export default [
     data: { roles: ['usuario', 'conductor'] },
   },
   {
-    path: 'lista-viajes',
+    path: 'lista-viajes', 
     component: ListaViajesComponent,
     canActivate: [roleGuard],
     data: { roles: ['usuario', 'conductor'] },
-  },
-  {
-    path: 'nuevo-viaje',
-    component: NuevoViajeComponent,
-    canActivate: [roleGuard],
-    data: { roles: ['conductor'] },
   },
   {
     path: 'acceso-qr',
