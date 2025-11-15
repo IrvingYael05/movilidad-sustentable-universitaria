@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -15,6 +15,9 @@ import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+
+import { SupabaseService } from '../../../shared/data-access/supabase.service';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 interface LoginForm {
   email: FormControl<string | null>;
@@ -46,11 +49,14 @@ export function institutionalEmailValidator(
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export default class LoginComponent {
+export default class LoginComponent implements OnDestroy {
   private _formBuilder = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _router = inject(Router);
   private _messageService = inject(MessageService);
+
+  private _supabase = inject(SupabaseService);
+  private channel: RealtimeChannel | null = null;
 
   form = this._formBuilder.group<LoginForm>({
     email: this._formBuilder.control('', [
@@ -72,6 +78,7 @@ export default class LoginComponent {
   async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+
       const emailErrors = this.form.controls.email.errors;
 
       if (emailErrors?.['required']) {
@@ -114,11 +121,29 @@ export default class LoginComponent {
         throw authResponse.error;
       }
 
+      const userId = authResponse.data.session?.user.id;
+
+      if (userId) {
+        const channelName = `session-user-${userId}`;
+        this.channel = this._supabase.supabaseClient.channel(channelName);
+
+        this.channel?.subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            this.channel?.send({
+              type: 'broadcast',
+              event: 'NEW_LOGIN',
+              payload: { message: 'Nueva sesión iniciada.' },
+            });
+          }
+        });
+      }
+
       this.showToast(
         'success',
         '¡Bienvenido!',
         'Has iniciado sesión correctamente.'
       );
+
       setTimeout(() => {
         this._router.navigate(['/']);
       }, 3000);
@@ -129,6 +154,12 @@ export default class LoginComponent {
         'Error al iniciar sesión',
         'Credenciales inválidas. Por favor, verifica tu correo y contraseña.'
       );
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.channel) {
+      this._supabase.supabaseClient.removeChannel(this.channel);
     }
   }
 }

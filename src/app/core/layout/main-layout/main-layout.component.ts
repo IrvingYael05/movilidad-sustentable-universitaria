@@ -10,6 +10,10 @@ import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
+// --- AÑADIDO: Importaciones de Supabase Realtime ---
+import { SupabaseService } from '../../../shared/data-access/supabase.service';
+import { RealtimeChannel } from '@supabase/supabase-js';
+
 interface SideMenuItem {
   label: string;
   icon: string;
@@ -41,6 +45,9 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   private route = inject(Router);
   private userSubscription: Subscription | undefined;
 
+  private _supabase = inject(SupabaseService);
+  private channel: RealtimeChannel | null = null;
+
   sidebarVisible = false;
   sidebarItems: SideMenuItem[] = [];
   menuBarItems: MenuBarItem[] = [];
@@ -51,6 +58,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         if (profile) {
           this.buildMenuBarItems(profile.roles);
           this.buildSidebarItems(profile.roles);
+
+          this.setupSessionListener(profile.usuario_id);
         }
       }
     );
@@ -58,6 +67,33 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.userSubscription?.unsubscribe();
+    if (this.channel) {
+      this._supabase.supabaseClient.removeChannel(this.channel);
+    }
+  }
+
+  setupSessionListener(userId: string) {
+    if (this.channel) {
+      this._supabase.supabaseClient.removeChannel(this.channel);
+    }
+
+    const channelName = `session-user-${userId}`;
+    this.channel = this._supabase.supabaseClient.channel(channelName);
+
+    this.channel?.on('broadcast', { event: 'NEW_LOGIN' }, (payload) => {
+
+        this._messageService.add({
+          severity: 'warn',
+          summary: 'Sesión terminada',
+          detail: 'Has iniciado sesión en otro dispositivo. Cerrando esta sesión.',
+          sticky: true,
+        });
+
+        setTimeout(() => {
+          this.forceLogout();
+        }, 1500);
+      })
+      .subscribe();
   }
 
   buildMenuBarItems(roles: string[]) {
@@ -65,7 +101,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
     if (roles.includes('usuario') || roles.includes('conductor')) {
       items.push({ label: 'Viajes', routerLink: '/' });
-      // Ahora "Mi Viaje" maneja tanto la vista del viaje como la creación
       items.push({ label: 'Mi Viaje', routerLink: '/lista-viajes' });
       items.push({ label: 'Acceso', routerLink: '/acceso-qr' });
     } 
@@ -119,6 +154,11 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   }
 
   async logout() {
+    if (this.channel) {
+      this._supabase.supabaseClient.removeChannel(this.channel);
+      this.channel = null;
+    }
+
     try {
       const response = await this._authService.logOut();
 
@@ -142,5 +182,15 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         detail: 'Hubo un problema al cerrar sesión.',
       });
     }
+  }
+
+  private async forceLogout() {
+    if (this.channel) {
+      this._supabase.supabaseClient.removeChannel(this.channel);
+      this.channel = null;
+    }
+    
+    await this._authService.logOut(); 
+    this.route.navigate(['/auth/login']);
   }
 }
