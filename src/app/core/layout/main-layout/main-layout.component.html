@@ -14,7 +14,7 @@
   </div>
 </p-toolbar>
 
-<nav class="custom-menubar">
+<nav class="custom-menubar" *ngIf="shouldShowMenuBar">
   <a
     *ngFor="let item of menuBarItems"
     class="menubar-item"

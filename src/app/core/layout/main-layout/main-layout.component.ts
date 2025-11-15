@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
-import { Subscription } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 
 // --- Importaciones de PrimeNG ---
 import { ToolbarModule } from 'primeng/toolbar';
@@ -48,6 +48,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   private _supabase = inject(SupabaseService);
   private channel: RealtimeChannel | null = null;
 
+  public shouldShowMenuBar = true;
+
   sidebarVisible = false;
   sidebarItems: SideMenuItem[] = [];
   menuBarItems: MenuBarItem[] = [];
@@ -58,11 +60,24 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         if (profile) {
           this.buildMenuBarItems(profile.roles);
           this.buildSidebarItems(profile.roles);
-
-          this.setupSessionListener(profile.usuario_id);
         }
       }
     );
+    this.route.events.pipe(
+      filter((event) => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      //Obtiene la URL actual
+      const currentUrl = (event as NavigationEnd).urlAfterRedirects;
+      // Define las rutas dónde SI se ocultará la barra de menú
+      const routesToHideOn = ['/mi-perfil', '/mi-vehiculo'];
+
+      //Comprobar si la URL actual está en la lista de rutas para ocultar la barra de menú
+      if (routesToHideOn.includes(currentUrl)) {
+        this.shouldShowMenuBar = false;
+      } else {
+        this.shouldShowMenuBar = true;
+      }
+    });
   }
 
   ngOnDestroy(): void {
