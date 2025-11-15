@@ -1,0 +1,69 @@
+<div class="mapa-container">
+  <div class="mapa-layout-grid">
+
+    <div class="area-fila-superior">
+      <div 
+        *ngFor="let espacio of espaciosDinamicos" 
+        class="espacio" 
+        [ngClass]="getClass(espacio)">
+        {{ getLabel(espacio) }}
+      </div>
+    </div>
+
+    <div class="area-col-izquierda">
+      <div class="espacio dummy">16</div>
+      <div class="espacio dummy">17</div>
+      <div class="espacio dummy">18</div>
+      <div class="espacio dummy">19</div>
+      <div class="espacio dummy">20</div>
+    </div>
+
+    <div class="area-fila-central-1">
+      <div class="espacio dummy">21</div>
+      <div class="espacio dummy">22</div>
+      <div class="espacio dummy">23</div>
+      <div class="espacio dummy">24</div>
+      <div class="espacio dummy">25</div>
+      <div class="espacio dummy">26</div>
+    </div>
+    
+    <div class="area-fila-central-2">
+      <div class="espacio dummy">27</div>
+      <div class="espacio dummy">28</div>
+      <div class="espacio dummy">29</div>
+      <div class="espacio dummy">30</div>
+      <div class="espacio dummy">31</div>
+      <div class="espacio dummy">32</div>
+    </div>
+
+    <div class="area-col-derecha">
+      <div class="espacio dummy">33</div>
+      <div class="espacio dummy">34</div>
+      <div class="espacio dummy">35</div>
+      <div class="espacio dummy">36</div>
+      <div class="espacio dummy">37</div>
+    </div>
+
+    <div class="area-fila-inferior">
+      <div class="espacio dummy">01</div>
+      <div class="espacio dummy">02</div>
+      <div class="espacio dummy">03</div>
+      <div class="espacio dummy">04</div>
+      <div class="espacio dummy">05</div>
+      <div class="espacio dummy">06</div>
+      <div class="espacio dummy">07</div>
+      <div class="espacio dummy">08</div>
+      <div class="espacio dummy">09</div>
+      <div class="espacio dummy">10</div>
+      <div class="espacio dummy">11</div>
+      <div class="espacio dummy">12</div>
+      <div class="espacio dummy">13</div>
+      <div class="espacio dummy">14</div>
+      <div class="espacio dummy">15</div>
+    </div>
+
+  </div> <div class="leyenda">
+    <span class="cuadro asignado"></span> Tu Espacio
+    <span class="cuadro ocupado"></span> Espacio Ocupado
+  </div>
+</div>

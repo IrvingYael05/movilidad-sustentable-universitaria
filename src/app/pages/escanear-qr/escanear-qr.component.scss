@@ -1,11 +1,10 @@
-/* src/app/pages/escanear-qr/escanear-qr.component.scss */
 :host {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   height: 100%;
   padding: 1rem;
-  background-color: #ffffff;
+  background-color: var(--surface-ground);
 }
 
 .scanner-container {
@@ -14,17 +13,11 @@
   text-align: center;
 }
 
-h1 { font-size: 2rem; color: #244e7c; font-weight: 700; margin-bottom: 0.25rem; }
-p { color: #71706f; margin-top: 0.5rem; font-size: 0.95rem; }
-
 .scanner-viewport {
   position: relative;
   width: 100%;
   max-width: 400px;
   margin: 2rem auto;
-  border: 4px solid #244e7c;
-  border-radius: 12px;
-  overflow: hidden;
 
   .scanner-overlay {
     position: absolute;
@@ -35,47 +28,72 @@ p { color: #71706f; margin-top: 0.5rem; font-size: 0.95rem; }
     justify-content: center;
     align-items: center;
     z-index: 10;
-    i { font-size: 3rem; color: #244e7c; }
-    p { font-size: 1.2rem; color: #244e7c; }
+    
+    i { 
+      font-size: 3rem; 
+      color: var(--secondary-color); 
+    }
+    
+    p { 
+      font-size: 1.2rem; 
+      color: var(--secondary-color); 
+    }
   }
 }
 
-/* Estilos del Modal */
-.result-modal {
+.result-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  text-align: center;
+  z-index: 1001;
   padding: 1rem;
+  color: #ffffff; /* Texto blanco por defecto */
+  text-align: center;
+  cursor: pointer;
 
-  .icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-  h2 { font-size: 1.5rem; font-weight: 700; margin-top: 0; }
-
+  /* Colores de fondo según el estado */
   &.approved {
-    .icon, h2 { color: #3a8251; }
-    .highlight {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #244e7c;
-    }
-    .info-grid {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 0.5rem 1rem;
-      text-align: left;
-      width: 100%;
-      margin: 1.5rem 0;
-      span:nth-child(odd) { font-weight: 600; color: #71706f; }
-    }
+    background-color: var(--success-color);
   }
-
   &.denied {
-    .icon, h2 { color: #a82424; }
-    .motivo { font-size: 1rem; color: #333; margin: 1rem 0; }
+    /* El usuario pidió primary, no error */
+    background-color: var(--primary-color); 
+  }
+}
+
+.result-content {
+  .icon {
+    font-size: 8rem;
+    margin-bottom: 1.5rem;
   }
 
-  button { width: 100%; margin-top: 1.5rem; }
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    color: #ffffff; /* Asegura que h2 sea blanco */
+  }
+
+  p {
+    color: #ffffff;
+  }
+
+  .pasajeros-lista {
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+  }
 }

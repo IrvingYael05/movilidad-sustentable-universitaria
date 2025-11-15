@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { delay } from 'rxjs';
 
-// 🔽 --- IMPORTS ADICIONALES DEL EJEMPLO --- 🔽
 import {
   ScannerQRCodeResult,
-  ScannerQRCodeConfig,       // Para la configuración
-  NgxScannerQrcodeComponent, // Para ViewChild
-  ScannerQRCodeDevice,       // Para la lista de cámaras
+  ScannerQRCodeConfig,      
+  NgxScannerQrcodeComponent,
+  ScannerQRCodeDevice,
 } from 'ngx-scanner-qrcode';
 import { EscanearQrService, ScanResult } from './services/escanear-qr.service';
 
@@ -26,13 +25,12 @@ export class EscanearQrComponent implements AfterViewInit, OnDestroy {
   scanResult: ScanResult | null = null;
   isLoading = false;
 
-  // 🔽 --- CÓDIGO DEL EJEMPLO ADAPTADO --- 🔽
 
   // 1. Configuración de la cámara
   public config: ScannerQRCodeConfig = {
     constraints: {
       video: {
-        width: window.innerWidth, // Usar el ancho de la ventana
+        width: window.innerWidth,
       },
     },
   };
@@ -74,10 +72,10 @@ export class EscanearQrComponent implements AfterViewInit, OnDestroy {
   closeDialog() {
     this.showResultDialog = false;
     this.scanResult = null;
-    this.handle(this.action, 'start'); // Listo para el siguiente auto
+    this.handle(this.action, 'start');
   }
 
-  // 6. Función de control (del ejemplo)
+  // 6. Función de control
   public handle(action: any, fn: string): void {
     const playDeviceFacingBack = (devices: ScannerQRCodeDevice[]) => {
       // Busca la cámara trasera
@@ -99,7 +97,6 @@ export class EscanearQrComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Detener la cámara al salir del componente
     if (this.action) {
       this.handle(this.action, 'stop');
     }

@@ -1,6 +1,6 @@
 <div class="scanner-container">
-  <h1>Validación de Acceso</h1>
-  <p>Apunta la cámara al código QR del usuario.</p>
+  <h1>Validación QR</h1>
+  <p>Apunta la cámara al código QR del usuario para validar su acceso.</p>
   
   <div class="scanner-viewport">
     <div *ngIf="isLoading" class="scanner-overlay">
@@ -13,17 +13,39 @@
       [config]="config"
       (event)="onEvent($event)">
     </ngx-scanner-qrcode>
-    </div>
+  </div>
 </div>
 
-<p-dialog [(visible)]="showResultDialog" [modal]="true" [style]="{width: '90vw', 'max-width': '400px'}"
-  [closable]="false" [draggable]="false" [resizable]="false">
-  
-  <div *ngIf="scanResult?.aprobado" class="result-modal approved">
-    <button pButton label="Cerrar" (click)="closeDialog()"></button>
+<div 
+  *ngIf="showResultDialog" 
+  class="result-overlay" 
+  [ngClass]="{
+    'approved': scanResult?.aprobado, 
+    'denied': !scanResult?.aprobado
+  }"
+  (click)="closeDialog()">
+
+  <div class="result-content">
+    <!-- Acceso Aprobado -->
+    <div *ngIf="scanResult?.aprobado">
+      <i class="pi pi-check-circle icon"></i>
+      <h2>Acceso Permitido</h2>
+      
+      <div class="pasajeros-lista">
+        <p><strong>Conductor: </strong> {{ scanResult?.conductor }} </p>
+        <p *ngIf="scanResult?.pasajeros"><strong>{{ scanResult?.pasajeros }}</strong> pasajero(s) a bordo:</p>
+        <ul>
+          <li *ngFor="let pasajero of scanResult?.pasajeros_detalles">{{ pasajero }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Caso: Acceso Denegado -->
+    <div *ngIf="scanResult && !scanResult.aprobado">
+      <i class="pi pi-times-circle icon"></i>
+      <h2>Acceso Denegado</h2>
+      <p class="motivo"><strong>{{ scanResult.motivo }}</strong></p>
+    </div>
   </div>
 
-  <div *ngIf="scanResult && !scanResult.aprobado" class="result-modal denied">
-     <button pButton label="Cerrar" (click)="closeDialog()" class="p-button-danger"></button>
-  </div>
-</p-dialog>
+</div>

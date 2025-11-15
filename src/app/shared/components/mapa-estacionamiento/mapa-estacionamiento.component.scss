@@ -1,0 +1,122 @@
+/* Contenedor principal del mapa */
+.mapa-container {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  margin-top: 2rem;
+  background-color: #f8fafc;
+}
+
+/* EL GRID DE LAYOUT PRINCIPAL */
+.mapa-layout-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: auto repeat(6, 1fr) auto;
+  gap: 0.25rem;
+  grid-template-areas:
+    "top top top top top top top top top"
+    "left . . mid1 mid2 . . . right"
+    "left . . mid1 mid2 . . . right"
+    "left . . mid1 mid2 . . . right"
+    "left . . mid1 mid2 . . . right"
+    "left . . mid1 mid2 . . . right"
+    "left . . mid1 mid2 . . . right"
+    "bottom bottom bottom bottom bottom bottom bottom bottom bottom";
+}
+
+/* --- ÁREAS DEL GRID --- */
+.area-fila-superior,
+.area-fila-inferior,
+.area-col-izquierda,
+.area-col-derecha,
+.area-fila-central-1,
+.area-fila-central-2 {
+  display: grid;
+  gap: inherit;
+}
+
+.area-fila-superior {
+  grid-area: top;
+  grid-template-columns: repeat(15, 1fr);
+}
+.area-fila-inferior {
+  grid-area: bottom;
+  grid-template-columns: repeat(15, 1fr);
+}
+.area-col-izquierda {
+  grid-area: left;
+  grid-template-rows: repeat(6, 1fr);
+}
+.area-col-derecha {
+  grid-area: right;
+  grid-template-rows: repeat(6, 1fr);
+}
+.area-fila-central-1 {
+  grid-area: mid1;
+  grid-template-rows: repeat(6, 1fr);
+}
+.area-fila-central-2 {
+  grid-area: mid2;
+  grid-template-rows: repeat(6, 1fr);
+}
+
+/* --- ESTILOS DE LOS ESPACIOS (CAJONES) --- */
+.espacio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40px;
+  max-width: 15px;
+  font-size: 0.4rem;
+  font-weight: 600;
+  background-color: #ffffff;
+  color: var(--text-color-secondary);
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 0 1px var(--surface-border);
+
+  /* Espacios DUMMY (los que no son funcionales) */
+  &.dummy {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+  }
+
+  /* Espacios Ocupados */
+  &.ocupado {
+    background-color: #e2e8f0;
+    color: var(--text-color-secondary);
+  }
+  
+  /* Espacio Asignado */
+  &.asignado {
+    background-color: var(--success-color);
+    color: #ffffff;
+    transform: scale(1.05);
+    z-index: 1;
+    box-shadow: 0 0 15px rgba(58, 130, 81, 0.5);
+  }
+}
+
+/* --- LEYENDA --- */
+.leyenda {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+
+  .cuadro {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: -10px;
+    box-shadow: inset 0 0 0 1px #94a3b8;
+    
+    &.ocupado { background-color: #e2e8f0; }
+    &.asignado { background-color: var(--success-color); }
+  }
+}

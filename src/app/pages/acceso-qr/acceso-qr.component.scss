@@ -4,7 +4,7 @@
   align-items: flex-start;
   height: 100%;
   padding: 1rem;
-  background-color: #ffffff;
+  background-color: var(--surface-ground);
 }
 
 .qr-container {
@@ -16,19 +16,6 @@
   text-align: center;
 }
 
-h1 {
-  font-size: 2rem;
-  color: #244e7c;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-p {
-  color: #71706f;
-  margin-top: 0.5rem;
-  font-size: 0.95rem;
-}
-
 .state-box {
   display: flex;
   flex-direction: column;
@@ -36,7 +23,7 @@ p {
   justify-content: center;
   padding: 2rem;
   margin-top: 2rem;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   width: 100%;
   
   i {
@@ -45,30 +32,47 @@ p {
   }
 
   &.loading {
-    color: #244e7c;
+    color: var(--secondary-color);
   }
   
   &.error {
-    color: #a82424;
+    color: var(--error-color);
     background-color: #f7e8e8;
-    border: 1px solid #a82424;
+    border: 1px solid var(--error-color);
+
+    p {
+      color: var(--error-color);
+    }
   }
 }
 
 .qr-box {
-  margin-top: 1.5rem;
+  position: relative;
+  display: inline-block;
+  margin: 1rem;
+  margin-top: 0.5rem;
   padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-border);
   box-shadow: 0 4px 12px rgba(36, 78, 124, 0.05);
+}
 
-  .qr-footer {
-    font-size: 0.85rem;
-    color: #71706f;
-    margin-top: 1rem;
-    margin-bottom: 0;
+.qr-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--success-color);
+  border-radius: var(--border-radius);
+  
+  i {
+    font-size: 10rem;
+    font-weight: bold;
   }
-
-  // La regla .qr-code-canvas ya no es necesaria
-  // porque [width] lo maneja
 }
