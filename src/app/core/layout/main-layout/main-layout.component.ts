@@ -189,6 +189,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       this._supabase.supabaseClient.removeChannel(this.channel);
       this.channel = null;
     }
+
+    localStorage.clear();
     
     await this._authService.logOut(); 
     this.route.navigate(['/auth/login']);
