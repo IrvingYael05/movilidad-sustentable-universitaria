@@ -72,6 +72,27 @@ p {
   }
 }
 
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-color-secondary);
+  font-size: 1rem;
+  background-color: #f8f9fa;
+  border-radius: var(--border-radius);
+  border: 1px dashed var(--surface-border);
+  margin-top: 2rem;
+
+  i {
+    font-size: 2.5rem;
+    color: var(--neutral-color);
+    margin-bottom: 1rem;
+  }
+
+  strong {
+    color: var(--text-color);
+  }
+}
+
 // --- Overrides Globales de PrimeNG ---
 
 /* Botones (p-button) */

@@ -12,6 +12,12 @@
     <small>Intentalo de nuevo más tarde.</small>
   </div>
 
+  <div *ngIf="!isLoading && !errorMessage && !tokenQR" class="empty-state">
+    <i class="pi pi-qrcode"></i>
+    <p class="font-semibold">QR no disponible</p>
+    <small>Para generar un código QR debes crear un viaje o unirte a uno existente.</small>
+  </div>
+
   <div *ngIf="!isLoading && !errorMessage" class="w-full">
     
     <div *ngIf="estadoQR === 'disponible' || estadoQR === 'utilizado'">
