@@ -33,6 +33,7 @@
       
       <div class="pasajeros-lista">
         <p><strong>Conductor: </strong> {{ scanResult?.conductor }} </p>
+        <p><strong>Placa:</strong> {{ scanResult?.placa }}</p>
         <p *ngIf="scanResult?.pasajeros"><strong>{{ scanResult?.pasajeros }}</strong> pasajero(s) a bordo:</p>
         <ul>
           <li *ngFor="let pasajero of scanResult?.pasajeros_detalles">{{ pasajero }}</li>
@@ -40,7 +41,7 @@
       </div>
     </div>
 
-    <!-- Caso: Acceso Denegado -->
+    <!-- Acceso Denegado -->
     <div *ngIf="scanResult && !scanResult.aprobado">
       <i class="pi pi-times-circle icon"></i>
       <h2>Acceso Denegado</h2>
