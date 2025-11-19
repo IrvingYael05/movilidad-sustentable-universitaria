@@ -84,6 +84,7 @@
 
         <div class="section-header mb-2">
           <label class="font-semibold">Destino</label>
+          <div *ngIf="pasajerosConfirmados.length === 0"></div>
           <p>{{ viajeActivo.lugar_llegada }}</p>
         </div>
 
@@ -109,7 +110,7 @@
           </ul>
         </div>
 
-        <div class="flex justify-content-center mt-4">
+        <div class="flex justify-content-center mt-5">
           <p-button *ngIf="!esPasajero" label="Eliminar viaje" styleClass="delete-btn" (click)="confirmarEliminar(viajeActivo.viaje_id)"></p-button>
           <p-button *ngIf="esPasajero" label="Salir del Viaje" icon="pi pi-sign-out" styleClass="p-button-danger" (click)="salirDelViaje()"></p-button>
         </div>
@@ -118,15 +119,36 @@
       <div *ngIf="esPasajero" class="driver-card mt-4">
         <h3 class="section-title">Tu Conductor</h3>
         <div class="driver-info">
-          <div class="driver-header">
-            <p class="driver-name">{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
-            <p class="driver-email">{{ viajeActivo.conductor.email }}</p>
+
+          <div class="section-header mb-3">
+           <label class="font-semibold">Nombre</label>
+           <p>{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
           </div>
-          <div class="vehicle-info">
-            <div class="vehicle-row"><span class="label">Placa :</span><span class="value">{{ viajeActivo.vehiculo?.placa || 'N/A' }}</span></div>
-            <div class="vehicle-row"><span class="label">Marca :</span><span class="value">{{ viajeActivo.vehiculo?.marca || 'N/A' }}</span></div>
-            <div class="vehicle-row"><span class="label">Color :</span><span class="value">{{ viajeActivo.vehiculo?.color || 'N/A' }}</span></div>
+
+          <div class="section-header mb-3">
+            <p>{{ viajeActivo.conductor.email }}</p>
           </div>
+          
+          <div class="section-header mb-3">
+            <label class="font-semibold">Placa</label>
+            <p>{{ viajeActivo.vehiculo?.placa || 'N/A' }}</p>
+          </div>
+
+          <div class="section-header mb-3">
+            <label class="font-semibold">Modelo</label>
+            <p>{{ viajeActivo.vehiculo?.modelo || 'N/A' }}</p>
+          </div>
+
+          <div class="section-header mb-3">
+            <label class="font-semibold">Marca</label>
+            <p>{{ viajeActivo.vehiculo?.marca || 'N/A' }}</p>
+          </div>
+
+          <div class="section-header mb-3">
+            <label class="font-semibold">Color</label>
+            <p>{{ viajeActivo.vehiculo?.color || 'N/A' }}</p>
+          </div>
+
         </div>
       </div>
 

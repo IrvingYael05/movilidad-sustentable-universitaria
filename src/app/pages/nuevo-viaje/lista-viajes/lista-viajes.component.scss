@@ -174,3 +174,33 @@ h1 {
     background-color: #8a1c1c !important;
   }
 }
+.viaje-card p {
+  text-align: left !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.section-header ul,
+.section-header li {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Centrar nombre y correo del conductor */
+.driver-card .driver-header {
+  text-align: left !important;
+}
+
+/* Alinear la información del vehículo a la izquierda */
+.driver-card .section-header {
+  text-align: left !important;
+}
+
+.driver-card .section-header label,
+.driver-card .section-header p {
+  text-align: left !important;
+  display: block;
+}
+
+
