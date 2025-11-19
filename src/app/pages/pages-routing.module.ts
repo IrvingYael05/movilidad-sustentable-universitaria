@@ -7,8 +7,7 @@ import { ListaViajesComponent } from './nuevo-viaje/lista-viajes/lista-viajes.co
 import { AccesoQrComponent } from './acceso-qr/acceso-qr.component';
 import { roleGuard } from '../shared/guards/role.guard';
 import { EscanearQrComponent } from './escanear-qr/escanear-qr.component';
-
-// import { MetricasComponent } from './metricas/metricas.component';
+import { MetricasComponent } from './metricas/metricas.component';
 
 export default [
   {
@@ -30,7 +29,7 @@ export default [
     data: { roles: ['usuario', 'conductor'] },
   },
   {
-    path: 'lista-viajes', 
+    path: 'lista-viajes',
     component: ListaViajesComponent,
     canActivate: [roleGuard],
     data: { roles: ['usuario', 'conductor'] },
@@ -47,12 +46,12 @@ export default [
     canActivate: [roleGuard],
     data: { roles: ['guardia'] },
   },
-  // {
-  //   path: 'metricas',
-  //   component: MetricasComponent,
-  //   canActivate: [roleGuard],
-  //   data: { roles: ['administrador'] }
-  // },
+  {
+    path: 'metricas',
+    component: MetricasComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['administrador'] },
+  },
   {
     path: '**',
     redirectTo: '',
