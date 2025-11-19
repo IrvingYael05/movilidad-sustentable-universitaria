@@ -1,0 +1,153 @@
+/* ===================================
+   MÉTRICAS DASHBOARD DESIGN
+   =================================== */
+
+/* Usamos var(--surface-ground) definido en styles.scss */
+.metricas-container {
+  /* ✅ CORRECCIÓN CLAVE: Eliminar padding superior (0) */
+  padding: 0 2rem 2rem 2rem; 
+  background-color: var(--surface-ground);
+  min-height: calc(100vh - 60px);
+}
+
+.page-title {
+  color: var(--primary-color); 
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  /* ✅ CENTRADO DEL TÍTULO */
+  text-align: center;
+}
+
+/* Línea divisoria principal: más suave y con margen ajustado */
+.separator {
+  margin: 1.5rem 0; 
+  border: none;
+  border-top: 1px solid var(--surface-border);
+  opacity: 0.8;
+}
+
+/* --- 1. KPIs Grid --- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background-color: #ffffff;
+  border-radius: var(--border-radius);
+  padding: 20px;
+  /* Sombra más limpia y moderna */
+  box-shadow: 0 4px 12px rgba(36, 78, 124, 0.1);
+  border-left: 5px solid; /* Borde más visible */
+  transition: all 0.3s ease;
+  
+  /* Colores de Borde basados en variables */
+  &.parking { border-color: var(--secondary-color); } 
+  &.trips { border-color: #f6c23e; } 
+  &.prediction { border-color: var(--error-color); } 
+  &.sustainability { border-color: var(--success-color); } 
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(36, 78, 124, 0.15);
+  }
+}
+
+.kpi-title {
+  color: var(--text-color-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre icono y texto */
+
+  i {
+    font-size: 14px;
+  }
+}
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 5px;
+}
+
+.kpi-detail {
+  font-size: 12px;
+  color: #858796;
+}
+
+.text-danger { color: var(--error-color) !important; }
+.text-success { color: var(--success-color) !important; }
+
+/* --- 2. Charts Section --- */
+.charts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 2rem;
+  
+  &.full-width {
+    .chart-card {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+.chart-card {
+  background-color: #ffffff;
+  border-radius: var(--border-radius);
+  padding: 25px; 
+  /* Sombra más limpia */
+  box-shadow: 0 4px 12px rgba(36, 78, 124, 0.1); 
+  flex: 1 1 100%;
+  min-height: 400px;
+}
+
+.large-chart {
+  min-height: 450px; 
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  /* Eliminamos la línea divisoria inferior */
+  border-bottom: none; 
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.chart-content {
+  height: 300px; 
+}
+
+.loading-placeholder {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color-secondary);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .chart-card {
+    padding: 15px;
+    min-height: 350px;
+  }
+  .chart-content {
+    height: 250px;
+  }
+  /* ✅ Ajuste responsive sin padding superior */
+  .metricas-container {
+    padding: 0 1rem 1rem 1rem; 
+  }
+}
