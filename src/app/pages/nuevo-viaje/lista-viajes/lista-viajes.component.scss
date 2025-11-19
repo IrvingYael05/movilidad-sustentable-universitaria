@@ -17,68 +17,17 @@ h1 {
   color: #71706f;
 }
 
-/* --- INPUTS (Del formulario nuevo viaje) --- */
-:host ::ng-deep input[pInputText],
-:host ::ng-deep .p-inputmask {
-  border: 2px solid #244e7c;
-  border-radius: 12px;
-  padding: 0.8rem;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: #94a3b8;
-  }
-
-  &:focus,
-  &.p-inputwrapper-focus {
-    border-color: #94a3b8;
-    box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2) !important;
-    outline: none !important;
-  }
-}
-
-/* 🔴 CORRECCIÓN CRÍTICA DE EMPALME (OVERLAP FIX) */
-:host ::ng-deep .p-float-label:has(p-inputmask.p-inputwrapper-focus) label,
-:host ::ng-deep .p-float-label:has(p-inputmask.p-inputwrapper-filled) label,
-:host ::ng-deep .p-float-label:has(p-inputmask input:focus) label {
-  top: 0.25rem !important;
-  font-size: 0.75rem !important;
-  color: #244e7c !important;
-  background-color: #ffffff;
-  padding: 0 4px;
-  z-index: 10;
-}
-
-/* Ajuste específico input interno */
-:host ::ng-deep .p-inputmask {
-  padding: 0 !important;
-  border: none !important;
-
-  input {
-    border: 2px solid #244e7c !important;
-    border-radius: 12px !important;
-    padding: 0.8rem !important;
-    width: 100%;
-  }
-
-  &.p-inputwrapper-focus input {
-    border-color: #94a3b8 !important;
-    box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2) !important;
-  }
-}
-
 /* --- ITEM PASAJERO (FORMULARIO) --- */
 .pasajero-item {
   padding: 0.8rem;
   background-color: #f3f4f6;
   border-radius: 12px;
   border: 2px solid #244e7c;
+}
 
-  span {
-    color: #244e7c;
-    font-weight: 500;
-  }
+.pasajero-item span {
+  color: #244e7c;
+  font-weight: 500;
 }
 
 .add-btn,
@@ -96,17 +45,15 @@ h1 {
   margin-top: 1rem;
 }
 
-.section-header {
-  label {
-    color: #244e7c;
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
+.section-header label {
+  color: #244e7c;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
 
-  p {
-    margin: 0.2rem 0 0 0;
-    color: #4b5563;
-  }
+.section-header p {
+  margin: 0.2rem 0 0 0;
+  color: #4b5563;
 }
 
 /* --- TARJETA CONDUCTOR --- */
@@ -115,7 +62,6 @@ h1 {
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(36, 78, 124, 0.1);
-  text-align: center;
 }
 
 .driver-name {
@@ -130,56 +76,17 @@ h1 {
   margin-top: 0.2rem;
 }
 
-.vehicle-info {
-  background-color: #f8fafc;
-  border-radius: 12px;
-  padding: 1rem;
-  border: 1px solid #e2e8f0;
-  margin-top: 1rem;
-}
-
-.vehicle-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.vehicle-row:last-child {
-  margin-bottom: 0;
-}
-
-.vehicle-row .label {
-  font-weight: 600;
-  color: #244e7c;
-}
-
-/* --- BOTONES GLOBALES --- */
-:host ::ng-deep p-button button {
-  background-color: #244e7c !important;
-  border: none !important;
-  border-radius: 12px !important;
-  font-weight: 600;
-
-  &:hover {
-    background-color: #1e3d63 !important;
-  }
-}
-
-:host ::ng-deep .delete-btn,
-:host ::ng-deep .p-button-danger {
-  background-color: #a82424 !important;
-
-  &:hover {
-    background-color: #8a1c1c !important;
-  }
-}
-.viaje-card p {
+/* Alinear toda la info del conductor a la izquierda */
+.driver-card {
   text-align: left !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
 }
 
+.driver-card .section-header label,
+.driver-card .section-header p {
+  text-align: left !important;
+}
+
+/* --- ELIMINAR VIÑETAS --- */
 .section-header ul,
 .section-header li {
   list-style: none !important;
@@ -187,20 +94,16 @@ h1 {
   margin-left: 0 !important;
 }
 
-/* Centrar nombre y correo del conductor */
-.driver-card .driver-header {
+/* --- TEXTO DE VIAJE --- */
+.viaje-card p {
   text-align: left !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
 }
 
-/* Alinear la información del vehículo a la izquierda */
-.driver-card .section-header {
-  text-align: left !important;
-}
-
-.driver-card .section-header label,
-.driver-card .section-header p {
-  text-align: left !important;
+/* Centrar únicamente el título "Tu Conductor" */
+.driver-card h3 {
+  text-align: center !important;
   display: block;
+  width: 100%;
 }
-
-
