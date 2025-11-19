@@ -50,3 +50,16 @@ form {
     text-align: left;
   }
 }
+
+/* Enlace de aviso de privacidad */
+.privacy-link {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--primary-color);
+  }
+}
