@@ -18,43 +18,37 @@
           <div class="section-header">
             <label class="font-semibold">Punto de partida</label>
           </div>
-          <input pInputText placeholder="Calle" [(ngModel)]="viajeForm.calle" class="w-full" />
+          <input pInputText placeholder="Calle" [(ngModel)]="viajeForm.calle" class="w-full" required (input)="soloTexto($event)" pattern="[A-Za-zÀ-ÿ\s]+"/>
           
           <div class="flex gap-2">
-            <input pInputText placeholder="No. Exterior" [(ngModel)]="viajeForm.numeroExterior" class="flex-1" />
-            <input pInputText placeholder="C.P." [(ngModel)]="viajeForm.codigoPostal" class="flex-1" />
+            <input pInputText placeholder="No. Exterior" [(ngModel)]="viajeForm.numeroExterior" class="flex-1"  required min="1"  maxlength="4"   (input)="limitarNumeroExterior($event)" />
+            <input pInputText placeholder="C.P." [(ngModel)]="viajeForm.codigoPostal" class="flex-1"  maxlength="5"  (input)="limitarCP($event)" required />
           </div>
           
-          <input pInputText placeholder="Colonia" [(ngModel)]="viajeForm.colonia" class="w-full" />
+          <input pInputText placeholder="Colonia" [(ngModel)]="viajeForm.colonia" class="w-full" required/>
 
           <div class="section-header mt-2">
             <label class="font-semibold">Hora de Salida</label>
-            <p-calendar 
-              [(ngModel)]="viajeForm.hora" 
-              [timeOnly]="true" 
-              [showTime]="true" 
-              [showSeconds]="false" 
-              inputId="hora"
-              placeholder="Selecciona una hora"
-              styleClass="w-full" 
-              [inputStyle]="{'width':'100%'}"
-              dataType="date">
-            </p-calendar>
+            <div class="hora-wrapper">
+
+            <input 
+              type="time" 
+              class="hora-input"
+              [(ngModel)]="horaString"
+              min="{{ horaMinima }}"
+              required
+            />
+
+          </div>
+
+
           </div>
 
           <div class="section-header mt-2">
             <label class="font-semibold">Lugares disponibles: {{ viajeForm.lugaresDisponibles }}</label>
           </div>
 
-          <div class="flex flex-column gap-2">
-            <div *ngFor="let p of pasajerosList; let i = index" class="flex align-items-center justify-content-between pasajero-item">
-              <span>Pasajero {{ p }}</span>
-              <div class="flex gap-2">
-                <button pButton label="+" class="p-button-rounded p-button-sm add-btn" (click)="agregarPasajeroForm()" *ngIf="i === pasajerosList.length - 1"></button>
-                <button pButton label="-" class="p-button-rounded p-button-sm p-button-danger remove-btn" (click)="eliminarPasajeroForm(i)" *ngIf="pasajerosList.length > 1"></button>
-              </div>
-            </div>
-          </div>
+          <input type="number" pInputText class="w-full" [(ngModel)]="viajeForm.lugaresDisponibles" min="1" max="4" required />
 
           <div class="flex justify-content-end mt-4">
             <p-button label="Publicar Viaje" [loading]="isPublishing" (click)="publicarViaje()" styleClass="w-full"></p-button>

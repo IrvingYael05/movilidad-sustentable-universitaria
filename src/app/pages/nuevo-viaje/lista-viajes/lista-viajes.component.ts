@@ -9,13 +9,13 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { CalendarModule } from 'primeng/calendar'; // <--- IMPORTANTE
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 // Servicios e Interfaces
 import { ViajesService, SolicitudViaje, PasajeroViaje } from '../services/viajes.service';
 import { SupabaseService } from '../../../shared/data-access/supabase.service';
 import { AuthService } from '../../../auth/services/auth.service';
+
 
 interface ViajeForm {
   calle: string;
@@ -36,7 +36,7 @@ interface ViajeForm {
     ToastModule,
     ConfirmDialogModule,
     InputTextModule,
-    CalendarModule // <--- AGREGADO
+
   ],
   templateUrl: './lista-viajes.component.html',
   styleUrls: ['./lista-viajes.component.scss'],
@@ -86,6 +86,8 @@ export class ListaViajesComponent implements OnInit {
   };
   pasajerosList: number[] = [1];
   isPublishing = false;
+  horaString: string = '';
+
 
   async ngOnInit() {
     const { data: { user } } = await this.supabase.supabaseClient.auth.getUser();
@@ -108,6 +110,7 @@ export class ListaViajesComponent implements OnInit {
         life: 3000,
       });
     }
+    
   }
 
   async cargarDatosIniciales() {
@@ -264,17 +267,7 @@ export class ListaViajesComponent implements OnInit {
     } catch (err) { console.error('Error verificando vehículo:', err); }
   }
 
-  agregarPasajeroForm() {
-    this.pasajerosList.push(this.pasajerosList.length + 1);
-    this.viajeForm.lugaresDisponibles = this.pasajerosList.length;
-  }
-
-  eliminarPasajeroForm(index: number) {
-    if (this.pasajerosList.length > 1) {
-      this.pasajerosList.splice(index, 1);
-      this.viajeForm.lugaresDisponibles = this.pasajerosList.length;
-    }
-  }
+  
 
   async publicarViaje() {
     if (!this.validarFormulario()) return;
@@ -287,9 +280,8 @@ export class ListaViajesComponent implements OnInit {
 
     try {
       // Formatear Hora Date a String "HH:MM"
-      const horas = this.viajeForm.hora!.getHours().toString().padStart(2, '0');
-      const minutos = this.viajeForm.hora!.getMinutes().toString().padStart(2, '0');
-      const horaString = `${horas}:${minutos}`;
+      const horaString = this.horaString;
+
 
       const direccionCompleta = `${this.viajeForm.calle} ${this.viajeForm.numeroExterior}, ${this.viajeForm.colonia}, CP ${this.viajeForm.codigoPostal}`;
 
@@ -319,23 +311,37 @@ export class ListaViajesComponent implements OnInit {
   }
 
   private validarFormulario(): boolean {
-    const f = this.viajeForm;
-    if (!f.calle || !f.numeroExterior || !f.colonia || !f.codigoPostal) {
-      this.messageService.add({ severity: 'warn', detail: 'Completa la dirección.' });
-      return false;
-    }
-    if (!f.hora) { // <--- Validación simple de objeto
-      this.messageService.add({ severity: 'warn', detail: 'Ingresa una hora válida.' });
-      return false;
-    }
-    return true;
+  const f = this.viajeForm;
+
+  if (!f.calle || !f.numeroExterior || !f.colonia || !f.codigoPostal) {
+    this.messageService.add({ severity: 'warn', detail: 'Completa la dirección.' });
+    return false;
   }
+
+  if (!f.hora) {
+    this.messageService.add({ severity: 'warn', detail: 'Ingresa una hora válida.' });
+    return false;
+  }
+
+  // Validación de número de lugares
+  if (f.lugaresDisponibles < 1 || f.lugaresDisponibles > 4) {
+    this.messageService.add({
+      severity: 'warn',
+      detail: 'Los lugares deben ser entre 1 y 4.'
+    });
+    return false;
+  }
+
+  return true;
+}
+
+
 
   private limpiarFormulario() {
     this.viajeForm = {
       calle: '', numeroExterior: '', codigoPostal: '', colonia: '', hora: null, lugaresDisponibles: 1
     };
-    this.pasajerosList = [1];
+    
   }
   // ====================== MODAL MANUAL ======================
 
@@ -376,9 +382,6 @@ async buscarUsuario() {
 
   this.resultadosBusqueda = data || [];
 }
-
-
-
 
 
 // Agregar pasajero manualmente
@@ -427,6 +430,25 @@ async agregarPasajeroManual(user: any) {
   });
 
   this.closeModal();
+}
+limitarCP(event: any) {
+  const value = event.target.value;
+  event.target.value = value.replace(/\D/g, '').slice(0, 5);
+  this.viajeForm.codigoPostal = event.target.value;
+}
+
+// Limitar No. Exterior a solo números (máx 4 dígitos)
+limitarNumeroExterior(event: any) {
+  const value = event.target.value;
+  event.target.value = value.replace(/\D/g, '').slice(0, 4);
+  this.viajeForm.numeroExterior = event.target.value;
+}
+
+// Validar calle solo texto
+soloTexto(event: any) {
+  const value = event.target.value;
+  event.target.value = value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+  this.viajeForm.calle = event.target.value;
 }
 
 }
