@@ -41,9 +41,11 @@
               dataType="date">
             </p-calendar>
           </div>
+
           <div class="section-header mt-2">
             <label class="font-semibold">Lugares disponibles: {{ viajeForm.lugaresDisponibles }}</label>
           </div>
+
           <div class="flex flex-column gap-2">
             <div *ngFor="let p of pasajerosList; let i = index" class="flex align-items-center justify-content-between pasajero-item">
               <span>Pasajero {{ p }}</span>
@@ -84,7 +86,6 @@
 
         <div class="section-header mb-2">
           <label class="font-semibold">Destino</label>
-          <div *ngIf="pasajerosConfirmados.length === 0"></div>
           <p>{{ viajeActivo.lugar_llegada }}</p>
         </div>
 
@@ -110,6 +111,11 @@
           </ul>
         </div>
 
+        <!-- BOTÓN PARA ABRIR MODAL -->
+        <div class="flex justify-content-end mb-2">
+          <button class="btn-add-pasajero" (click)="openModal()">+</button>
+        </div>
+
         <div class="flex justify-content-center mt-5">
           <p-button *ngIf="!esPasajero" label="Eliminar viaje" styleClass="delete-btn" (click)="confirmarEliminar(viajeActivo.viaje_id)"></p-button>
           <p-button *ngIf="esPasajero" label="Salir del Viaje" icon="pi pi-sign-out" styleClass="p-button-danger" (click)="salirDelViaje()"></p-button>
@@ -121,8 +127,8 @@
         <div class="driver-info">
 
           <div class="section-header mb-3">
-           <label class="font-semibold">Nombre</label>
-           <p>{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
+            <label class="font-semibold">Nombre</label>
+            <p>{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
           </div>
 
           <div class="section-header mb-3">
@@ -178,4 +184,53 @@
     </div>
   </div>
 </div>
+
+<!-- ========================== MODAL AGREGAR PASAJERO ========================== -->
+<div *ngIf="modalVisible" class="modal-backdrop">
+  <div class="modal-card">
+
+    <h3 class="text-center mb-3">Agregar pasajero</h3>
+
+    <!-- INPUT DE BÚSQUEDA -->
+    <div class="search-wrapper">
+      <input 
+        type="text"
+        pInputText
+        class="search-input"
+        [(ngModel)]="searchQuery"
+        (input)="buscarUsuario()"
+        placeholder="Buscar por nombre o matrícula"
+      />
+    </div>
+
+    <!-- Sin resultados -->
+    <div *ngIf="resultadosBusqueda.length === 0" class="text-center text-secondary mt-3">
+      <small>Escribe para buscar usuarios...</small>
+    </div>
+
+    <!-- LISTA DE RESULTADOS -->
+    <ul *ngIf="resultadosBusqueda.length > 0" class="lista-resultados mt-3">
+      <li 
+        *ngFor="let u of resultadosBusqueda" 
+        class="resultado-item"
+        (click)="agregarPasajeroManual(u)"
+      >
+        <div class="nombre">{{ u.nombre }} {{ u.apellido }}</div>
+        <div class="email">{{ u.email }}</div>
+      </li>
+    </ul>
+
+    <!-- BOTÓN CERRAR -->
+    <button 
+      pButton 
+      label="Cerrar" 
+      class="w-full mt-4" 
+      (click)="closeModal()">
+    </button>
+
+  </div>
+</div>
+<!-- =========================================================================== -->
+
+
 <p-confirmDialog></p-confirmDialog>

@@ -94,7 +94,7 @@ h1 {
   margin-left: 0 !important;
 }
 
-/* --- TEXTO DE VIAJE --- */
+
 .viaje-card p {
   text-align: left !important;
   margin-left: 0 !important;
@@ -106,4 +106,63 @@ h1 {
   text-align: center !important;
   display: block;
   width: 100%;
+}
+
+.btn-add-pasajero {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #244e7c;
+  color: white;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.2);
+}
+
+.lista-resultados {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lista-resultados li {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e9e9e9;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.lista-resultados li:hover {
+  background-color: #f0f4ff;
+}
+
+.matricula {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
 }

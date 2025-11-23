@@ -184,6 +184,8 @@ export class ListaViajesComponent implements OnInit {
     this.confirmationService.confirm({
         message: `¿Aceptar a ${solicitud.pasajero.nombre}?`,
         header: 'Confirmar',
+        acceptLabel: 'Sí',
+        rejectLabel: 'No',
         icon: 'pi pi-check-circle',
         acceptButtonStyleClass: 'p-button-success',
         accept: async () => {
@@ -213,6 +215,8 @@ export class ListaViajesComponent implements OnInit {
         message: '¿Eliminar este viaje?',
         header: 'Confirmar',
         icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sí',
+        rejectLabel: 'No',
         acceptButtonStyleClass: 'p-button-danger',
         accept: () => this.eliminarViaje(viajeId)
     });
@@ -333,4 +337,97 @@ export class ListaViajesComponent implements OnInit {
     };
     this.pasajerosList = [1];
   }
+  // ====================== MODAL MANUAL ======================
+
+modalVisible = false;
+searchQuery = '';
+resultadosBusqueda: any[] = [];
+
+// Abrir modal
+openModal() {
+  this.modalVisible = true;
 }
+
+// Cerrar modal
+closeModal() {
+  this.modalVisible = false;
+  this.searchQuery = '';
+  this.resultadosBusqueda = [];
+}
+
+// Buscar usuario por matrícula / nombre
+async buscarUsuario() {
+  if (this.searchQuery.trim().length < 2) return;
+
+  const texto = this.searchQuery.trim();
+
+  const { data, error } = await this.supabase.supabaseClient
+    .from("usuarios")
+    .select("usuario_id, nombre, apellido, email")
+    .or(
+      `nombre.ilike.%${texto}%,apellido.ilike.%${texto}%,email.ilike.%${texto}%`
+    )
+    .neq("usuario_id", this.usuarioId)
+    .limit(10);
+
+  if (error) {
+    console.error("Error buscando usuarios:", error);
+  }
+
+  this.resultadosBusqueda = data || [];
+}
+
+
+
+
+
+// Agregar pasajero manualmente
+async agregarPasajeroManual(user: any) {
+  if (user.usuario_id === this.usuarioId) {
+  this.messageService.add({
+    severity: "warn",
+    summary: "Acción no permitida",
+    detail: "No puedes agregarte a tu propio viaje."
+  });
+  return;
+  }
+
+  if (this.viajeActivo.asientos_disponibles <= 0) {
+    this.messageService.add({
+      severity: "warn",
+      summary: "Sin asientos",
+      detail: "No hay lugares disponibles."
+    });
+    return;
+  }
+  
+  // Insertar pasajero
+  await this.supabase.supabaseClient
+    .from("pasajerosviaje")
+    .insert({
+      viaje_id: this.viajeActivo.viaje_id,
+      pasajero_id: user.usuario_id
+    });
+
+  // Actualizar asientos
+  const nuevosAsientos = this.viajeActivo.asientos_disponibles - 1;
+
+  await this.supabase.supabaseClient
+    .from("viajes")
+    .update({ asientos_disponibles: nuevosAsientos })
+    .eq("viaje_id", this.viajeActivo.viaje_id);
+
+  await this.cargarPasajeros();
+  this.viajeActivo.asientos_disponibles = nuevosAsientos;
+
+  this.messageService.add({
+    severity: "success",
+    summary: "Pasajero agregado",
+    detail: `${user.nombre} agregado al viaje`
+  });
+
+  this.closeModal();
+}
+
+}
+

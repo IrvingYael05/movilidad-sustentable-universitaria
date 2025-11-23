@@ -257,7 +257,7 @@ export class ViajesService {
         .from('pasajerosviaje')
         .select(`
           *,
-          pasajero:usuarios!pasajero_id (
+          pasajero:usuarios!pasajerosviaje_pasajero_id_fkey (
             usuario_id,
             nombre,
             apellido,
@@ -269,9 +269,12 @@ export class ViajesService {
 
       if (error) throw error;
       return { data, error: null };
+
     } catch (error) {
       console.error('Error al obtener pasajeros:', error);
       return { data: null, error };
     }
   }
+
+
 }
