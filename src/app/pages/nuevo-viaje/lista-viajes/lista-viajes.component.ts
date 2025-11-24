@@ -16,13 +16,12 @@ import { ViajesService, SolicitudViaje, PasajeroViaje } from '../services/viajes
 import { SupabaseService } from '../../../shared/data-access/supabase.service';
 import { AuthService } from '../../../auth/services/auth.service';
 
-
 interface ViajeForm {
   calle: string;
   numeroExterior: string;
   codigoPostal: string;
   colonia: string;
-  hora: Date | null; // <--- CAMBIO: Ahora es Date
+  hora: Date | null;
   lugaresDisponibles: number;
 }
 
@@ -36,7 +35,6 @@ interface ViajeForm {
     ToastModule,
     ConfirmDialogModule,
     InputTextModule,
-
   ],
   templateUrl: './lista-viajes.component.html',
   styleUrls: ['./lista-viajes.component.scss'],
@@ -81,15 +79,25 @@ export class ListaViajesComponent implements OnInit {
     numeroExterior: '',
     codigoPostal: '',
     colonia: '',
-    hora: null, // <--- INICIALIZA EN NULL
+    hora: null,
     lugaresDisponibles: 1,
   };
   pasajerosList: number[] = [1];
   isPublishing = false;
-  horaString: string = '';
-
+  
+  // ✅ CORRECCIÓN 1: Agregamos las propiedades faltantes
+  horaString: string = ''; 
+  horaMinima: string = ''; // <--- Esta es la que causaba el error
 
   async ngOnInit() {
+    // ✅ CORRECCIÓN 2: Calcular la hora mínima al iniciar
+    const now = new Date();
+    // Formato HH:MM para el input type="time"
+    this.horaMinima = now.toTimeString().slice(0, 5);
+    
+    // Si la horaString está vacía, podrías inicializarla con la hora actual si deseas:
+    // this.horaString = this.horaMinima;
+
     const { data: { user } } = await this.supabase.supabaseClient.auth.getUser();
     this.usuarioId = user?.id || null;
 
@@ -110,7 +118,6 @@ export class ListaViajesComponent implements OnInit {
         life: 3000,
       });
     }
-    
   }
 
   async cargarDatosIniciales() {
@@ -128,7 +135,10 @@ export class ListaViajesComponent implements OnInit {
     this.isLoading = false;
   }
 
-  // ... (Métodos de carga: cargarViajeActivo, cargarViajeComoPasajero, cargarSolicitudes, cargarPasajeros se mantienen igual)
+  // ... Resto de tu código (cargarViajeActivo, cargarViajeComoPasajero, etc.)
+  // (No es necesario repetir todas las funciones si no han cambiado, 
+  //  solo asegúrate de mantener el resto de la clase igual).
+
   async cargarViajeActivo() {
     try {
       const { data } = await this.viajesService.obtenerViajeActivoConductor(this.usuarioId!);
@@ -152,7 +162,6 @@ export class ListaViajesComponent implements OnInit {
 
       if (data && data.viajes) {
         const viaje = data.viajes;
-        // Cargar vehículo manualmente si falta
         if (!viaje.vehiculo && viaje.vehiculo_id) {
             const { data: vehiculo } = await this.supabase.supabaseClient
                 .from('vehiculos').select('*').eq('vehiculo_id', viaje.vehiculo_id).single();
@@ -182,7 +191,6 @@ export class ListaViajesComponent implements OnInit {
     this.pasajerosConfirmados = data || [];
   }
 
-  // ... (Métodos aceptar/rechazar/eliminar/salir se mantienen igual, omitidos por brevedad, el código anterior funciona bien)
   async aceptarSolicitud(solicitud: SolicitudViaje) {
     this.confirmationService.confirm({
         message: `¿Aceptar a ${solicitud.pasajero.nombre}?`,
@@ -241,7 +249,6 @@ export class ListaViajesComponent implements OnInit {
         icon: 'pi pi-sign-out',
         acceptButtonStyleClass: 'p-button-danger',
         accept: async () => {
-            // Lógica de salida...
              await this.supabase.supabaseClient.from('pasajerosviaje').delete()
                 .eq('viaje_id', this.viajeActivo.viaje_id).eq('pasajero_id', this.usuarioId);
             await this.supabase.supabaseClient.from('solicitudesviaje').update({ estado_solicitud: 'cancelada' })
@@ -267,8 +274,6 @@ export class ListaViajesComponent implements OnInit {
     } catch (err) { console.error('Error verificando vehículo:', err); }
   }
 
-  
-
   async publicarViaje() {
     if (!this.validarFormulario()) return;
     if (!this.vehiculoId) {
@@ -279,10 +284,7 @@ export class ListaViajesComponent implements OnInit {
     this.isPublishing = true;
 
     try {
-      // Formatear Hora Date a String "HH:MM"
       const horaString = this.horaString;
-
-
       const direccionCompleta = `${this.viajeForm.calle} ${this.viajeForm.numeroExterior}, ${this.viajeForm.colonia}, CP ${this.viajeForm.codigoPostal}`;
 
       const nuevoViaje = {
@@ -290,7 +292,7 @@ export class ListaViajesComponent implements OnInit {
         vehiculo_id: this.vehiculoId,
         lugar_salida: direccionCompleta,
         lugar_llegada: 'UTEQ',
-        hora_salida: horaString, // <--- Enviamos el string formateado
+        hora_salida: horaString,
         asientos_disponibles: this.viajeForm.lugaresDisponibles,
         estado_viaje: 'activo',
       };
@@ -311,145 +313,130 @@ export class ListaViajesComponent implements OnInit {
   }
 
   private validarFormulario(): boolean {
-  const f = this.viajeForm;
+    const f = this.viajeForm;
 
-  if (!f.calle || !f.numeroExterior || !f.colonia || !f.codigoPostal) {
-    this.messageService.add({ severity: 'warn', detail: 'Completa la dirección.' });
-    return false;
+    if (!f.calle || !f.numeroExterior || !f.colonia || !f.codigoPostal) {
+      this.messageService.add({ severity: 'warn', detail: 'Completa la dirección.' });
+      return false;
+    }
+
+    if (!this.horaString) { // Validar el string directamente
+      this.messageService.add({ severity: 'warn', detail: 'Ingresa una hora válida.' });
+      return false;
+    }
+
+    if (f.lugaresDisponibles < 1 || f.lugaresDisponibles > 4) {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Los lugares deben ser entre 1 y 4.'
+      });
+      return false;
+    }
+
+    return true;
   }
-
-  if (!f.hora) {
-    this.messageService.add({ severity: 'warn', detail: 'Ingresa una hora válida.' });
-    return false;
-  }
-
-  // Validación de número de lugares
-  if (f.lugaresDisponibles < 1 || f.lugaresDisponibles > 4) {
-    this.messageService.add({
-      severity: 'warn',
-      detail: 'Los lugares deben ser entre 1 y 4.'
-    });
-    return false;
-  }
-
-  return true;
-}
-
-
 
   private limpiarFormulario() {
     this.viajeForm = {
       calle: '', numeroExterior: '', codigoPostal: '', colonia: '', hora: null, lugaresDisponibles: 1
     };
-    
+    this.horaString = ''; // Limpiar el string de hora
   }
+
   // ====================== MODAL MANUAL ======================
+  modalVisible = false;
+  searchQuery = '';
+  resultadosBusqueda: any[] = [];
 
-modalVisible = false;
-searchQuery = '';
-resultadosBusqueda: any[] = [];
-
-// Abrir modal
-openModal() {
-  this.modalVisible = true;
-}
-
-// Cerrar modal
-closeModal() {
-  this.modalVisible = false;
-  this.searchQuery = '';
-  this.resultadosBusqueda = [];
-}
-
-// Buscar usuario por matrícula / nombre
-async buscarUsuario() {
-  if (this.searchQuery.trim().length < 2) return;
-
-  const texto = this.searchQuery.trim();
-
-  const { data, error } = await this.supabase.supabaseClient
-    .from("usuarios")
-    .select("usuario_id, nombre, apellido, email")
-    .or(
-      `nombre.ilike.%${texto}%,apellido.ilike.%${texto}%,email.ilike.%${texto}%`
-    )
-    .neq("usuario_id", this.usuarioId)
-    .limit(10);
-
-  if (error) {
-    console.error("Error buscando usuarios:", error);
+  openModal() {
+    this.modalVisible = true;
   }
 
-  this.resultadosBusqueda = data || [];
-}
-
-
-// Agregar pasajero manualmente
-async agregarPasajeroManual(user: any) {
-  if (user.usuario_id === this.usuarioId) {
-  this.messageService.add({
-    severity: "warn",
-    summary: "Acción no permitida",
-    detail: "No puedes agregarte a tu propio viaje."
-  });
-  return;
+  closeModal() {
+    this.modalVisible = false;
+    this.searchQuery = '';
+    this.resultadosBusqueda = [];
   }
 
-  if (this.viajeActivo.asientos_disponibles <= 0) {
+  async buscarUsuario() {
+    if (this.searchQuery.trim().length < 2) return;
+
+    const texto = this.searchQuery.trim();
+
+    const { data, error } = await this.supabase.supabaseClient
+      .from("usuarios")
+      .select("usuario_id, nombre, apellido, email")
+      .or(`nombre.ilike.%${texto}%,apellido.ilike.%${texto}%,email.ilike.%${texto}%`)
+      .neq("usuario_id", this.usuarioId)
+      .limit(10);
+
+    if (error) {
+      console.error("Error buscando usuarios:", error);
+    }
+
+    this.resultadosBusqueda = data || [];
+  }
+
+  async agregarPasajeroManual(user: any) {
+    if (user.usuario_id === this.usuarioId) {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Acción no permitida",
+        detail: "No puedes agregarte a tu propio viaje."
+      });
+      return;
+    }
+
+    if (this.viajeActivo.asientos_disponibles <= 0) {
+      this.messageService.add({
+        severity: "warn",
+        summary: "Sin asientos",
+        detail: "No hay lugares disponibles."
+      });
+      return;
+    }
+    
+    await this.supabase.supabaseClient
+      .from("pasajerosviaje")
+      .insert({
+        viaje_id: this.viajeActivo.viaje_id,
+        pasajero_id: user.usuario_id
+      });
+
+    const nuevosAsientos = this.viajeActivo.asientos_disponibles - 1;
+
+    await this.supabase.supabaseClient
+      .from("viajes")
+      .update({ asientos_disponibles: nuevosAsientos })
+      .eq("viaje_id", this.viajeActivo.viaje_id);
+
+    await this.cargarPasajeros();
+    this.viajeActivo.asientos_disponibles = nuevosAsientos;
+
     this.messageService.add({
-      severity: "warn",
-      summary: "Sin asientos",
-      detail: "No hay lugares disponibles."
+      severity: "success",
+      summary: "Pasajero agregado",
+      detail: `${user.nombre} agregado al viaje`
     });
-    return;
+
+    this.closeModal();
   }
-  
-  // Insertar pasajero
-  await this.supabase.supabaseClient
-    .from("pasajerosviaje")
-    .insert({
-      viaje_id: this.viajeActivo.viaje_id,
-      pasajero_id: user.usuario_id
-    });
 
-  // Actualizar asientos
-  const nuevosAsientos = this.viajeActivo.asientos_disponibles - 1;
+  limitarCP(event: any) {
+    const value = event.target.value;
+    event.target.value = value.replace(/\D/g, '').slice(0, 5);
+    this.viajeForm.codigoPostal = event.target.value;
+  }
 
-  await this.supabase.supabaseClient
-    .from("viajes")
-    .update({ asientos_disponibles: nuevosAsientos })
-    .eq("viaje_id", this.viajeActivo.viaje_id);
+  limitarNumeroExterior(event: any) {
+    const value = event.target.value;
+    event.target.value = value.replace(/\D/g, '').slice(0, 4);
+    this.viajeForm.numeroExterior = event.target.value;
+  }
 
-  await this.cargarPasajeros();
-  this.viajeActivo.asientos_disponibles = nuevosAsientos;
-
-  this.messageService.add({
-    severity: "success",
-    summary: "Pasajero agregado",
-    detail: `${user.nombre} agregado al viaje`
-  });
-
-  this.closeModal();
+  soloTexto(event: any) {
+    const value = event.target.value;
+    event.target.value = value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+    this.viajeForm.calle = event.target.value;
+  }
 }
-limitarCP(event: any) {
-  const value = event.target.value;
-  event.target.value = value.replace(/\D/g, '').slice(0, 5);
-  this.viajeForm.codigoPostal = event.target.value;
-}
-
-// Limitar No. Exterior a solo números (máx 4 dígitos)
-limitarNumeroExterior(event: any) {
-  const value = event.target.value;
-  event.target.value = value.replace(/\D/g, '').slice(0, 4);
-  this.viajeForm.numeroExterior = event.target.value;
-}
-
-// Validar calle solo texto
-soloTexto(event: any) {
-  const value = event.target.value;
-  event.target.value = value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
-  this.viajeForm.calle = event.target.value;
-}
-
-}
-
