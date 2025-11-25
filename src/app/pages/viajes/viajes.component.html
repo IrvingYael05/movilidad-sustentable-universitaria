@@ -1,75 +1,76 @@
 <!-- src/app/pages/viajes/viajes.component.html -->
-
-<!-- SEARCH BAR -->
 <div class="search-container">
   <div class="search-input-group">
     <input
-      type="text"
-      placeholder="Buscar por conductor, salida o llegada..."
-      [(ngModel)]="searchTerm"
-      (keyup.enter)="onSearch()"
-      class="search-input">
+  type="text"
+  placeholder="Buscar por conductor, salida o llegada..."
+  [(ngModel)]="searchTerm"
+  (input)="onSearch()"
+  class="search-input">
     <i class="pi pi-search search-icon"></i>
   </div>
 </div>
 
-<!-- CONTENIDO PRINCIPAL -->
 <div class="trips-container">
-  <!-- Loader -->
   <div *ngIf="cargando" class="loader">
     <i class="pi pi-spin pi-spinner"></i>
     <p>Cargando viajes disponibles...</p>
   </div>
 
-  <!-- Sin resultados -->
+  <!-- MENSAJE CUANDO NO HAY VIAJES VISIBLES -->
   <div *ngIf="!cargando && viajesFiltrados.length === 0" class="empty-state">
     <i class="pi pi-car" style="font-size: 2.5rem; color: #71706f; margin-bottom: 1rem;"></i>
-    <p *ngIf="searchTerm">
-      No se encontraron viajes para "<strong>{{ searchTerm }}</strong>"
-    </p>
-    <p *ngIf="!searchTerm">
-      No hay viajes activos en este momento.
-    </p>
+
+    <!-- Caso: Conductor con viaje activo -->
+    <div *ngIf="esConductorConViajeActivo">
+      <p><strong>Estás ofreciendo un viaje activo</strong></p>
+      <p style="font-size: 0.9rem; color: #71706f; line-height: 1.5;">
+        No puedes unirte a otros viajes mientras eres conductor.<br>
+        Aquí solo verás tu viaje actual.
+      </p>
+    </div>
+
+    <!-- Caso: Pasajero normal sin resultados -->
+    <div *ngIf="!esConductorConViajeActivo">
+      <p *ngIf="searchTerm">
+        No se encontraron viajes para "<strong>{{ searchTerm }}</strong>"
+      </p>
+      <p *ngIf="!searchTerm">
+        No hay viajes con lugares disponibles en este momento.
+      </p>
+    </div>
   </div>
 
   <!-- LISTA DE VIAJES -->
   <div *ngFor="let viaje of viajesFiltrados" class="trip-card">
-    <!-- Detalles del viaje -->
     <div class="trip-details">
-      <!-- Nombre del conductor + badge si es tú -->
       <div class="conductor-name">
         {{ viaje.usuarios.nombre }} {{ viaje.usuarios.apellido }}
         <span *ngIf="viaje.es_mio" class="badge-conductor">Tú</span>
       </div>
 
-      <!-- Ruta -->
       <div class="detail route">
         <i class="pi pi-map-marker"></i>
         {{ viaje.lugar_salida }} → {{ viaje.lugar_llegada }}
       </div>
 
-      <!-- Hora -->
       <div class="detail time">
         <i class="pi pi-clock"></i>
         {{ viaje.hora_salida }}
       </div>
 
-      <!-- Asientos disponibles -->
       <div class="detail seats" [class.full]="viaje.asientos_disponibles === 0">
         <i class="pi pi-users"></i>
         {{ viaje.asientos_disponibles }} lugar{{ viaje.asientos_disponibles !== 1 ? 'es' : '' }} disponible{{ viaje.asientos_disponibles !== 1 ? 's' : '' }}
       </div>
     </div>
 
-    <!-- ACCIONES (BOTÓN O INFO) -->
     <div class="trip-actions">
-      <!-- Si es TU viaje como conductor -->
       <div *ngIf="viaje.es_mio" class="mi-viaje-info">
         <i class="pi pi-check-circle" style="color: #10b981;"></i>
         <span>Tu viaje</span>
       </div>
 
-      <!-- Si NO es tu viaje → botón de solicitud -->
       <button
         *ngIf="!viaje.es_mio"
         pButton
@@ -82,5 +83,4 @@
   </div>
 </div>
 
-<!-- TOAST PARA MENSAJES -->
 <p-toast position="bottom-center"></p-toast>
