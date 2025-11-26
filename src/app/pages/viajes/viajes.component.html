@@ -7,6 +7,13 @@
   [(ngModel)]="searchTerm"
   (input)="onSearch()"
   class="search-input">
+  <!-- Dentro del div.search-input-group, después del <input> -->
+<i 
+  class="pi pi-times search-clear" 
+  *ngIf="searchTerm" 
+  (click)="searchTerm = ''; onSearch()"
+  style="cursor: pointer;">
+</i>
     <i class="pi pi-search search-icon"></i>
   </div>
 </div>
