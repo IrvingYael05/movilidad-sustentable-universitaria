@@ -49,6 +49,12 @@ h1 {
 .hora-input {
   color: #244e7c !important;
   font-weight: 500;
+  
+  /* Cambiar color del ícono del reloj */
+  &::-webkit-calendar-picker-indicator {
+    filter: invert(27%) sepia(36%) saturate(1340%) hue-rotate(181deg) brightness(93%) contrast(90%);
+    cursor: pointer;
+  }
 }
 
 /* --- ITEM PASAJERO (FORMULARIO) --- */
