@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -52,7 +52,7 @@ interface ViajeForm {
     ]),
   ],
 })
-export class ListaViajesComponent implements OnInit {
+export class ListaViajesComponent implements OnInit, OnDestroy {
   // Inyecciones
   private authService = inject(AuthService);
   private viajesService = inject(ViajesService);
@@ -60,6 +60,11 @@ export class ListaViajesComponent implements OnInit {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
+
+  // Canales de Realtime
+  private viajesChannel: any;
+  private pasajerosChannel: any;
+  private solicitudesChannel: any;
 
   // Estado Usuario
   usuarioId: string | null = null;
@@ -91,7 +96,6 @@ export class ListaViajesComponent implements OnInit {
 
   async ngOnInit() {
     const now = new Date();
-    // Formato HH:MM para el input type="time"
     this.horaMinima = now.toTimeString().slice(0, 5);
 
     const { data: { user } } = await this.supabase.supabaseClient.auth.getUser();
@@ -105,6 +109,7 @@ export class ListaViajesComponent implements OnInit {
       });
 
       await this.cargarDatosIniciales();
+      this.iniciarRealtimeSubscriptions();
     } else {
       this.isLoading = false;
       this.messageService.add({
@@ -116,6 +121,148 @@ export class ListaViajesComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    this.limpiarRealtimeSubscriptions();
+  }
+
+  // ==================== REALTIME SUBSCRIPTIONS ====================
+  private iniciarRealtimeSubscriptions() {
+    if (!this.viajeActivo) return;
+
+    // Suscripción a cambios en la tabla VIAJES
+    this.viajesChannel = this.supabase.supabaseClient
+      .channel(`viaje-${this.viajeActivo.viaje_id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'viajes',
+          filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`
+        },
+        (payload: any) => {
+          console.log('Cambio en viaje detectado:', payload);
+          
+          if (payload.eventType === 'UPDATE') {
+            this.viajeActivo.asientos_disponibles = payload.new.asientos_disponibles;
+            
+            if (payload.new.estado_viaje === 'inactivo') {
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Viaje cancelado',
+                detail: 'El conductor ha cancelado este viaje.',
+                life: 5000
+              });
+              this.viajeActivo = null;
+              this.limpiarRealtimeSubscriptions();
+            }
+          } else if (payload.eventType === 'DELETE') {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Viaje eliminado',
+              detail: 'Este viaje ya no está disponible.',
+              life: 5000
+            });
+            this.viajeActivo = null;
+            this.limpiarRealtimeSubscriptions();
+          }
+        }
+      )
+      .subscribe();
+
+    // Suscripción a cambios en PASAJEROSVIAJE
+    this.pasajerosChannel = this.supabase.supabaseClient
+      .channel(`pasajeros-${this.viajeActivo.viaje_id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pasajerosviaje',
+          filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`
+        },
+        (payload: any) => {
+          console.log('Cambio en pasajeros detectado:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            this.cargarPasajeros();
+            
+            if (this.esPasajero) {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Nuevo pasajero',
+                detail: 'Se ha unido un nuevo pasajero al viaje.',
+                life: 3000
+              });
+            }
+          } else if (payload.eventType === 'DELETE') {
+            this.cargarPasajeros();
+            
+            if (payload.old['pasajero_id'] === this.usuarioId) {
+              this.viajeActivo = null;
+              this.esPasajero = false;
+              this.limpiarRealtimeSubscriptions();
+            } else if (!this.esPasajero) {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Pasajero salió',
+                detail: 'Un pasajero ha abandonado el viaje.',
+                life: 3000
+              });
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    // Suscripción a SOLICITUDES (solo para conductores)
+    if (!this.esPasajero) {
+      this.solicitudesChannel = this.supabase.supabaseClient
+        .channel(`solicitudes-${this.viajeActivo.viaje_id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'solicitudesviaje',
+            filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`
+          },
+          (payload: any) => {
+            console.log('Cambio en solicitudes detectado:', payload);
+            
+            if (payload.eventType === 'INSERT' && payload.new.estado_solicitud === 'pendiente') {
+              this.cargarSolicitudes();
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Nueva solicitud',
+                detail: 'Tienes una nueva solicitud de viaje.',
+                life: 3000
+              });
+            } else if (payload.eventType === 'UPDATE' || payload.eventType === 'DELETE') {
+              this.cargarSolicitudes();
+            }
+          }
+        )
+        .subscribe();
+    }
+  }
+
+  private limpiarRealtimeSubscriptions() {
+    if (this.viajesChannel) {
+      this.supabase.supabaseClient.removeChannel(this.viajesChannel);
+      this.viajesChannel = undefined;
+    }
+    if (this.pasajerosChannel) {
+      this.supabase.supabaseClient.removeChannel(this.pasajerosChannel);
+      this.pasajerosChannel = undefined;
+    }
+    if (this.solicitudesChannel) {
+      this.supabase.supabaseClient.removeChannel(this.solicitudesChannel);
+      this.solicitudesChannel = undefined;
+    }
+  }
+
+  // ==================== RESTO DEL CÓDIGO ====================
   async cargarDatosIniciales() {
     this.isLoading = true;
     await this.cargarViajeComoPasajero();
@@ -147,10 +294,10 @@ export class ListaViajesComponent implements OnInit {
     try {
       const { data } = await this.supabase.supabaseClient
         .from('solicitudesviaje')
-        .select(`*, viajes!inner (*, conductor:conductor_id(*), vehiculo_id)`) // !inner hace un JOIN que excluye nulls
+        .select(`*, viajes!inner (*, conductor:conductor_id(*), vehiculo_id)`)
         .eq('pasajero_id', this.usuarioId)
         .eq('estado_solicitud', 'aceptada')
-        .eq('viajes.estado_viaje', 'activo') // Borra datos si se elimino el viaje xD
+        .eq('viajes.estado_viaje', 'activo')
         .maybeSingle();
 
       if (data && data.viajes) {
@@ -235,20 +382,17 @@ export class ListaViajesComponent implements OnInit {
 
   async eliminarViaje(viajeId: string) {
     try {
-      // 1. Eliminar todos los pasajeros del viaje
       await this.supabase.supabaseClient
         .from('pasajerosviaje')
         .delete()
         .eq('viaje_id', viajeId);
 
-      // 2. Cancelar todas las solicitudes pendientes o aceptadas
       await this.supabase.supabaseClient
         .from('solicitudesviaje')
         .update({ estado_solicitud: 'cancelada' })
         .eq('viaje_id', viajeId)
         .in('estado_solicitud', ['pendiente', 'aceptada']);
 
-      // 3. Actualizar el estado del viaje a inactivo
       await this.viajesService.actualizarEstadoViaje(viajeId, 'inactivo');
 
       this.messageService.add({ 
@@ -257,6 +401,7 @@ export class ListaViajesComponent implements OnInit {
         detail: 'Viaje cancelado. Se notificó a los pasajeros.' 
       });
 
+      this.limpiarRealtimeSubscriptions();
       this.viajeActivo = null;
       this.solicitudesPendientes = [];
       this.pasajerosConfirmados = [];
@@ -290,6 +435,7 @@ export class ListaViajesComponent implements OnInit {
             await this.supabase.supabaseClient.from('viajes').update({ asientos_disponibles: nuevosAsientos })
                 .eq('viaje_id', this.viajeActivo.viaje_id);
 
+            this.limpiarRealtimeSubscriptions();
             this.viajeActivo = null;
             this.esPasajero = false;
             this.messageService.add({ severity: 'success', summary: 'Listo', detail: 'Has salido del viaje.' });
@@ -335,6 +481,7 @@ export class ListaViajesComponent implements OnInit {
       this.messageService.add({ severity: 'success', summary: 'Publicado', detail: 'Viaje creado exitosamente.' });
       this.limpiarFormulario();
       await this.cargarViajeActivo();
+      this.iniciarRealtimeSubscriptions();
 
     } catch (error) {
       console.error(error);
@@ -442,9 +589,6 @@ export class ListaViajesComponent implements OnInit {
       .from("viajes")
       .update({ asientos_disponibles: nuevosAsientos })
       .eq("viaje_id", this.viajeActivo.viaje_id);
-
-    await this.cargarPasajeros();
-    this.viajeActivo.asientos_disponibles = nuevosAsientos;
 
     this.messageService.add({
       severity: "success",
