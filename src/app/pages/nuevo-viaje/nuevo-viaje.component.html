@@ -71,41 +71,46 @@
         />
 
         <!-- Pasajeros -->
-    <div class="section-header mt-2">
-    <label class="font-semibold">Pasajeros</label>
-    </div>
-    <div class="flex flex-column gap-2">
-    <div
-        *ngFor="let pasajero of pasajeros; let i = index"
-        class="flex align-items-center justify-content-between pasajero-item"
-    >
-        <span>Pasajero {{ pasajero }}</span>
-        <div class="flex gap-2">
-        <button
-            pButton
-            label="+"
-            class="p-button-rounded p-button-sm add-btn"
-            (click)="agregarPasajero()"
-            *ngIf="i === pasajeros.length - 1"
-        ></button>
-        <button
-            pButton
-            label="-"
-            class="p-button-rounded p-button-sm p-button-danger remove-btn"
-            (click)="eliminarPasajero(i)"
-            *ngIf="pasajeros.length > 1"
-        ></button>
+        <div class="section-header mt-2">
+            <label class="font-semibold">Pasajeros</label>
         </div>
-    </div>
-    </div>
+        <div class="flex flex-column gap-2">
+            <div
+                *ngFor="let pasajero of pasajeros; let i = index"
+                class="flex align-items-center justify-content-between pasajero-item"
+            >
+                <span>Pasajero {{ pasajero }}</span>
+                <div class="flex gap-2">
+                    <button
+                        pButton
+                        label="+"
+                        class="p-button-rounded p-button-sm add-btn"
+                        (click)="agregarPasajero()"
+                        *ngIf="i === pasajeros.length - 1"
+                    ></button>
+                    <button
+                        pButton
+                        label="-"
+                        class="p-button-rounded p-button-sm p-button-danger remove-btn"
+                        (click)="eliminarPasajero(i)"
+                        *ngIf="pasajeros.length > 1"
+                    ></button>
+                </div>
+            </div>
+        </div>
 
         <!-- Botón Publicar -->
         <div class="flex justify-content-end mt-4">
             <p-button
                 label="Publicar Viaje"
+                [loading]="isLoading"
                 (click)="publicarViaje()"
                 styleClass="publish-btn">
             </p-button>
         </div>
+        </div>
     </div>
 </div>
+
+<!-- Mostrar mensajes -->
+<p-toast position="top-right"></p-toast>

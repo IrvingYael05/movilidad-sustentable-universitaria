@@ -1,13 +1,13 @@
 <div class="flex flex-column align-items-center justify-content-center min-h-screen p-4 overflow-auto">
   <div class="w-full md:w-30rem">
-    
+
     <div *ngIf="isLoading" class="text-center">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       <p class="text-secondary mt-2">Cargando...</p>
     </div>
 
     <div *ngIf="!isLoading && !viajeActivo">
-      
+
       <div *ngIf="esConductor">
         <div class="text-center mb-4">
           <h1 class="text-3xl font-bold m-0">Nuevo Viaje</h1>
@@ -19,30 +19,25 @@
             <label class="font-semibold">Punto de partida</label>
           </div>
           <input pInputText placeholder="Calle" [(ngModel)]="viajeForm.calle" class="w-full" required (input)="soloTexto($event)" pattern="[A-Za-zÀ-ÿ\s]+"/>
-          
+
           <div class="flex gap-2">
             <input pInputText placeholder="No. Exterior" [(ngModel)]="viajeForm.numeroExterior" class="flex-1"  required min="1"  maxlength="4"   (input)="limitarNumeroExterior($event)" />
             <input pInputText placeholder="C.P." [(ngModel)]="viajeForm.codigoPostal" class="flex-1"  maxlength="5"  (input)="limitarCP($event)" required />
           </div>
-          
+
           <input pInputText placeholder="Colonia" [(ngModel)]="viajeForm.colonia" class="w-full" required/>
 
           <div class="section-header mt-2">
             <label class="font-semibold">Hora de Salida</label>
-            <div class="hora-wrapper">
-
-            <input 
-              type="time" 
-              class="hora-input"
-              [(ngModel)]="horaString"
-              min="{{ horaMinima }}"
-              required
-            />
-
           </div>
 
-
-          </div>
+          <input
+            type="time"
+            class="hora-input"
+            [(ngModel)]="horaString"
+            min="{{ horaMinima }}"
+            required
+          />
 
           <div class="section-header mt-2">
             <label class="font-semibold">Lugares disponibles: {{ viajeForm.lugaresDisponibles }}</label>
@@ -66,7 +61,7 @@
     </div>
 
     <div *ngIf="!isLoading && viajeActivo">
-  
+
     <div class="text-center mb-4">
       <h1 class="text-2xl font-bold m-0">Mi Viaje</h1>
       <p class="text-secondary mt-1">{{ esPasajero ? 'Detalles de tu transporte' : 'Gestiona tu viaje publicado' }}</p>
@@ -128,7 +123,7 @@
           <div class="section-header mb-3">
             <p>{{ viajeActivo.conductor.email }}</p>
           </div>
-          
+
           <div class="section-header mb-3">
             <label class="font-semibold">Placa</label>
             <p>{{ viajeActivo.vehiculo?.placa || 'N/A' }}</p>
@@ -154,9 +149,9 @@
 
       <div *ngIf="!esPasajero" class="mt-5">
         <h3 class="text-center text-xl font-bold mb-3">Solicitudes Pendientes</h3>
-        
+
         <div *ngIf="isLoadingSolicitudes" class="text-center"><i class="pi pi-spin pi-spinner"></i></div>
-        
+
         <div *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length === 0" class="text-center py-3 border-round border-1 surface-border">
           <p class="text-secondary m-0">No tienes solicitudes pendientes.</p>
         </div>
@@ -187,7 +182,7 @@
 
     <!-- INPUT DE BÚSQUEDA -->
     <div class="search-wrapper">
-      <input 
+      <input
         type="text"
         pInputText
         class="search-input"
@@ -204,8 +199,8 @@
 
     <!-- LISTA DE RESULTADOS -->
     <ul *ngIf="resultadosBusqueda.length > 0" class="lista-resultados mt-3">
-      <li 
-        *ngFor="let u of resultadosBusqueda" 
+      <li
+        *ngFor="let u of resultadosBusqueda"
         class="resultado-item"
         (click)="agregarPasajeroManual(u)"
       >
@@ -215,16 +210,17 @@
     </ul>
 
     <!-- BOTÓN CERRAR -->
-    <button 
-      pButton 
-      label="Cerrar" 
-      class="w-full mt-4" 
+    <button
+      pButton
+      label="Cerrar"
+      class="w-full mt-4"
       (click)="closeModal()">
     </button>
 
   </div>
 </div>
-<!-- =========================================================================== -->
 
+<!-- Mostrar mensajes -->
+<p-toast position="top-right"></p-toast>
 
 <p-confirmDialog></p-confirmDialog>

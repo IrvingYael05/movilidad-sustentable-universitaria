@@ -17,6 +17,39 @@ h1 {
   color: #71706f;
 }
 
+/* --- ESTILOS PARA INPUTS --- */
+::ng-deep input[pInputText],
+::ng-deep .p-inputtext,
+.hora-input {
+  border: 2px solid #244e7c !important;
+  border-radius: 12px !important;
+  padding: 0.8rem !important;
+  font-size: 1rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  color: #244e7c !important;
+  font-weight: 500;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:hover {
+    border-color: #94a3b8 !important;
+  }
+
+  &:focus {
+    border-color: #94a3b8 !important;
+    box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2) !important;
+    outline: none !important;
+  }
+}
+
+.hora-input {
+  color: #244e7c !important;
+  font-weight: 500;
+}
+
 /* --- ITEM PASAJERO (FORMULARIO) --- */
 .pasajero-item {
   padding: 0.8rem;
@@ -121,6 +154,7 @@ h1 {
   align-items: center;
   justify-content: center;
 }
+
 .modal-backdrop {
   position: fixed;
   top: 0;

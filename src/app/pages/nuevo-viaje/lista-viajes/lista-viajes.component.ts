@@ -348,18 +348,19 @@ export class ListaViajesComponent implements OnInit {
     const f = this.viajeForm;
 
     if (!f.calle || !f.numeroExterior || !f.colonia || !f.codigoPostal) {
-      this.messageService.add({ severity: 'warn', detail: 'Completa la dirección.' });
+      this.messageService.add({ severity: 'warn', summary: "Formulario incompleto", detail: 'Completa la dirección.' });
       return false;
     }
 
-    if (!this.horaString) { // Validar el string directamente
-      this.messageService.add({ severity: 'warn', detail: 'Ingresa una hora válida.' });
+    if (!this.horaString) {
+      this.messageService.add({ severity: 'warn', summary: "Formulario incompleto",  detail: 'Ingresa una hora válida.' });
       return false;
     }
 
     if (f.lugaresDisponibles < 1 || f.lugaresDisponibles > 4) {
       this.messageService.add({
         severity: 'warn',
+        summary: "Formulario incompleto",
         detail: 'Los lugares deben ser entre 1 y 4.'
       });
       return false;
@@ -372,7 +373,7 @@ export class ListaViajesComponent implements OnInit {
     this.viajeForm = {
       calle: '', numeroExterior: '', codigoPostal: '', colonia: '', hora: null, lugaresDisponibles: 1
     };
-    this.horaString = ''; // Limpiar el string de hora
+    this.horaString = '';
   }
 
   // ====================== MODAL MANUAL ======================
