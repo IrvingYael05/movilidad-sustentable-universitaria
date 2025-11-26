@@ -277,6 +277,8 @@ export class ListaViajesComponent implements OnInit {
         message: '¿Salir del viaje?',
         header: 'Salir',
         icon: 'pi pi-sign-out',
+        rejectLabel: 'No',
+        acceptLabel: 'Sí',
         acceptButtonStyleClass: 'p-button-danger',
         accept: async () => {
              await this.supabase.supabaseClient.from('pasajerosviaje').delete()
