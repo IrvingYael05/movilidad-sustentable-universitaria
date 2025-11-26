@@ -37,7 +37,7 @@ export class ViajesComponent implements OnInit {
   usuarioId: string | null = null;
   searchTerm: string = '';
   puedeSolicitar = true;
-  esConductorConViajeActivo = false; // ← NUEVA Y CLAVE
+  esConductorConViajeActivo = false;
 
   private _supabase = inject(SupabaseService).supabaseClient;
 
@@ -68,7 +68,6 @@ export class ViajesComponent implements OnInit {
       const tieneViajeActivo = await this.viajesService.usuarioTieneViajeActivo(this.usuarioId);
 
       if (tieneViajeActivo) {
-        // ¿Tiene un viaje activo como CONDUCTOR?
         const { data: viajeConductor, error } = await this._supabase
           .from('viajes')
           .select('viaje_id')
@@ -79,16 +78,13 @@ export class ViajesComponent implements OnInit {
         if (error && error.code !== 'PGRST116') throw error;
 
         if (viajeConductor) {
-          // Es conductor con viaje activo
           this.esConductorConViajeActivo = true;
           this.puedeSolicitar = false;
         } else {
-          // Es pasajero aceptado en un viaje
           this.esConductorConViajeActivo = false;
           this.puedeSolicitar = false;
         }
       } else {
-        // No tiene ningún viaje activo
         this.esConductorConViajeActivo = false;
         this.puedeSolicitar = true;
       }
@@ -127,7 +123,6 @@ export class ViajesComponent implements OnInit {
             es_mio: esMio
           };
 
-          // Solo verificar solicitud si no es su propio viaje
           if (this.usuarioId && !esMio) {
             viaje.solicitud_pendiente = await this.viajesService.tieneSolicitudPendiente(viaje.viaje_id, this.usuarioId);
           }
@@ -138,21 +133,10 @@ export class ViajesComponent implements OnInit {
 
       this.viajes = viajesProcesados;
 
-      // === REGLAS DE VISUALIZACIÓN ===
-      if (!this.usuarioId) {
-        // Visitante → solo viajes con asientos
-        this.viajesFiltrados = viajesProcesados.filter(v => v.asientos_disponibles > 0);
-      }
-      else if (this.esConductorConViajeActivo) {
-        // Conductor con viaje activo → SOLO ve el suyo
-        this.viajesFiltrados = viajesProcesados.filter(v => v.es_mio);
-      }
-      else {
-        // Pasajero normal (puede o no solicitar) → ve viajes con asientos + los suyos
-        this.viajesFiltrados = viajesProcesados.filter(v =>
-          v.asientos_disponibles > 0 || v.es_mio
-        );
-      }
+      // === REGLAS DE VISUALIZACIÓN (ACTUALIZADAS) ===
+      // TODOS los usuarios ven viajes con asientos > 0
+      // La restricción de "no puede solicitar" se maneja en los botones, no en la visualización
+      this.viajesFiltrados = viajesProcesados.filter(v => v.asientos_disponibles > 0);
 
     } catch (error: any) {
       this.msg.add({ severity: 'error', summary: 'Error', detail: error.message || 'Error al cargar viajes' });
@@ -161,36 +145,30 @@ export class ViajesComponent implements OnInit {
     }
   }
 
-onSearch() {
-  const term = this.searchTerm.toLowerCase().trim();
+  onSearch() {
+    const term = this.searchTerm.toLowerCase().trim();
 
-  if (!term) {
-    // Si no hay texto → mostrar según el tipo de usuario
-    if (this.esConductorConViajeActivo) {
-      this.viajesFiltrados = this.viajes.filter(v => v.es_mio);
-    } else {
-      this.viajesFiltrados = this.viajes.filter(v => v.asientos_disponibles > 0 || v.es_mio);
+    if (!term) {
+      // Sin búsqueda: mostrar todos los viajes con asientos disponibles
+      this.viajesFiltrados = this.viajes.filter(v => v.asientos_disponibles > 0);
+      return;
     }
-    return;
+
+    // Con búsqueda: filtrar por término Y que tenga asientos disponibles
+    this.viajesFiltrados = this.viajes.filter(viaje => {
+      // Solo viajes con asientos
+      if (viaje.asientos_disponibles <= 0) return false;
+
+      const coincideConductor = `${viaje.usuarios.nombre} ${viaje.usuarios.apellido}`
+        .toLowerCase()
+        .includes(term);
+
+      const coincideSalida = viaje.lugar_salida.toLowerCase().includes(term);
+      const coincideLlegada = viaje.lugar_llegada.toLowerCase().includes(term);
+
+      return coincideConductor || coincideSalida || coincideLlegada;
+    });
   }
-
-  // Filtrar en tiempo real
-  this.viajesFiltrados = this.viajes.filter(viaje => {
-    const coincideConductor = `${viaje.usuarios.nombre} ${viaje.usuarios.apellido}`
-      .toLowerCase()
-      .includes(term);
-
-    const coincideSalida = viaje.lugar_salida.toLowerCase().includes(term);
-    const coincideLlegada = viaje.lugar_llegada.toLowerCase().includes(term);
-
-    // Solo mostrar si tiene asientos o es del usuario (excepto si es conductor activo)
-    const esVisible = this.esConductorConViajeActivo
-      ? viaje.es_mio
-      : (viaje.asientos_disponibles > 0 || viaje.es_mio);
-
-    return esVisible && (coincideConductor || coincideSalida || coincideLlegada);
-  });
-}
 
   getBotonLabel(viaje: Viaje): string {
     if (viaje.solicitud_pendiente) return 'Pendiente';
