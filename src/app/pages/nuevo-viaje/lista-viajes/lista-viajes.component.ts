@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 // PrimeNG
@@ -35,6 +35,7 @@ interface ViajeForm {
     ToastModule,
     ConfirmDialogModule,
     InputTextModule,
+    RouterModule,
   ],
   templateUrl: './lista-viajes.component.html',
   styleUrls: ['./lista-viajes.component.scss'],
