@@ -85,19 +85,14 @@ export class ListaViajesComponent implements OnInit {
   };
   pasajerosList: number[] = [1];
   isPublishing = false;
-  
-  // ✅ CORRECCIÓN 1: Agregamos las propiedades faltantes
-  horaString: string = ''; 
-  horaMinima: string = ''; // <--- Esta es la que causaba el error
+
+  horaString: string = '';
+  horaMinima: string = '';
 
   async ngOnInit() {
-    // ✅ CORRECCIÓN 2: Calcular la hora mínima al iniciar
     const now = new Date();
     // Formato HH:MM para el input type="time"
     this.horaMinima = now.toTimeString().slice(0, 5);
-    
-    // Si la horaString está vacía, podrías inicializarla con la hora actual si deseas:
-    // this.horaString = this.horaMinima;
 
     const { data: { user } } = await this.supabase.supabaseClient.auth.getUser();
     this.usuarioId = user?.id || null;
@@ -124,21 +119,17 @@ export class ListaViajesComponent implements OnInit {
   async cargarDatosIniciales() {
     this.isLoading = true;
     await this.cargarViajeComoPasajero();
-    
+
     if (!this.viajeActivo) {
       await this.cargarViajeActivo();
     }
-    
+
     if (!this.viajeActivo && this.esConductor) {
       await this.verificarVehiculo();
     }
 
     this.isLoading = false;
   }
-
-  // ... Resto de tu código (cargarViajeActivo, cargarViajeComoPasajero, etc.)
-  // (No es necesario repetir todas las funciones si no han cambiado, 
-  //  solo asegúrate de mantener el resto de la clase igual).
 
   async cargarViajeActivo() {
     try {
@@ -156,17 +147,21 @@ export class ListaViajesComponent implements OnInit {
     try {
       const { data } = await this.supabase.supabaseClient
         .from('solicitudesviaje')
-        .select(`*, viajes (*, conductor:conductor_id(*), vehiculo_id)`)
+        .select(`*, viajes!inner (*, conductor:conductor_id(*), vehiculo_id)`) // !inner hace un JOIN que excluye nulls
         .eq('pasajero_id', this.usuarioId)
         .eq('estado_solicitud', 'aceptada')
+        .eq('viajes.estado_viaje', 'activo') // Borra datos si se elimino el viaje xD
         .maybeSingle();
 
       if (data && data.viajes) {
         const viaje = data.viajes;
         if (!viaje.vehiculo && viaje.vehiculo_id) {
-            const { data: vehiculo } = await this.supabase.supabaseClient
-                .from('vehiculos').select('*').eq('vehiculo_id', viaje.vehiculo_id).single();
-            viaje.vehiculo = vehiculo;
+          const { data: vehiculo } = await this.supabase.supabaseClient
+            .from('vehiculos')
+            .select('*')
+            .eq('vehiculo_id', viaje.vehiculo_id)
+            .single();
+          viaje.vehiculo = vehiculo;
         }
         this.viajeActivo = viaje;
         this.esPasajero = true;
@@ -175,7 +170,11 @@ export class ListaViajesComponent implements OnInit {
         this.viajeActivo = null;
         this.esPasajero = false;
       }
-    } catch (error) { console.error(error); }
+    } catch (error) {
+      console.error(error);
+      this.viajeActivo = null;
+      this.esPasajero = false;
+    }
   }
 
   async cargarSolicitudes() {
@@ -235,12 +234,42 @@ export class ListaViajesComponent implements OnInit {
   }
 
   async eliminarViaje(viajeId: string) {
-    await this.viajesService.actualizarEstadoViaje(viajeId, 'inactivo');
-    this.messageService.add({ severity: 'success', summary: 'Eliminado', detail: 'Viaje finalizado.' });
-    this.viajeActivo = null;
-    this.solicitudesPendientes = [];
-    this.pasajerosConfirmados = [];
-    if (this.esConductor) await this.verificarVehiculo();
+    try {
+      // 1. Eliminar todos los pasajeros del viaje
+      await this.supabase.supabaseClient
+        .from('pasajerosviaje')
+        .delete()
+        .eq('viaje_id', viajeId);
+
+      // 2. Cancelar todas las solicitudes pendientes o aceptadas
+      await this.supabase.supabaseClient
+        .from('solicitudesviaje')
+        .update({ estado_solicitud: 'cancelada' })
+        .eq('viaje_id', viajeId)
+        .in('estado_solicitud', ['pendiente', 'aceptada']);
+
+      // 3. Actualizar el estado del viaje a inactivo
+      await this.viajesService.actualizarEstadoViaje(viajeId, 'inactivo');
+
+      this.messageService.add({ 
+        severity: 'success', 
+        summary: 'Eliminado', 
+        detail: 'Viaje cancelado. Se notificó a los pasajeros.' 
+      });
+
+      this.viajeActivo = null;
+      this.solicitudesPendientes = [];
+      this.pasajerosConfirmados = [];
+      
+      if (this.esConductor) await this.verificarVehiculo();
+    } catch (error) {
+      console.error('Error al eliminar viaje:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo cancelar el viaje.'
+      });
+    }
   }
 
   async salirDelViaje() {

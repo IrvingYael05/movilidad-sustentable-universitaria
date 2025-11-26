@@ -66,55 +66,55 @@
     </div>
 
     <div *ngIf="!isLoading && viajeActivo">
-      
-      <div class="text-center mb-4">
-        <h1 class="text-2xl font-bold m-0">Mi Viaje</h1>
-        <p class="text-secondary mt-1">{{ esPasajero ? 'Detalles de tu transporte' : 'Gestiona tu viaje publicado' }}</p>
+  
+    <div class="text-center mb-4">
+      <h1 class="text-2xl font-bold m-0">Mi Viaje</h1>
+      <p class="text-secondary mt-1">{{ esPasajero ? 'Detalles de tu transporte' : 'Gestiona tu viaje publicado' }}</p>
+    </div>
+
+    <div class="viaje-card">
+      <div class="section-header mb-2">
+        <label class="font-semibold">Punto de partida</label>
+        <p>{{ viajeActivo.lugar_salida }}</p>
       </div>
 
-      <div class="viaje-card">
-        <div class="section-header mb-2">
-          <label class="font-semibold">Punto de partida</label>
-          <p>{{ viajeActivo.lugar_salida }}</p>
-        </div>
-
-        <div class="section-header mb-2">
-          <label class="font-semibold">Destino</label>
-          <p>{{ viajeActivo.lugar_llegada }}</p>
-        </div>
-
-        <div class="section-header mb-2">
-          <label class="font-semibold">Hora de salida</label>
-          <p>{{ viajeActivo.hora_salida | date: 'shortTime' }}</p>
-        </div>
-
-        <div class="section-header mb-3">
-          <label class="font-semibold">Lugares disponibles</label>
-          <p>{{ viajeActivo.asientos_disponibles }}</p>
-        </div>
-
-        <div class="section-header mb-3">
-          <label class="font-semibold">Pasajeros</label>
-          <div *ngIf="pasajerosConfirmados.length === 0">
-            <p class="text-secondary text-sm">Aún no hay pasajeros confirmados.</p>
-          </div>
-          <ul *ngIf="pasajerosConfirmados.length > 0" class="m-0 pl-3">
-            <li *ngFor="let p of pasajerosConfirmados">
-              {{ p.pasajero.nombre }} {{ p.pasajero.apellido }}
-            </li>
-          </ul>
-        </div>
-
-        <!-- BOTÓN PARA ABRIR MODAL -->
-        <div class="flex justify-content-end mb-2">
-          <button class="btn-add-pasajero" (click)="openModal()">+</button>
-        </div>
-
-        <div class="flex justify-content-center mt-5">
-          <p-button *ngIf="!esPasajero" label="Eliminar viaje" styleClass="delete-btn" (click)="confirmarEliminar(viajeActivo.viaje_id)"></p-button>
-          <p-button *ngIf="esPasajero" label="Salir del Viaje" icon="pi pi-sign-out" styleClass="p-button-danger" (click)="salirDelViaje()"></p-button>
-        </div>
+      <div class="section-header mb-2">
+        <label class="font-semibold">Destino</label>
+        <p>{{ viajeActivo.lugar_llegada }}</p>
       </div>
+
+      <div class="section-header mb-2">
+        <label class="font-semibold">Hora de salida</label>
+        <p>{{ viajeActivo.hora_salida | date: 'shortTime' }}</p>
+      </div>
+
+      <div class="section-header mb-3">
+        <label class="font-semibold">Lugares disponibles</label>
+        <p>{{ viajeActivo.asientos_disponibles }}</p>
+      </div>
+
+      <div class="section-header mb-3">
+        <label class="font-semibold">Pasajeros</label>
+        <div *ngIf="pasajerosConfirmados.length === 0">
+          <p class="text-secondary text-sm">Aún no hay pasajeros confirmados.</p>
+        </div>
+        <ul *ngIf="pasajerosConfirmados.length > 0" class="m-0 pl-3">
+          <li *ngFor="let p of pasajerosConfirmados">
+            {{ p.pasajero.nombre }} {{ p.pasajero.apellido }}
+          </li>
+        </ul>
+      </div>
+
+      <!--  Botón para añadir pasajeros - Solo para conductor -->
+      <div *ngIf="!esPasajero" class="flex justify-content-end mb-2">
+        <button class="btn-add-pasajero" (click)="openModal()">+</button>
+      </div>
+
+      <div class="flex justify-content-center mt-5">
+        <p-button *ngIf="!esPasajero" label="Eliminar viaje" styleClass="delete-btn" (click)="confirmarEliminar(viajeActivo.viaje_id)"></p-button>
+        <p-button *ngIf="esPasajero" label="Salir del Viaje" icon="pi pi-sign-out" styleClass="p-button-danger" (click)="salirDelViaje()"></p-button>
+      </div>
+    </div>
 
       <div *ngIf="esPasajero" class="driver-card mt-4">
         <h3 class="section-title">Tu Conductor</h3>
