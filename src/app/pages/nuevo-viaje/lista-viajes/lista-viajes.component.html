@@ -1,31 +1,64 @@
-<div class="flex flex-column align-items-center justify-content-center min-h-screen p-4 overflow-auto">
+<div
+  class="flex flex-column align-items-center justify-content-start min-h-screen p-4 overflow-auto"
+>
   <div class="w-full md:w-30rem">
-
     <div *ngIf="isLoading" class="text-center">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       <p class="text-secondary mt-2">Cargando...</p>
     </div>
 
     <div *ngIf="!isLoading && !viajeActivo">
-
       <div *ngIf="esConductor">
         <div class="text-center mb-4">
           <h1 class="text-3xl font-bold m-0">Nuevo Viaje</h1>
-          <p class="text-secondary mb-4 mt-2">Completa los campos para publicar tu viaje</p>
+          <p class="text-secondary mb-4 mt-2">
+            Completa los campos para publicar tu viaje
+          </p>
         </div>
 
-        <div class="flex flex-column gap-3 p-4 border-round shadow-1">
+        <div class="info-card flex flex-column gap-3">
           <div class="section-header">
             <label class="font-semibold">Punto de partida</label>
           </div>
-          <input pInputText placeholder="Calle" [(ngModel)]="viajeForm.calle" class="w-full" required (input)="soloTexto($event)" pattern="[A-Za-zÀ-ÿ\s]+"/>
+          <input
+            pInputText
+            placeholder="Calle"
+            [(ngModel)]="viajeForm.calle"
+            class="w-full"
+            required
+            (input)="soloTexto($event)"
+            pattern="[A-Za-zÀ-ÿ\s]+"
+          />
 
           <div class="flex gap-2">
-            <input pInputText placeholder="No. Exterior" [(ngModel)]="viajeForm.numeroExterior" class="flex-1"  required min="1"  maxlength="4"   (input)="limitarNumeroExterior($event)" />
-            <input pInputText placeholder="C.P." [(ngModel)]="viajeForm.codigoPostal" class="flex-1"  maxlength="5"  (input)="limitarCP($event)" required />
+            <input
+              pInputText
+              placeholder="No. Exterior"
+              [(ngModel)]="viajeForm.numeroExterior"
+              class="flex-1"
+              required
+              min="1"
+              maxlength="4"
+              (input)="limitarNumeroExterior($event)"
+            />
+            <input
+              pInputText
+              placeholder="C.P."
+              [(ngModel)]="viajeForm.codigoPostal"
+              class="flex-1"
+              maxlength="5"
+              (input)="limitarCP($event)"
+              required
+            />
           </div>
 
-          <input pInputText placeholder="Colonia" [(ngModel)]="viajeForm.colonia" class="w-full" required/>
+          <input
+            pInputText
+            placeholder="Colonia"
+            [(ngModel)]="viajeForm.colonia"
+            class="w-full"
+            required
+          />
 
           <div class="section-header mt-2">
             <label class="font-semibold">Hora de Salida</label>
@@ -40,84 +73,138 @@
           />
 
           <div class="section-header mt-2">
-            <label class="font-semibold">Lugares disponibles: {{ viajeForm.lugaresDisponibles }}</label>
+            <label class="font-semibold"
+              >Lugares disponibles: {{ viajeForm.lugaresDisponibles }}</label
+            >
           </div>
 
-          <input type="number" pInputText class="w-full" [(ngModel)]="viajeForm.lugaresDisponibles" min="1" max="4" required />
+          <input
+            type="number"
+            pInputText
+            class="w-full"
+            [(ngModel)]="viajeForm.lugaresDisponibles"
+            min="1"
+            max="4"
+            required
+          />
 
           <div class="flex justify-content-end mt-4">
-            <p-button label="Publicar Viaje" [loading]="isPublishing" (click)="publicarViaje()" styleClass="w-full"></p-button>
+            <p-button
+              label="Publicar Viaje"
+              [loading]="isPublishing"
+              (click)="publicarViaje()"
+              styleClass="w-full"
+            ></p-button>
           </div>
         </div>
       </div>
 
       <div *ngIf="!esConductor" class="text-center mt-5">
-        <i class="pi pi-car" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
-        <p class="text-secondary mt-3">No tienes ningún viaje activo por el momento.</p>
-        <p class="text-sm text-secondary">Busca un viaje disponible en la sección de "Viajes".</p>
-        <p-button label="Buscar Viajes" routerLink="/viajes" styleClass="mt-3 p-button-outlined"></p-button>
+        <i
+          class="pi pi-car"
+          style="font-size: 3rem; color: var(--text-color-secondary)"
+        ></i>
+        <p class="text-secondary mt-3">
+          No tienes ningún viaje activo por el momento.
+        </p>
+        <p class="text-sm text-secondary">
+          Busca un viaje disponible en la sección de "Viajes".
+        </p>
+        <p-button
+          label="Buscar Viajes"
+          routerLink="/viajes"
+          styleClass="mt-3 p-button-outlined"
+        ></p-button>
       </div>
-
     </div>
 
     <div *ngIf="!isLoading && viajeActivo">
-
-    <div class="text-center mb-4">
-      <h1 class="text-2xl font-bold m-0">Mi Viaje</h1>
-      <p class="text-secondary mt-1">{{ esPasajero ? 'Detalles de tu transporte' : 'Gestiona tu viaje publicado' }}</p>
-    </div>
-
-    <div class="viaje-card">
-      <div class="section-header mb-2">
-        <label class="font-semibold">Punto de partida</label>
-        <p>{{ viajeActivo.lugar_salida }}</p>
+      <div class="text-center mb-4">
+        <h1 class="text-3xl font-bold m-0">Mi Viaje</h1>
+        <p class="text-secondary mt-1">
+          {{
+            esPasajero
+              ? "Detalles de tu transporte"
+              : "Gestiona tu viaje publicado"
+          }}
+        </p>
       </div>
 
-      <div class="section-header mb-2">
-        <label class="font-semibold">Destino</label>
-        <p>{{ viajeActivo.lugar_llegada }}</p>
-      </div>
-
-      <div class="section-header mb-2">
-        <label class="font-semibold">Hora de salida</label>
-        <p>{{ viajeActivo.hora_salida | date: 'shortTime' }}</p>
-      </div>
-
-      <div class="section-header mb-3">
-        <label class="font-semibold">Lugares disponibles</label>
-        <p>{{ viajeActivo.asientos_disponibles }}</p>
-      </div>
-
-      <div class="section-header mb-3">
-        <label class="font-semibold">Pasajeros</label>
-        <div *ngIf="pasajerosConfirmados.length === 0">
-          <p class="text-secondary text-sm">Aún no hay pasajeros confirmados.</p>
+      <div class="info-card">
+        <div class="section-header mb-2">
+          <label class="font-semibold">Punto de partida</label>
+          <p>{{ viajeActivo.lugar_salida }}</p>
         </div>
-        <ul *ngIf="pasajerosConfirmados.length > 0" class="m-0 pl-3">
-          <li *ngFor="let p of pasajerosConfirmados">
-            {{ p.pasajero.nombre }} {{ p.pasajero.apellido }}
-          </li>
-        </ul>
+
+        <div class="section-header mb-2">
+          <label class="font-semibold">Destino</label>
+          <p>{{ viajeActivo.lugar_llegada }}</p>
+        </div>
+
+        <div class="section-header mb-2">
+          <label class="font-semibold">Hora de salida</label>
+          <p>{{ viajeActivo.hora_salida | date : "shortTime" }}</p>
+        </div>
+
+        <div class="section-header mb-3">
+          <label class="font-semibold">Lugares disponibles</label>
+          <p>{{ viajeActivo.asientos_disponibles }}</p>
+        </div>
+
+        <div class="section-header mb-3">
+          <label class="font-semibold">Pasajeros</label>
+          <div *ngIf="pasajerosConfirmados.length === 0">
+            <p class="text-secondary text-sm">
+              Aún no hay pasajeros confirmados.
+            </p>
+          </div>
+          <ul *ngIf="pasajerosConfirmados.length > 0" class="lista-pasajeros m-0 p-0">
+            <li *ngFor="let p of pasajerosConfirmados" class="pasajero-item">
+              <span>{{ p.pasajero.nombre }} {{ p.pasajero.apellido }}</span>
+              <p-button
+                *ngIf="!esPasajero"
+                icon="pi pi-times"
+                styleClass="p-button-danger p-button-text p-button-rounded"
+                (click)="confirmarEliminarPasajero(p)"
+              ></p-button>
+            </li>
+          </ul>
+        </div>
+
+        <!--  Botón para añadir pasajeros - Solo para conductor -->
+        <div *ngIf="!esPasajero" class="flex justify-content-end mb-2">
+          <button class="btn-add-pasajero" (click)="openModal()">+</button>
+        </div>
+
+        <div class="flex justify-content-center mt-5">
+          <p-button
+            *ngIf="!esPasajero"
+            label="Eliminar viaje"
+            styleClass="delete-btn"
+            (click)="confirmarEliminar(viajeActivo.viaje_id)"
+          ></p-button>
+          <p-button
+            *ngIf="esPasajero"
+            label="Salir del Viaje"
+            icon="pi pi-sign-out"
+            styleClass="p-button-danger"
+            (click)="salirDelViaje()"
+          ></p-button>
+        </div>
       </div>
 
-      <!--  Botón para añadir pasajeros - Solo para conductor -->
-      <div *ngIf="!esPasajero" class="flex justify-content-end mb-2">
-        <button class="btn-add-pasajero" (click)="openModal()">+</button>
-      </div>
-
-      <div class="flex justify-content-center mt-5">
-        <p-button *ngIf="!esPasajero" label="Eliminar viaje" styleClass="delete-btn" (click)="confirmarEliminar(viajeActivo.viaje_id)"></p-button>
-        <p-button *ngIf="esPasajero" label="Salir del Viaje" icon="pi pi-sign-out" styleClass="p-button-danger" (click)="salirDelViaje()"></p-button>
-      </div>
-    </div>
-
-      <div *ngIf="esPasajero" class="driver-card mt-4">
-        <h3 class="section-title">Tu Conductor</h3>
+      <div *ngIf="esPasajero" class="info-card mt-4">
+        <div class="text-center mb-4">
+          <h1 class="text-3xl font-bold m-0">Tu Conductor</h1>
+          <p class="text-secondary mt-1">Detalles del conductor y vehículo</p>
+        </div>
         <div class="driver-info">
-
           <div class="section-header mb-3">
             <label class="font-semibold">Nombre</label>
-            <p>{{ viajeActivo.conductor.nombre }} {{ viajeActivo.conductor.apellido }}</p>
+            <p>
+              {{ viajeActivo.conductor.nombre }}
+              {{ viajeActivo.conductor.apellido }}
+            </p>
           </div>
 
           <div class="section-header mb-3">
@@ -126,50 +213,72 @@
 
           <div class="section-header mb-3">
             <label class="font-semibold">Placa</label>
-            <p>{{ viajeActivo.vehiculo?.placa || 'N/A' }}</p>
+            <p>{{ viajeActivo.vehiculo?.placa || "N/A" }}</p>
           </div>
 
           <div class="section-header mb-3">
             <label class="font-semibold">Modelo</label>
-            <p>{{ viajeActivo.vehiculo?.modelo || 'N/A' }}</p>
+            <p>{{ viajeActivo.vehiculo?.modelo || "N/A" }}</p>
           </div>
 
           <div class="section-header mb-3">
             <label class="font-semibold">Marca</label>
-            <p>{{ viajeActivo.vehiculo?.marca || 'N/A' }}</p>
+            <p>{{ viajeActivo.vehiculo?.marca || "N/A" }}</p>
           </div>
 
           <div class="section-header mb-3">
             <label class="font-semibold">Color</label>
-            <p>{{ viajeActivo.vehiculo?.color || 'N/A' }}</p>
+            <p>{{ viajeActivo.vehiculo?.color || "N/A" }}</p>
           </div>
-
         </div>
       </div>
 
       <div *ngIf="!esPasajero" class="mt-5">
-        <h3 class="text-center text-xl font-bold mb-3">Solicitudes Pendientes</h3>
-
-        <div *ngIf="isLoadingSolicitudes" class="text-center"><i class="pi pi-spin pi-spinner"></i></div>
-
-        <div *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length === 0" class="text-center py-3 border-round border-1 surface-border">
-          <p class="text-secondary m-0">No tienes solicitudes pendientes.</p>
+        <div class="text-center mb-4">
+          <h1 class="text-3xl font-bold m-0">Tus Solicitudes</h1>
+          <p class="text-secondary mt-1">
+            Gestiona las solicitudes de los pasajeros que quieren unirse
+          </p>
+        </div>
+        <div *ngIf="isLoadingSolicitudes" class="text-center">
+          <i class="pi pi-spin pi-spinner"></i>
         </div>
 
-        <div *ngFor="let s of solicitudesPendientes" class="solicitud-item mb-3 p-3 border-round shadow-1" [@fadeSlide]>
+        <div
+          *ngIf="!isLoadingSolicitudes && solicitudesPendientes.length === 0"
+          class="empty-state"
+        >
+          <i class="pi pi-user-plus"></i>
+          <p>No tienes solicitudes pendientes.</p>
+        </div>
+
+        <div
+          *ngFor="let s of solicitudesPendientes"
+          class="info-card"
+          [@fadeSlide]
+        >
           <div class="flex justify-content-between align-items-center">
             <div>
-              <p class="font-semibold m-0">{{ s.pasajero.nombre }} {{ s.pasajero.apellido }}</p>
+              <p class="font-semibold m-0" style="color: var(--primary-color)">
+                {{ s.pasajero.nombre }} {{ s.pasajero.apellido }}
+              </p>
               <small class="text-secondary">{{ s.pasajero.email }}</small>
             </div>
             <div class="flex gap-2">
-              <p-button icon="pi pi-times" styleClass="p-button-danger p-button-text p-button-rounded" (click)="rechazarSolicitud(s)"></p-button>
-              <p-button icon="pi pi-check" styleClass="p-button-success p-button-rounded" (click)="aceptarSolicitud(s)"></p-button>
+              <p-button
+                icon="pi pi-times"
+                styleClass="p-button-danger p-button-text p-button-rounded"
+                (click)="rechazarSolicitud(s)"
+              ></p-button>
+              <p-button
+                icon="pi pi-check"
+                styleClass="p-button-success p-button-rounded"
+                (click)="aceptarSolicitud(s)"
+              ></p-button>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -177,8 +286,7 @@
 <!-- ========================== MODAL AGREGAR PASAJERO ========================== -->
 <div *ngIf="modalVisible" class="modal-backdrop">
   <div class="modal-card">
-
-    <h3 class="text-center mb-3">Agregar pasajero</h3>
+    <h2 class="text-center mb-3">Agregar pasajero</h2>
 
     <!-- INPUT DE BÚSQUEDA -->
     <div class="search-wrapper">
@@ -193,8 +301,16 @@
     </div>
 
     <!-- Sin resultados -->
-    <div *ngIf="resultadosBusqueda.length === 0" class="text-center text-secondary mt-3">
-      <small>Escribe para buscar usuarios...</small>
+    <div
+      *ngIf="resultadosBusqueda.length === 0"
+      class="text-center text-secondary mt-3"
+    >
+      <small *ngIf="searchQuery.length === 0"
+        >Escribe para buscar usuarios...</small
+      >
+      <small *ngIf="resultadosBusqueda.length === 0 && searchQuery.length > 0"
+        >No se encontraron usuarios.</small
+      >
     </div>
 
     <!-- LISTA DE RESULTADOS -->
@@ -204,7 +320,7 @@
         class="resultado-item"
         (click)="agregarPasajeroManual(u)"
       >
-        <div class="nombre">{{ u.nombre }} {{ u.apellido }}</div>
+        <div class="nombre font-semibold">{{ u.nombre }} {{ u.apellido }}</div>
         <div class="email">{{ u.email }}</div>
       </li>
     </ul>
@@ -214,13 +330,34 @@
       pButton
       label="Cerrar"
       class="w-full mt-4"
-      (click)="closeModal()">
-    </button>
-
+      (click)="closeModal()"
+    ></button>
   </div>
 </div>
 
 <!-- Mostrar mensajes -->
 <p-toast position="top-right"></p-toast>
 
-<p-confirmDialog></p-confirmDialog>
+<!-- ========================== MODAL CONFIRMACIÓN ========================== -->
+<div *ngIf="confirmModalVisible" class="modal-backdrop">
+  <div class="modal-card">
+    <h2 class="text-center mb-3">{{ confirmModalData.header }}</h2>
+    <p class="text-center text-secondary my-4">{{ confirmModalData.message }}</p>
+
+    <div class="flex gap-3 mt-5">
+      <button
+        pButton
+        [label]="confirmModalData.rejectLabel || 'No'"
+        [class]="'p-button-outlined w-full ' + (confirmModalData.rejectClass || '')"
+        (click)="onConfirm(false)"
+      ></button>
+      <button
+        pButton
+        [label]="confirmModalData.acceptLabel || 'Sí'"
+        [class]="'w-full ' + (confirmModalData.acceptClass || '')"
+        (click)="onConfirm(true)"
+      ></button>
+    </div>
+  </div>
+</div>
+

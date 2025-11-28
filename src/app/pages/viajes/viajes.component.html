@@ -2,18 +2,19 @@
 <div class="search-container">
   <div class="search-input-group">
     <input
-  type="text"
-  placeholder="Buscar por conductor, salida o llegada..."
-  [(ngModel)]="searchTerm"
-  (input)="onSearch()"
-  class="search-input">
-  <!-- Dentro del div.search-input-group, después del <input> -->
-<i 
-  class="pi pi-times search-clear" 
-  *ngIf="searchTerm" 
-  (click)="searchTerm = ''; onSearch()"
-  style="cursor: pointer;">
-</i>
+      type="text"
+      placeholder="Buscar por conductor/salida"
+      [(ngModel)]="searchTerm"
+      (input)="onSearch()"
+      class="search-input"
+    />
+    <i
+      class="pi pi-times search-clear"
+      *ngIf="searchTerm"
+      (click)="searchTerm = ''; onSearch()"
+      style="cursor: pointer"
+    >
+    </i>
     <i class="pi pi-search search-icon"></i>
   </div>
 </div>
@@ -26,25 +27,25 @@
 
   <!-- MENSAJE CUANDO NO HAY VIAJES VISIBLES -->
   <div *ngIf="!cargando && viajesFiltrados.length === 0" class="empty-state">
-    <i class="pi pi-car" style="font-size: 2.5rem; color: #71706f; margin-bottom: 1rem;"></i>
+    <i class="pi pi-car"></i>
 
     <!-- Caso: Conductor con viaje activo -->
     <div *ngIf="esConductorConViajeActivo">
-      <p><strong>Estás ofreciendo un viaje activo</strong></p>
-      <p style="font-size: 0.9rem; color: #71706f; line-height: 1.5;">
-        No puedes unirte a otros viajes mientras eres conductor.<br>
+      <p class="font-semibold">Estás ofreciendo un viaje activo</p>
+      <small>
+        No puedes unirte a otros viajes mientras eres conductor.<br />
         Aquí solo verás tu viaje actual.
-      </p>
+      </small>
     </div>
 
     <!-- Caso: Pasajero normal sin resultados -->
     <div *ngIf="!esConductorConViajeActivo">
-      <p *ngIf="searchTerm">
-        No se encontraron viajes para "<strong>{{ searchTerm }}</strong>"
+      <p class="font-semibold" *ngIf="searchTerm">
+        No se encontraron viajes
       </p>
-      <p *ngIf="!searchTerm">
-        No hay viajes con lugares disponibles en este momento.
-      </p>
+      <small>
+        No hay viajes con lugares disponibles en este momento para "<strong>{{ searchTerm }}</strong>".
+      </small>
     </div>
   </div>
 
@@ -68,14 +69,16 @@
 
       <div class="detail seats" [class.full]="viaje.asientos_disponibles === 0">
         <i class="pi pi-users"></i>
-        {{ viaje.asientos_disponibles }} lugar{{ viaje.asientos_disponibles !== 1 ? 'es' : '' }} disponible{{ viaje.asientos_disponibles !== 1 ? 's' : '' }}
+        {{ viaje.asientos_disponibles }} lugar{{
+          viaje.asientos_disponibles !== 1 ? "es" : ""
+        }}
+        disponible{{ viaje.asientos_disponibles !== 1 ? "s" : "" }}
       </div>
     </div>
 
     <div class="trip-actions">
       <div *ngIf="viaje.es_mio" class="mi-viaje-info">
-        <i class="pi pi-check-circle" style="color: #10b981;"></i>
-        <span>Tu viaje</span>
+        <span> Tu viaje</span>
       </div>
 
       <button
@@ -84,8 +87,8 @@
         [label]="getBotonLabel(viaje)"
         [disabled]="!getBotonEnabled(viaje)"
         class="join-button"
-        (click)="onJoin(viaje)">
-      </button>
+        (click)="onJoin(viaje)"
+      ></button>
     </div>
   </div>
 </div>

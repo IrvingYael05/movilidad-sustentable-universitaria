@@ -7,12 +7,15 @@ import { animate, style, transition, trigger } from '@angular/animations';
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
-import { ConfirmationService, MessageService } from 'primeng/api';
 
 // Servicios e Interfaces
-import { ViajesService, SolicitudViaje, PasajeroViaje } from '../services/viajes.service';
+import {
+  ViajesService,
+  SolicitudViaje,
+  PasajeroViaje,
+} from '../services/viajes.service';
 import { SupabaseService } from '../../../shared/data-access/supabase.service';
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -33,21 +36,26 @@ interface ViajeForm {
     FormsModule,
     ButtonModule,
     ToastModule,
-    ConfirmDialogModule,
     InputTextModule,
     RouterModule,
   ],
   templateUrl: './lista-viajes.component.html',
   styleUrls: ['./lista-viajes.component.scss'],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService],
   animations: [
     trigger('fadeSlide', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(20px)' }),
-        animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+        animate(
+          '500ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        ),
       ]),
       transition(':leave', [
-        animate('300ms ease-in', style({ opacity: 0, transform: 'translateY(20px)' })),
+        animate(
+          '300ms ease-in',
+          style({ opacity: 0, transform: 'translateY(20px)' })
+        ),
       ]),
     ]),
   ],
@@ -58,7 +66,6 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   private viajesService = inject(ViajesService);
   private supabase = inject(SupabaseService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
 
   // Canales de Realtime
@@ -94,15 +101,22 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   horaString: string = '';
   horaMinima: string = '';
 
+  // ====================== MODAL CONFIRMACIÓN ======================
+  confirmModalVisible = false;
+  confirmModalData: any = {};
+  private _confirmAction: ((confirmed: boolean) => void) | null = null;
+
   async ngOnInit() {
     const now = new Date();
     this.horaMinima = now.toTimeString().slice(0, 5);
 
-    const { data: { user } } = await this.supabase.supabaseClient.auth.getUser();
+    const {
+      data: { user },
+    } = await this.supabase.supabaseClient.auth.getUser();
     this.usuarioId = user?.id || null;
 
     if (this.usuarioId) {
-      this.authService.currentUserProfile$.subscribe(profile => {
+      this.authService.currentUserProfile$.subscribe((profile) => {
         if (profile) {
           this.esConductor = profile.roles.includes('conductor');
         }
@@ -138,20 +152,19 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
           event: '*',
           schema: 'public',
           table: 'viajes',
-          filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`
+          filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`,
         },
         (payload: any) => {
-          console.log('Cambio en viaje detectado:', payload);
-          
           if (payload.eventType === 'UPDATE') {
-            this.viajeActivo.asientos_disponibles = payload.new.asientos_disponibles;
-            
+            this.viajeActivo.asientos_disponibles =
+              payload.new.asientos_disponibles;
+
             if (payload.new.estado_viaje === 'inactivo') {
               this.messageService.add({
                 severity: 'warn',
                 summary: 'Viaje cancelado',
                 detail: 'El conductor ha cancelado este viaje.',
-                life: 5000
+                life: 5000,
               });
               this.viajeActivo = null;
               this.limpiarRealtimeSubscriptions();
@@ -161,7 +174,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
               severity: 'error',
               summary: 'Viaje eliminado',
               detail: 'Este viaje ya no está disponible.',
-              life: 5000
+              life: 5000,
             });
             this.viajeActivo = null;
             this.limpiarRealtimeSubscriptions();
@@ -179,36 +192,50 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
           event: '*',
           schema: 'public',
           table: 'pasajerosviaje',
-          filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`
+          filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`,
         },
         (payload: any) => {
-          console.log('Cambio en pasajeros detectado:', payload);
-          
           if (payload.eventType === 'INSERT') {
-            this.cargarPasajeros();
-            
-            if (this.esPasajero) {
+            // Un pasajero se unió
+            const nuevoPasajero = payload.new;
+            this.viajesService
+              .obtenerDetallesPasajero(nuevoPasajero.pasajero_id)
+              .then((pasajero) => {
+                if (pasajero) {
+                  this.pasajerosConfirmados.push({
+                    ...nuevoPasajero,
+                    pasajero,
+                  });
+                  this.messageService.add({
+                    severity: 'info',
+                    summary: 'Nuevo Pasajero',
+                    detail: `${pasajero.nombre} se ha unido al viaje.`,
+                  });
+                }
+              });
+          } else if (payload.eventType === 'DELETE') {
+            // Un pasajero se fue
+            const pasajeroEliminado = payload.old;
+            const index = this.pasajerosConfirmados.findIndex(
+              (p) => p.pasajero_id === pasajeroEliminado.pasajero_id
+            );
+
+            if (index !== -1) {
+              const pasajero = this.pasajerosConfirmados[index].pasajero;
+              this.pasajerosConfirmados.splice(index, 1);
               this.messageService.add({
-                severity: 'info',
-                summary: 'Nuevo pasajero',
-                detail: 'Se ha unido un nuevo pasajero al viaje.',
-                life: 3000
+                severity: 'warn',
+                summary: 'Pasajero se fue',
+                detail: `${pasajero.nombre} ha salido del viaje.`,
               });
             }
-          } else if (payload.eventType === 'DELETE') {
-            this.cargarPasajeros();
-            
-            if (payload.old['pasajero_id'] === this.usuarioId) {
-              this.viajeActivo = null;
-              this.esPasajero = false;
-              this.limpiarRealtimeSubscriptions();
-            } else if (!this.esPasajero) {
-              this.messageService.add({
-                severity: 'info',
-                summary: 'Pasajero salió',
-                detail: 'Un pasajero ha abandonado el viaje.',
-                life: 3000
-              });
+
+            // Si el que se fue soy yo (como pasajero), reseteo mi vista
+            if (
+              this.esPasajero &&
+              pasajeroEliminado.pasajero_id === this.usuarioId
+            ) {
+              this.salirDelViajeLocalmente();
             }
           }
         }
@@ -225,20 +252,24 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
             event: '*',
             schema: 'public',
             table: 'solicitudesviaje',
-            filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`
+            filter: `viaje_id=eq.${this.viajeActivo.viaje_id}`,
           },
           (payload: any) => {
-            console.log('Cambio en solicitudes detectado:', payload);
-            
-            if (payload.eventType === 'INSERT' && payload.new.estado_solicitud === 'pendiente') {
+            if (
+              payload.eventType === 'INSERT' &&
+              payload.new.estado_solicitud === 'pendiente'
+            ) {
               this.cargarSolicitudes();
               this.messageService.add({
                 severity: 'info',
                 summary: 'Nueva solicitud',
                 detail: 'Tienes una nueva solicitud de viaje.',
-                life: 3000
+                life: 3000,
               });
-            } else if (payload.eventType === 'UPDATE' || payload.eventType === 'DELETE') {
+            } else if (
+              payload.eventType === 'UPDATE' ||
+              payload.eventType === 'DELETE'
+            ) {
               this.cargarSolicitudes();
             }
           }
@@ -273,6 +304,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
 
     if (!this.viajeActivo && this.esConductor) {
       await this.verificarVehiculo();
+      await this.prellenarFormularioUltimoViaje();
     }
 
     this.isLoading = false;
@@ -280,45 +312,49 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
 
   async cargarViajeActivo() {
     try {
-      const { data } = await this.viajesService.obtenerViajeActivoConductor(this.usuarioId!);
+      const { data } = await this.viajesService.obtenerViajeActivoConductor(
+        this.usuarioId!
+      );
       this.viajeActivo = data || null;
       this.esPasajero = false;
       if (this.viajeActivo) {
         await this.cargarSolicitudes();
         await this.cargarPasajeros();
       }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async cargarViajeComoPasajero() {
     try {
       const { data } = await this.supabase.supabaseClient
-        .from('solicitudesviaje')
-        .select(`*, viajes!inner (*, conductor:conductor_id(*), vehiculo_id)`)
+        .from('pasajerosviaje')
+        .select(
+          `
+          viaje_id,
+          viajes!inner (
+            *,
+            conductor:conductor_id(*),
+            vehiculo:vehiculo_id(*)
+          )
+        `
+        )
         .eq('pasajero_id', this.usuarioId)
-        .eq('estado_solicitud', 'aceptada')
         .eq('viajes.estado_viaje', 'activo')
         .maybeSingle();
 
       if (data && data.viajes) {
-        const viaje = data.viajes;
-        if (!viaje.vehiculo && viaje.vehiculo_id) {
-          const { data: vehiculo } = await this.supabase.supabaseClient
-            .from('vehiculos')
-            .select('*')
-            .eq('vehiculo_id', viaje.vehiculo_id)
-            .single();
-          viaje.vehiculo = vehiculo;
-        }
-        this.viajeActivo = viaje;
+        this.viajeActivo = data.viajes;
         this.esPasajero = true;
         await this.cargarPasajeros();
+        this.iniciarRealtimeSubscriptions();
       } else {
         this.viajeActivo = null;
         this.esPasajero = false;
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error al cargar viaje como pasajero:', error);
       this.viajeActivo = null;
       this.esPasajero = false;
     }
@@ -327,56 +363,72 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   async cargarSolicitudes() {
     if (!this.viajeActivo) return;
     this.isLoadingSolicitudes = true;
-    const { data } = await this.viajesService.obtenerSolicitudesViaje(this.viajeActivo.viaje_id);
+    const { data } = await this.viajesService.obtenerSolicitudesViaje(
+      this.viajeActivo.viaje_id
+    );
     this.solicitudesPendientes = data || [];
     this.isLoadingSolicitudes = false;
   }
 
   async cargarPasajeros() {
     if (!this.viajeActivo) return;
-    const { data } = await this.viajesService.obtenerPasajerosViaje(this.viajeActivo.viaje_id);
+    const { data } = await this.viajesService.obtenerPasajerosViaje(
+      this.viajeActivo.viaje_id
+    );
     this.pasajerosConfirmados = data || [];
   }
 
   async aceptarSolicitud(solicitud: SolicitudViaje) {
-    this.confirmationService.confirm({
-        message: `¿Aceptar a ${solicitud.pasajero.nombre}?`,
-        header: 'Confirmar',
-        acceptLabel: 'Sí',
-        rejectLabel: 'No',
-        icon: 'pi pi-check-circle',
-        acceptButtonStyleClass: 'p-button-success',
-        accept: async () => {
-            await this.viajesService.aceptarSolicitud(solicitud.solicitud_id, solicitud.viaje_id, solicitud.pasajero_id);
-            this.messageService.add({ severity: 'success', summary: 'Aceptado', detail: 'Pasajero agregado.' });
-            await this.cargarViajeActivo();
-        }
+    this.openConfirmModal({
+      header: 'Confirmar',
+      message: `¿Aceptar a ${solicitud.pasajero.nombre} ${solicitud.pasajero.apellido}?`,
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      acceptClass: 'p-button-success',
+      accept: async () => {
+        await this.viajesService.aceptarSolicitud(
+          solicitud.solicitud_id,
+          solicitud.viaje_id,
+          solicitud.pasajero_id
+        );
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Aceptado',
+          detail: 'Pasajero agregado.',
+        });
+        await this.cargarViajeActivo();
+      },
     });
   }
 
   async rechazarSolicitud(solicitud: SolicitudViaje) {
-    this.confirmationService.confirm({
-        message: `¿Rechazar a ${solicitud.pasajero.nombre}?`,
-        header: 'Rechazar',
-        icon: 'pi pi-times-circle',
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: async () => {
-            await this.viajesService.rechazarSolicitud(solicitud.solicitud_id);
-            this.messageService.add({ severity: 'info', summary: 'Rechazado', detail: 'Solicitud rechazada.' });
-            await this.cargarSolicitudes();
-        }
+    this.openConfirmModal({
+      header: 'Rechazar',
+      message: `¿Rechazar a ${solicitud.pasajero.nombre}?`,
+      acceptLabel: 'Rechazar',
+      acceptClass: 'p-button-danger',
+      rejectLabel: 'Cancelar',
+      accept: async () => {
+        await this.viajesService.rechazarSolicitud(solicitud.solicitud_id);
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Rechazado',
+          detail: 'Solicitud rechazada.',
+        });
+        await this.cargarSolicitudes();
+      },
     });
   }
 
   confirmarEliminar(viajeId: string) {
-    this.confirmationService.confirm({
-        message: '¿Eliminar este viaje?',
-        header: 'Confirmar',
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Sí',
-        rejectLabel: 'No',
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: () => this.eliminarViaje(viajeId)
+    this.openConfirmModal({
+      header: 'Confirmar Eliminación',
+      message:
+        '¿Estás seguro de que quieres eliminar este viaje? Esta acción no se puede deshacer.',
+      acceptLabel: 'Eliminar',
+      acceptClass: 'p-button-danger',
+      rejectLabel: 'Cancelar',
+      accept: () => this.eliminarViaje(viajeId),
     });
   }
 
@@ -395,67 +447,142 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
 
       await this.viajesService.actualizarEstadoViaje(viajeId, 'inactivo');
 
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'Eliminado', 
-        detail: 'Viaje cancelado. Se notificó a los pasajeros.' 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Eliminado',
+        detail: 'Viaje cancelado. Se notificó a los pasajeros.',
       });
 
       this.limpiarRealtimeSubscriptions();
       this.viajeActivo = null;
       this.solicitudesPendientes = [];
       this.pasajerosConfirmados = [];
-      
-      if (this.esConductor) await this.verificarVehiculo();
+
+      if (this.esConductor) {
+        await this.verificarVehiculo();
+        await this.prellenarFormularioUltimoViaje();
+      }
     } catch (error) {
       console.error('Error al eliminar viaje:', error);
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'No se pudo cancelar el viaje.'
+        detail: 'No se pudo cancelar el viaje.',
       });
     }
   }
 
-  async salirDelViaje() {
-    this.confirmationService.confirm({
-        message: '¿Salir del viaje?',
-        header: 'Salir',
-        icon: 'pi pi-sign-out',
-        rejectLabel: 'No',
-        acceptLabel: 'Sí',
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: async () => {
-             await this.supabase.supabaseClient.from('pasajerosviaje').delete()
-                .eq('viaje_id', this.viajeActivo.viaje_id).eq('pasajero_id', this.usuarioId);
-            await this.supabase.supabaseClient.from('solicitudesviaje').update({ estado_solicitud: 'cancelada' })
-                .eq('viaje_id', this.viajeActivo.viaje_id).eq('pasajero_id', this.usuarioId);
-            
-            const nuevosAsientos = (this.viajeActivo.asientos_disponibles || 0) + 1;
-            await this.supabase.supabaseClient.from('viajes').update({ asientos_disponibles: nuevosAsientos })
-                .eq('viaje_id', this.viajeActivo.viaje_id);
+  confirmarEliminarPasajero(pasajero: PasajeroViaje) {
+    this.openConfirmModal({
+      header: 'Eliminar Pasajero',
+      message: `¿Estás seguro de que quieres eliminar a ${pasajero.pasajero.nombre} del viaje?`,
+      acceptLabel: 'Eliminar',
+      acceptClass: 'p-button-danger',
+      rejectLabel: 'Cancelar',
+      accept: async () => {
+        const { error } = await this.viajesService.eliminarPasajero(
+          pasajero.viaje_id,
+          pasajero.pasajero_id
+        );
 
-            this.limpiarRealtimeSubscriptions();
-            this.viajeActivo = null;
-            this.esPasajero = false;
-            this.messageService.add({ severity: 'success', summary: 'Listo', detail: 'Has salido del viaje.' });
-            if (this.esConductor) await this.verificarVehiculo();
+        // CAMBIO: Actualizamos el estado a 'rechazada' para mantener historial
+        if (!error) {
+          await this.supabase.supabaseClient
+            .from('solicitudesviaje')
+            .update({ estado_solicitud: 'rechazada' })
+            .eq('viaje_id', pasajero.viaje_id)
+            .eq('pasajero_id', pasajero.pasajero_id);
         }
+
+        if (error) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo eliminar al pasajero.',
+          });
+        } else {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Eliminado',
+            detail: 'El pasajero ha sido eliminado del viaje.',
+          });
+        }
+      },
     });
+  }
+
+  async salirDelViaje() {
+    this.openConfirmModal({
+      header: 'Salir del Viaje',
+      message: '¿Estás seguro de que quieres salir de este viaje?',
+      acceptLabel: 'Salir',
+      acceptClass: 'p-button-danger',
+      rejectLabel: 'Cancelar',
+      accept: async () => {
+        const { error } = await this.viajesService.salirDelViaje(
+          this.viajeActivo.viaje_id,
+          this.usuarioId!
+        );
+
+        // CAMBIO: Actualizamos el estado a 'cancelada' para mantener historial
+        if (!error) {
+          await this.supabase.supabaseClient
+            .from('solicitudesviaje')
+            .update({ estado_solicitud: 'cancelada' })
+            .eq('viaje_id', this.viajeActivo.viaje_id)
+            .eq('pasajero_id', this.usuarioId);
+        }
+
+        if (error) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo salir del viaje.',
+          });
+          return;
+        } else {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Ya no formas parte del viaje.',
+          });
+          this.salirDelViajeLocalmente();
+        }
+      },
+    });
+  }
+
+  private salirDelViajeLocalmente() {
+    console.log('Saliendo del viaje localmente');
+    this.limpiarRealtimeSubscriptions();
+    this.viajeActivo = null;
+    this.esPasajero = false;
+    this.solicitudesPendientes = [];
+    this.pasajerosConfirmados = [];
+    this.cargarDatosIniciales();
   }
 
   async verificarVehiculo() {
     try {
       const { data: vehiculo } = await this.supabase.supabaseClient
-        .from('vehiculos').select('vehiculo_id').eq('propietario_id', this.usuarioId).single();
+        .from('vehiculos')
+        .select('vehiculo_id')
+        .eq('propietario_id', this.usuarioId)
+        .single();
       if (vehiculo) this.vehiculoId = vehiculo.vehiculo_id;
-    } catch (err) { console.error('Error verificando vehículo:', err); }
+    } catch (err) {
+      console.error('Error verificando vehículo:', err);
+    }
   }
 
   async publicarViaje() {
     if (!this.validarFormulario()) return;
     if (!this.vehiculoId) {
-      this.messageService.add({ severity: 'warn', summary: 'Sin vehículo', detail: 'Registra un vehículo primero.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Sin vehículo',
+        detail: 'Registra un vehículo primero.',
+      });
       return;
     }
 
@@ -478,14 +605,21 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
       const { error } = await this.viajesService.crearViaje(nuevoViaje);
       if (error) throw error;
 
-      this.messageService.add({ severity: 'success', summary: 'Publicado', detail: 'Viaje creado exitosamente.' });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Publicado',
+        detail: 'Viaje creado exitosamente.',
+      });
       this.limpiarFormulario();
       await this.cargarViajeActivo();
       this.iniciarRealtimeSubscriptions();
-
     } catch (error) {
       console.error(error);
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo publicar.' });
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo publicar.',
+      });
     } finally {
       this.isPublishing = false;
     }
@@ -495,20 +629,28 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
     const f = this.viajeForm;
 
     if (!f.calle || !f.numeroExterior || !f.colonia || !f.codigoPostal) {
-      this.messageService.add({ severity: 'warn', summary: "Formulario incompleto", detail: 'Completa la dirección.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Formulario incompleto',
+        detail: 'Completa la dirección.',
+      });
       return false;
     }
 
     if (!this.horaString) {
-      this.messageService.add({ severity: 'warn', summary: "Formulario incompleto",  detail: 'Ingresa una hora válida.' });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Formulario incompleto',
+        detail: 'Ingresa una hora válida.',
+      });
       return false;
     }
 
     if (f.lugaresDisponibles < 1 || f.lugaresDisponibles > 4) {
       this.messageService.add({
         severity: 'warn',
-        summary: "Formulario incompleto",
-        detail: 'Los lugares deben ser entre 1 y 4.'
+        summary: 'Formulario incompleto',
+        detail: 'Los lugares deben ser entre 1 y 4.',
       });
       return false;
     }
@@ -518,7 +660,12 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
 
   private limpiarFormulario() {
     this.viajeForm = {
-      calle: '', numeroExterior: '', codigoPostal: '', colonia: '', hora: null, lugaresDisponibles: 1
+      calle: '',
+      numeroExterior: '',
+      codigoPostal: '',
+      colonia: '',
+      hora: null,
+      lugaresDisponibles: 1,
     };
     this.horaString = '';
   }
@@ -544,14 +691,16 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
     const texto = this.searchQuery.trim();
 
     const { data, error } = await this.supabase.supabaseClient
-      .from("usuarios")
-      .select("usuario_id, nombre, apellido, email")
-      .or(`nombre.ilike.%${texto}%,apellido.ilike.%${texto}%,email.ilike.%${texto}%`)
-      .neq("usuario_id", this.usuarioId)
+      .from('usuarios')
+      .select('usuario_id, nombre, apellido, email')
+      .or(
+        `nombre.ilike.%${texto}%,apellido.ilike.%${texto}%,email.ilike.%${texto}%`
+      )
+      .neq('usuario_id', this.usuarioId)
       .limit(10);
 
     if (error) {
-      console.error("Error buscando usuarios:", error);
+      console.error('Error buscando usuarios:', error);
     }
 
     this.resultadosBusqueda = data || [];
@@ -560,40 +709,38 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   async agregarPasajeroManual(user: any) {
     if (user.usuario_id === this.usuarioId) {
       this.messageService.add({
-        severity: "warn",
-        summary: "Acción no permitida",
-        detail: "No puedes agregarte a tu propio viaje."
+        severity: 'warn',
+        summary: 'Acción no permitida',
+        detail: 'No puedes agregarte a tu propio viaje.',
       });
       return;
     }
 
     if (this.viajeActivo.asientos_disponibles <= 0) {
       this.messageService.add({
-        severity: "warn",
-        summary: "Sin asientos",
-        detail: "No hay lugares disponibles."
+        severity: 'warn',
+        summary: 'Sin asientos',
+        detail: 'No hay lugares disponibles.',
       });
       return;
     }
-    
-    await this.supabase.supabaseClient
-      .from("pasajerosviaje")
-      .insert({
-        viaje_id: this.viajeActivo.viaje_id,
-        pasajero_id: user.usuario_id
-      });
+
+    await this.supabase.supabaseClient.from('pasajerosviaje').insert({
+      viaje_id: this.viajeActivo.viaje_id,
+      pasajero_id: user.usuario_id,
+    });
 
     const nuevosAsientos = this.viajeActivo.asientos_disponibles - 1;
 
     await this.supabase.supabaseClient
-      .from("viajes")
+      .from('viajes')
       .update({ asientos_disponibles: nuevosAsientos })
-      .eq("viaje_id", this.viajeActivo.viaje_id);
+      .eq('viaje_id', this.viajeActivo.viaje_id);
 
     this.messageService.add({
-      severity: "success",
-      summary: "Pasajero agregado",
-      detail: `${user.nombre} agregado al viaje`
+      severity: 'success',
+      summary: 'Pasajero agregado',
+      detail: `${user.nombre} agregado al viaje`,
     });
 
     this.closeModal();
@@ -615,5 +762,80 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
     const value = event.target.value;
     event.target.value = value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
     this.viajeForm.calle = event.target.value;
+  }
+
+  // ====================== LÓGICA MODAL CONFIRMACIÓN ======================
+  openConfirmModal(data: {
+    header: string;
+    message: string;
+    acceptLabel?: string;
+    rejectLabel?: string;
+    acceptClass?: string;
+    rejectClass?: string;
+    accept: () => void;
+  }) {
+    this.confirmModalData = data;
+    this.confirmModalVisible = true;
+    this._confirmAction = (confirmed: boolean) => {
+      if (confirmed) {
+        data.accept();
+      }
+      this.confirmModalVisible = false;
+      this._confirmAction = null;
+    };
+  }
+
+  onConfirm(confirmed: boolean) {
+    if (this._confirmAction) {
+      this._confirmAction(confirmed);
+    }
+  }
+
+  async prellenarFormularioUltimoViaje() {
+    if (!this.usuarioId) return;
+
+    const { data: ultimoViaje } =
+      await this.viajesService.obtenerUltimoViajeRegistrado(this.usuarioId);
+
+    if (ultimoViaje) {
+      // Intentar parsear la dirección: "Calle 123, Colonia, CP 12345"
+      const direccion = ultimoViaje.lugar_salida || '';
+      // Regex flexible:
+      // Grupo 1: Calle (todo hasta el último espacio antes de un número y coma)
+      // Grupo 2: Número (dígitos antes de la primera coma)
+      // Grupo 3: Colonia (entre la primera coma y ", CP")
+      // Grupo 4: CP (dígitos al final)
+      const regex = /^(.*?) (\d+), (.*?), CP (\d+)$/;
+      const match = direccion.match(regex);
+
+      if (match) {
+        this.viajeForm.calle = match[1];
+        this.viajeForm.numeroExterior = match[2];
+        this.viajeForm.colonia = match[3];
+        this.viajeForm.codigoPostal = match[4];
+      }
+
+      // Prellenar hora (extraer HH:MM de la fecha ISO)
+      if (ultimoViaje.hora_salida) {
+        const fecha = new Date(ultimoViaje.hora_salida);
+        const horas = fecha.getHours().toString().padStart(2, '0');
+        const minutos = fecha.getMinutes().toString().padStart(2, '0');
+        this.horaString = `${horas}:${minutos}`;
+      }
+
+      // Prellenar asientos (asegurando rango 1-4)
+      let asientos = ultimoViaje.asientos_disponibles;
+      if (asientos < 1) asientos = 1;
+      if (asientos > 4) asientos = 4;
+      this.viajeForm.lugaresDisponibles = asientos;
+      this.pasajerosList = Array(asientos).fill(1); // Actualizar visualización de iconos
+
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Historial',
+        detail: 'Se cargaron los datos de tu último viaje.',
+        life: 3000,
+      });
+    }
   }
 }

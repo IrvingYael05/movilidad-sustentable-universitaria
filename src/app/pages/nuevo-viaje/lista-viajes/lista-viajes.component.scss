@@ -1,158 +1,74 @@
-/* ===================================
-   MI VIAJE (UNIFICADO)
-=================================== */
+/* Estilos específicos para la página Mi Viaje / Nuevo Viaje */
 
 :host {
   display: block;
-  font-family: 'Poppins', sans-serif;
   min-height: 100vh;
 }
 
-/* --- TÍTULOS Y TEXTOS --- */
-h1 {
-  color: #244e7c;
-}
-
-.text-secondary {
-  color: #71706f;
-}
-
-/* --- ESTILOS PARA INPUTS --- */
-::ng-deep input[pInputText],
-::ng-deep .p-inputtext,
+/* --- Estilos para el input de hora --- */
 .hora-input {
-  border: 2px solid #244e7c !important;
-  border-radius: 12px !important;
+  border: var(--border-width) solid var(--primary-color) !important;
+  border-radius: var(--border-radius) !important;
   padding: 0.8rem !important;
-  font-size: 1rem !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: var(--font-size-lg) !important;
   width: 100%;
-  color: #244e7c !important;
+  color: var(--primary-color) !important;
   font-weight: 500;
-  background-color: #ffffff !important;
+  background-color: var(--surface-ground) !important;
 
-  &::placeholder {
-    color: #9ca3af;
+  /* Cambiar color del ícono del reloj */
+  &::-webkit-calendar-picker-indicator {
+    filter: invert(27%) sepia(36%) saturate(1340%) hue-rotate(181deg)
+      brightness(50%) contrast(90%);
+    cursor: pointer;
   }
 
   &:hover {
-    border-color: #94a3b8 !important;
+    border-color: var(--primary-color) !important;
   }
 
   &:focus {
-    border-color: #94a3b8 !important;
+    border-color: var(--primary-color) !important;
     box-shadow: 0 0 0 2px rgba(36, 78, 124, 0.2) !important;
     outline: none !important;
   }
 }
 
-.hora-input {
-  color: #244e7c !important;
-  font-weight: 500;
-  
-  /* Cambiar color del ícono del reloj */
-  &::-webkit-calendar-picker-indicator {
-    filter: invert(27%) sepia(36%) saturate(1340%) hue-rotate(181deg) brightness(93%) contrast(90%);
-    cursor: pointer;
-  }
-}
-
-/* --- ITEM PASAJERO (FORMULARIO) --- */
-.pasajero-item {
-  padding: 0.8rem;
-  background-color: #f3f4f6;
-  border-radius: 12px;
-  border: 2px solid #244e7c;
-}
-
-.pasajero-item span {
-  color: #244e7c;
-  font-weight: 500;
-}
-
-.add-btn,
-.remove-btn {
-  width: 2.5rem !important;
-  height: 2.5rem !important;
-}
-
-/* --- TARJETA DETALLE VIAJE --- */
-.viaje-card {
-  background-color: #ffffff;
+/* --- Tarjeta de Información Unificada --- */
+.info-card {
+  background-color: var(--surface-ground);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(36, 78, 124, 0.1);
   padding: 1.5rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(36, 78, 124, 0.12);
+  }
 }
 
 .section-header label {
-  color: #244e7c;
-  font-size: 0.95rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
 }
 
 .section-header p {
   margin: 0.2rem 0 0 0;
-  color: #4b5563;
+  text-align: left;
 }
 
-/* --- TARJETA CONDUCTOR --- */
-.driver-card {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(36, 78, 124, 0.1);
-}
-
-.driver-name {
-  font-weight: 600;
-  color: #244e7c;
-  margin: 0;
-}
-
-.driver-email {
-  font-size: 0.9rem;
-  color: #71706f;
-  margin-top: 0.2rem;
-}
-
-/* Alinear toda la info del conductor a la izquierda */
-.driver-card {
-  text-align: left !important;
-}
-
-.driver-card .section-header label,
-.driver-card .section-header p {
-  text-align: left !important;
-}
-
-/* --- ELIMINAR VIÑETAS --- */
-.section-header ul,
-.section-header li {
-  list-style: none !important;
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-}
-
-
-.viaje-card p {
-  text-align: left !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-/* Centrar únicamente el título "Tu Conductor" */
-.driver-card h3 {
+.driver-card h1 {
   text-align: center !important;
-  display: block;
-  width: 100%;
 }
 
+/* --- Botón para añadir pasajeros --- */
 .btn-add-pasajero {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background-color: #244e7c;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   font-size: 22px;
@@ -160,8 +76,14 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--secondary-color);
+  }
 }
 
+/* --- Modal para agregar pasajeros --- */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -177,7 +99,7 @@ h1 {
 }
 
 .modal-card {
-  background: white;
+  background: var(--surface-ground);
   padding: 2rem;
   border-radius: 16px;
   width: 90%;
@@ -189,21 +111,59 @@ h1 {
   list-style: none;
   padding: 0;
   margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .lista-resultados li {
   padding: 0.75rem;
-  border-bottom: 1px solid #e9e9e9;
+  border-bottom: 1px solid var(--surface-border);
   cursor: pointer;
   transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f0f4ff;
+  }
+
+  .nombre {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+
+  .email {
+    font-size: var(--font-size-sm);
+    color: var(--text-color-secondary);
+  }
 }
 
-.lista-resultados li:hover {
-  background-color: #f0f4ff;
+/* --- Estilos para la lista de pasajeros --- */
+.lista-pasajeros {
+  list-style: none;
 }
 
-.matricula {
-  display: block;
-  font-size: 0.8rem;
-  color: #666;
+.pasajero-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--surface-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+/* --- Estilos para Botones en Modales --- */
+.modal-card .p-button.p-button-danger {
+  background-color: var(--error-color) !important;
+  border-color: var(--error-color) !important;
+}
+
+.modal-card .p-button.p-button-success {
+  background-color: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+}
+
+.modal-card .p-button.p-button-text {
+  color: var(--text-color-secondary) !important;
 }

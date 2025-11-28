@@ -68,11 +68,15 @@ export class ViajesService {
 
     const { data, error } = await this._supabase
       .from('solicitudesviaje')
-      .insert({
-        viaje_id: viajeId,
-        pasajero_id: user.id,
-        estado_solicitud: 'pendiente',
-      })
+      .upsert(
+        {
+          viaje_id: viajeId,
+          pasajero_id: user.id,
+          estado_solicitud: 'pendiente',
+          solicitado_en: new Date().toISOString(),
+        },
+        { onConflict: 'viaje_id, pasajero_id' }
+      )
       .select()
       .single();
 

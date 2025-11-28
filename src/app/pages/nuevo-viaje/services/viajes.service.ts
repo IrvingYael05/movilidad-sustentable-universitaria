@@ -276,5 +276,127 @@ export class ViajesService {
     }
   }
 
+  /** Obtiene los detalles de un pasajero por su ID */
+  async obtenerDetallesPasajero(pasajeroId: string) {
+    try {
+      const { data, error } = await this._supabase
+        .from('usuarios')
+        .select('usuario_id, nombre, apellido, email')
+        .eq('usuario_id', pasajeroId)
+        .single();
 
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error al obtener detalles del pasajero:', error);
+      return null;
+    }
+  }
+
+  /** Incrementa los asientos de un viaje */
+  async incrementarAsientos(viajeId: string) {
+    try {
+      const { error } = await this._supabase.rpc('incrementar_asientos', {
+        p_viaje_id: viajeId,
+      });
+      if (error) throw error;
+      return { data: true, error: null };
+    } catch (error) {
+      console.error('Error al incrementar asientos:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** El pasajero sale de un viaje */
+  async salirDelViaje(viajeId: string, pasajeroId: string) {
+    try {
+      // 1. Eliminar al pasajero de la tabla pasajerosviaje
+      const { error: deleteError } = await this._supabase
+        .from('pasajerosviaje')
+        .delete()
+        .eq('viaje_id', viajeId)
+        .eq('pasajero_id', pasajeroId);
+
+      if (deleteError) throw deleteError;
+
+      // 2. Incrementar los asientos disponibles
+      const { error: rpcError } = await this.incrementarAsientos(viajeId);
+      if (rpcError) throw rpcError;
+
+      return { data: true, error: null };
+    } catch (error) {
+      console.error('Error al salir del viaje:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** El conductor elimina a un pasajero de un viaje */
+  async eliminarPasajero(viajeId: string, pasajeroId: string) {
+    try {
+      // 1. Eliminar al pasajero de la tabla pasajerosviaje
+      const { error: deleteError } = await this._supabase
+        .from('pasajerosviaje')
+        .delete()
+        .eq('viaje_id', viajeId)
+        .eq('pasajero_id', pasajeroId);
+
+      if (deleteError) throw deleteError;
+
+      // 2. Incrementar los asientos disponibles
+      const { error: rpcError } = await this.incrementarAsientos(viajeId);
+      if (rpcError) throw rpcError;
+
+      return { data: true, error: null };
+    } catch (error) {
+      console.error('Error al eliminar pasajero:', error);
+      return { data: null, error };
+    }
+  }
+
+  /** Solicitud para unirse a un viaje (Maneja historial con UPSERT) */
+  async solicitarUnirse(viajeId: string, pasajeroId: string) {
+    try {
+      // Usamos upsert para:
+      // 1. Crear nueva si no existe.
+      // 2. Actualizar a 'pendiente' si ya existía (aunque estuviera cancelada/rechazada).
+      const { data, error } = await this._supabase
+        .from('solicitudesviaje')
+        .upsert(
+          {
+            viaje_id: viajeId,
+            pasajero_id: pasajeroId,
+            estado_solicitud: 'pendiente',
+            solicitado_en: new Date().toISOString(), // Actualizamos la fecha
+          },
+          { onConflict: 'viaje_id, pasajero_id' }
+        )
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al solicitar unirse:', error);
+      throw error;
+    }
+  }
+
+  /** Obtiene el último viaje registrado por el conductor (activo o inactivo) para prellenar formulario */
+  async obtenerUltimoViajeRegistrado(conductorId: string) {
+    try {
+      const { data, error } = await this._supabase
+        .from('viajes')
+        .select('*')
+        .eq('conductor_id', conductorId)
+        .order('creado_en', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error al obtener último viaje:', error);
+      return { data: null, error };
+    }
+  }
 }
