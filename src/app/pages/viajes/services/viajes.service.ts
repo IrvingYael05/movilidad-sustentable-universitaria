@@ -25,13 +25,28 @@ export class ViajesService {
           usuario_id,
           nombre,
           apellido
+        ),
+        codigosqracceso (
+          estado
         )
       `)
       .eq('estado_viaje', 'activo')
       .order('hora_salida', { ascending: true });
+      console.log('Viajes obtenidos:', data);
 
     if (error) throw error;
-    return data;
+
+    // Filtrar viajes cuyo QR ya fue utilizado (ya ingresaron)
+    const viajesFiltrados = data.filter((viaje: any) => {
+      const qrs = viaje.codigosqracceso;
+      if (qrs && Array.isArray(qrs) && qrs.length > 0) {
+        // Si alguno de los QRs asociados está utilizado, no mostrar el viaje
+        return !qrs.some((qr: any) => qr.estado === 'utilizado');
+      }
+      return true;
+    });
+
+    return viajesFiltrados;
   }
 
   // ¿El usuario tiene un viaje activo?

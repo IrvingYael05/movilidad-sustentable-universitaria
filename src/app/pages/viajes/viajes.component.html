@@ -44,7 +44,7 @@
         No se encontraron viajes
       </p>
       <small>
-        No hay viajes con lugares disponibles en este momento para "<strong>{{ searchTerm }}</strong>".
+        No hay viajes con lugares disponibles en este momento<span *ngIf="searchTerm"> para "<strong>{{ searchTerm }}</strong>"</span>.
       </small>
     </div>
   </div>
