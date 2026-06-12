@@ -8,11 +8,14 @@ import { SupabaseService } from '../../../shared/data-access/supabase.service';
 export class ViajesService {
   private _supabase = inject(SupabaseService).supabaseClient;
 
-  // Obtener viajes disponibles (solo 'activo')
+  // Obtener viajes disponibles (solo 'activo' y con hora de salida futura) 
   async obtenerViajes() {
+    const horaActualIso = new Date().toISOString();
+
     const { data, error } = await this._supabase
       .from('viajes')
-      .select(`
+      .select(
+        `
         viaje_id,
         conductor_id,
         vehiculo_id,
@@ -25,31 +28,22 @@ export class ViajesService {
           usuario_id,
           nombre,
           apellido
-        ),
-        codigosqracceso (
-          estado
         )
-      `)
+      `,
+      )
       .eq('estado_viaje', 'activo')
+      .gte('hora_salida', horaActualIso)
       .order('hora_salida', { ascending: true });
-      console.log('Viajes obtenidos:', data);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error al obtener viajes:', error);
+      throw error;
+    }
 
-    // Filtrar viajes cuyo QR ya fue utilizado (ya ingresaron)
-    const viajesFiltrados = data.filter((viaje: any) => {
-      const qrs = viaje.codigosqracceso;
-      if (qrs && Array.isArray(qrs) && qrs.length > 0) {
-        // Si alguno de los QRs asociados está utilizado, no mostrar el viaje
-        return !qrs.some((qr: any) => qr.estado === 'utilizado');
-      }
-      return true;
-    });
-
-    return viajesFiltrados;
+    return data;
   }
 
-  // ¿El usuario tiene un viaje activo?
+  // Busca si el usuario tiene un viaje activo
   async usuarioTieneViajeActivo(usuarioId: string): Promise<boolean> {
     const { data, error } = await this._supabase
       .rpc('usuario_tiene_viaje_activo', { uid: usuarioId })
@@ -62,23 +56,31 @@ export class ViajesService {
     return data;
   }
 
-  // ¿Ya tiene solicitud pendiente?
-  async tieneSolicitudPendiente(viajeId: string, usuarioId: string): Promise<boolean> {
+  // Busca todos los viajes donde el usuario tiene solicitudes pendientes
+  async obtenerSolicitudesPendientesUsuario(
+    usuarioId: string,
+  ): Promise<string[]> {
     const { data, error } = await this._supabase
       .from('solicitudesviaje')
-      .select('solicitud_id')
-      .eq('viaje_id', viajeId)
+      .select('viaje_id')
       .eq('pasajero_id', usuarioId)
-      .eq('estado_solicitud', 'pendiente')
-      .maybeSingle();
+      .eq('estado_solicitud', 'pendiente');
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return !!data;
+    if (error) {
+      console.error('Error al obtener solicitudes:', error);
+      throw error;
+    }
+
+    // Retornamos un arreglo solo con los IDs de los viajes
+    return data ? data.map((s: any) => s.viaje_id) : [];
   }
 
   // Solicitar unirse
   async solicitarUnirse(viajeId: string, usuarioId: string) {
-    const { data: { user }, error: authError } = await this._supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await this._supabase.auth.getUser();
     if (!user) throw new Error('Debes iniciar sesión');
 
     const { data, error } = await this._supabase
@@ -90,7 +92,7 @@ export class ViajesService {
           estado_solicitud: 'pendiente',
           solicitado_en: new Date().toISOString(),
         },
-        { onConflict: 'viaje_id, pasajero_id' }
+        { onConflict: 'viaje_id, pasajero_id' },
       )
       .select()
       .single();

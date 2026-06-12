@@ -3,12 +3,8 @@
    =================================== */
 
 :host {
-  display: flex;
-  flex-direction: column;
+  display: block;
   min-height: 100vh;
-  background-color: var(--surface-ground); /* Hereda el fondo global */
-  font-family: var(--font-family);
-  color: var(--primary-color);
 }
 
 /* --- SEARCH BAR (AHORA 100% RESPONSIVE) --- */

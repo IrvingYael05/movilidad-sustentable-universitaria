@@ -1,85 +1,147 @@
-import { Component, Input, OnInit, OnDestroy, inject } from '@angular/core';
-import { CommonModule, NgClass } from '@angular/common';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  inject,
+  HostListener,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../data-access/supabase.service';
-import { RealtimeChannel } from '@supabase/supabase-js';
 
-interface Espacio {
+interface EspacioBD {
   espacio_id: number;
-  identificador_espacio: string;
   esta_disponible: boolean;
+}
+
+interface CajonSVG {
+  espacio_id: number;
+  identificador: string;
+  puntos: string; // Coordenadas del polígono de Python
+  disponible: boolean; // Estado que viene de Supabase
 }
 
 @Component({
   selector: 'app-mapa-estacionamiento',
   standalone: true,
-  imports: [CommonModule, NgClass],
+  imports: [CommonModule],
   templateUrl: './mapa-estacionamiento.component.html',
-  styleUrls: ['./mapa-estacionamiento.component.scss']
+  styleUrls: ['./mapa-estacionamiento.component.scss'],
 })
 export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
-  @Input() loteId: number = 3; 
-  @Input() espacioAsignadoId: number | null = null;
-  
+  cargando = true;
   private supabase = inject(SupabaseService).supabaseClient;
-  
-  espaciosDinamicos: Espacio[] = []; 
-  channel: RealtimeChannel | null = null;
-  
+  private realtimeChannel: any;
+
+  // Variables del Motor del Mapa
+  zoom = 1;
+  panX = 0;
+  panY = 0;
+  isDragging = false;
+  startX = 0;
+  startY = 0;
+
+  // Los cajones combinados (Coordenadas Python + Estado BD)
+  cajonesGraficos: CajonSVG[] = [];
+
+  // Simulamos la exportación de Python (En producción vendrá de un .json real)
+  private coordenadasPython = [
+    {
+      espacio_id: 1,
+      identificador: 'A1',
+      puntos: '100,100 200,100 220,250 80,250',
+    },
+    {
+      espacio_id: 2,
+      identificador: 'A2',
+      puntos: '210,100 310,100 330,250 230,250',
+    },
+    {
+      espacio_id: 3,
+      identificador: 'A3',
+      puntos: '320,100 420,100 440,250 340,250',
+    },
+  ];
+
   async ngOnInit() {
-    await this.cargarEspacios();
-    this.escucharCambiosEspacios();
+    await this.cargarEstadoYConstruirMapa();
+    this.iniciarSuscripcionOpenCV();
   }
 
-  async cargarEspacios() {
-    const { data, error } = await this.supabase
-      .from('espaciosestacionamiento')
-      .select('*')
-      .eq('lote_id', this.loteId)
-      .order('identificador_espacio', { ascending: true });
-
-    if (data) this.espaciosDinamicos = data;
+  ngOnDestroy() {
+    if (this.realtimeChannel) this.supabase.removeChannel(this.realtimeChannel);
   }
 
-  escucharCambiosEspacios() {
-    if (this.channel) this.supabase.removeChannel(this.channel);
+  async cargarEstadoYConstruirMapa() {
+    try {
+      const { data } = await this.supabase
+        .from('espaciosestacionamiento')
+        .select('espacio_id, esta_disponible');
+      const estadoBD = data || [];
 
-    this.channel = this.supabase
+      // Fusionamos las coordenadas con el estado actual
+      this.cajonesGraficos = this.coordenadasPython.map((coord) => {
+        const bd = estadoBD.find((e: any) => e.espacio_id === coord.espacio_id);
+        return {
+          ...coord,
+          disponible: bd ? bd.esta_disponible : true,
+        };
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.cargando = false;
+    }
+  }
+
+  private iniciarSuscripcionOpenCV() {
+    this.realtimeChannel = this.supabase
       .channel('public:espaciosestacionamiento')
       .on(
         'postgres_changes',
-        { 
-          event: 'UPDATE', 
-          schema: 'public', 
-          table: 'espaciosestacionamiento',
-          filter: `lote_id=eq.${this.loteId}`
+        { event: 'UPDATE', schema: 'public', table: 'espaciosestacionamiento' },
+        (payload: any) => {
+          const index = this.cajonesGraficos.findIndex(
+            (c) => c.espacio_id === payload.new.espacio_id,
+          );
+          if (index !== -1) {
+            this.cajonesGraficos[index].disponible =
+              payload.new.esta_disponible;
+          }
         },
-        (payload: { new: Espacio }) => this.handleUpdateEspacio(payload.new as Espacio)
       )
       .subscribe();
   }
 
-  handleUpdateEspacio(espacioActualizado: Espacio) {
-    const index = this.espaciosDinamicos.findIndex(e => e.espacio_id === espacioActualizado.espacio_id);
-    if (index > -1) {
-      this.espaciosDinamicos[index].esta_disponible = espacioActualizado.esta_disponible;
-    }
+  // ====================== MOTOR DE FÍSICAS ======================
+  onWheel(event: WheelEvent) {
+    event.preventDefault();
+    const zoomIn = event.deltaY < 0;
+    this.zoom += zoomIn ? 0.1 : -0.1;
+    this.zoom = Math.max(0.5, Math.min(this.zoom, 2)); // Limitamos el zoom entre 0.5x y 3x
   }
 
-  // --- Funciones Helper para el HTML ---
-  getLabel(espacio: Espacio): string {
-    return espacio.identificador_espacio.split('-')[1] || espacio.identificador_espacio;
+  onDragStart(event: MouseEvent | TouchEvent) {
+    this.isDragging = true;
+    const clientX =
+      event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+    const clientY =
+      event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+    this.startX = clientX - this.panX;
+    this.startY = clientY - this.panY;
   }
 
-  getClass(espacio: Espacio): any {
-    return {
-      'asignado': espacio.espacio_id === this.espacioAsignadoId,
-      'ocupado': !espacio.esta_disponible && espacio.espacio_id !== this.espacioAsignadoId
-    };
+  onDragMove(event: MouseEvent | TouchEvent) {
+    if (!this.isDragging) return;
+    event.preventDefault();
+    const clientX =
+      event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+    const clientY =
+      event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+    this.panX = clientX - this.startX;
+    this.panY = clientY - this.startY;
   }
-  
-  ngOnDestroy() {
-    if (this.channel) {
-      this.supabase.removeChannel(this.channel);
-    }
+
+  onDragEnd() {
+    this.isDragging = false;
   }
 }

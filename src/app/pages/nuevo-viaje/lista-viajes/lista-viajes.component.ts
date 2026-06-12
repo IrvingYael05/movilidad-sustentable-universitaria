@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { GeocercaService } from '../../../shared/services/geocerca.service';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -48,13 +49,13 @@ interface ViajeForm {
         style({ opacity: 0, transform: 'translateY(20px)' }),
         animate(
           '500ms ease-out',
-          style({ opacity: 1, transform: 'translateY(0)' })
+          style({ opacity: 1, transform: 'translateY(0)' }),
         ),
       ]),
       transition(':leave', [
         animate(
           '300ms ease-in',
-          style({ opacity: 0, transform: 'translateY(20px)' })
+          style({ opacity: 0, transform: 'translateY(20px)' }),
         ),
       ]),
     ]),
@@ -66,7 +67,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   private viajesService = inject(ViajesService);
   private supabase = inject(SupabaseService);
   private messageService = inject(MessageService);
-  private router = inject(Router);
+  private geocercaService = inject(GeocercaService);
 
   // Canales de Realtime
   private viajesChannel: any;
@@ -100,6 +101,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
 
   horaString: string = '';
   horaMinima: string = '';
+  permisoGpsActivo: boolean = false;
 
   // ====================== MODAL CONFIRMACIÓN ======================
   confirmModalVisible = false;
@@ -108,7 +110,10 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     const now = new Date();
-    this.horaMinima = now.toTimeString().slice(0, 5);
+    const limiteMinimo = new Date(now.getTime() + 30 * 60000);
+    const hm = limiteMinimo.getHours().toString().padStart(2, '0');
+    const mm = limiteMinimo.getMinutes().toString().padStart(2, '0');
+    this.horaMinima = `${hm}:${mm}`;
 
     const {
       data: { user },
@@ -122,6 +127,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
         }
       });
 
+      await this.verificarPermisoGPS();
       await this.cargarDatosIniciales();
       this.iniciarRealtimeSubscriptions();
     } else {
@@ -179,7 +185,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
             this.viajeActivo = null;
             this.limpiarRealtimeSubscriptions();
           }
-        }
+        },
       )
       .subscribe();
 
@@ -217,7 +223,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
             // Un pasajero se fue
             const pasajeroEliminado = payload.old;
             const index = this.pasajerosConfirmados.findIndex(
-              (p) => p.pasajero_id === pasajeroEliminado.pasajero_id
+              (p) => p.pasajero_id === pasajeroEliminado.pasajero_id,
             );
 
             if (index !== -1) {
@@ -238,7 +244,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
               this.salirDelViajeLocalmente();
             }
           }
-        }
+        },
       )
       .subscribe();
 
@@ -272,7 +278,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
             ) {
               this.cargarSolicitudes();
             }
-          }
+          },
         )
         .subscribe();
     }
@@ -313,13 +319,25 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   async cargarViajeActivo() {
     try {
       const { data } = await this.viajesService.obtenerViajeActivoConductor(
-        this.usuarioId!
+        this.usuarioId!,
       );
       this.viajeActivo = data || null;
       this.esPasajero = false;
       if (this.viajeActivo) {
         await this.cargarSolicitudes();
         await this.cargarPasajeros();
+
+        this.geocercaService
+          .iniciarRastreo(this.viajeActivo.viaje_id)
+          .then((msg) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Ubicación Activa',
+              detail: 'Monitoreando trayecto a la UTEQ.',
+            });
+            this.cargarDatosIniciales();
+          })
+          .catch((err) => console.log('Aviso de Geocerca:', err));
       }
     } catch (err) {
       console.error(err);
@@ -338,7 +356,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
             conductor:conductor_id(*),
             vehiculo:vehiculo_id(*)
           )
-        `
+        `,
         )
         .eq('pasajero_id', this.usuarioId)
         .eq('viajes.estado_viaje', 'activo')
@@ -364,7 +382,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
     if (!this.viajeActivo) return;
     this.isLoadingSolicitudes = true;
     const { data } = await this.viajesService.obtenerSolicitudesViaje(
-      this.viajeActivo.viaje_id
+      this.viajeActivo.viaje_id,
     );
     this.solicitudesPendientes = data || [];
     this.isLoadingSolicitudes = false;
@@ -373,7 +391,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   async cargarPasajeros() {
     if (!this.viajeActivo) return;
     const { data } = await this.viajesService.obtenerPasajerosViaje(
-      this.viajeActivo.viaje_id
+      this.viajeActivo.viaje_id,
     );
     this.pasajerosConfirmados = data || [];
   }
@@ -389,7 +407,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
         await this.viajesService.aceptarSolicitud(
           solicitud.solicitud_id,
           solicitud.viaje_id,
-          solicitud.pasajero_id
+          solicitud.pasajero_id,
         );
         this.messageService.add({
           severity: 'success',
@@ -434,6 +452,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
 
   async eliminarViaje(viajeId: string) {
     try {
+      this.geocercaService.detenerRastreo();
       await this.supabase.supabaseClient
         .from('pasajerosviaje')
         .delete()
@@ -482,7 +501,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
       accept: async () => {
         const { error } = await this.viajesService.eliminarPasajero(
           pasajero.viaje_id,
-          pasajero.pasajero_id
+          pasajero.pasajero_id,
         );
 
         // CAMBIO: Actualizamos el estado a 'rechazada' para mantener historial
@@ -521,7 +540,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
       accept: async () => {
         const { error } = await this.viajesService.salirDelViaje(
           this.viajeActivo.viaje_id,
-          this.usuarioId!
+          this.usuarioId!,
         );
 
         // CAMBIO: Actualizamos el estado a 'cancelada' para mantener historial
@@ -553,7 +572,6 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   }
 
   private salirDelViajeLocalmente() {
-    console.log('Saliendo del viaje localmente');
     this.limpiarRealtimeSubscriptions();
     this.viajeActivo = null;
     this.esPasajero = false;
@@ -576,6 +594,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   }
 
   async publicarViaje() {
+    if (this.isPublishing) return;
     if (!this.validarFormulario()) return;
     if (!this.vehiculoId) {
       this.messageService.add({
@@ -586,7 +605,30 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const validacionTiempo = this.validarFormatoHorario(this.horaString);
+    if (!validacionTiempo.valido) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Horario Inválido',
+        detail: validacionTiempo.mensaje,
+      });
+      return;
+    }
+
     this.isPublishing = true;
+
+    try {
+      await this.geocercaService.solicitarPermisos();
+    } catch (error: any) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'GPS Obligatorio',
+        detail:
+          typeof error === 'string' ? error : 'Permiso de ubicación denegado.',
+      });
+      this.isPublishing = false;
+      return;
+    }
 
     try {
       const horaString = this.horaString;
@@ -610,9 +652,31 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
         summary: 'Publicado',
         detail: 'Viaje creado exitosamente.',
       });
+
       this.limpiarFormulario();
+
       await this.cargarViajeActivo();
       this.iniciarRealtimeSubscriptions();
+
+      if (this.viajeActivo) {
+        this.geocercaService
+          .iniciarRastreo(this.viajeActivo.viaje_id)
+          .then((msg) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Llegada Registrada',
+              detail: msg,
+            });
+            this.salirDelViajeLocalmente();
+          })
+          .catch((err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error de GPS',
+              detail: err,
+            });
+          });
+      }
     } catch (error) {
       console.error(error);
       this.messageService.add({
@@ -624,6 +688,158 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
       this.isPublishing = false;
     }
   }
+
+  async registrarAccesoManual() {
+    if (!this.viajeActivo) return;
+
+    this.openConfirmModal({
+      header: 'Registrar Ingreso Manual',
+      message:
+        'El sistema verificará tu ubicación actual. Úsalo solo si estás en la entrada de la universidad y el acceso automático no funcionó.',
+      acceptLabel: 'Verificar y Entrar',
+      rejectClass: 'p-button-danger',
+      rejectLabel: 'Cancelar',
+      accept: async () => {
+        try {
+          this.isLoading = true;
+
+          const estaCerca =
+            await this.geocercaService.validarUbicacionManual(0.5);
+
+          if (!estaCerca) {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lejos de la UTEQ',
+              detail:
+                'Debes estar cerca de la universidad para usar el ingreso manual.',
+            });
+            return;
+          }
+
+          this.geocercaService.detenerRastreo();
+
+          const { error } = await this.supabase.supabaseClient.rpc(
+            'registrar_entrada_geocerca',
+            {
+              p_viaje_id: this.viajeActivo.viaje_id,
+            },
+          );
+
+          if (error) throw error;
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Ingreso Manual',
+            detail: 'Acceso validado y registrado.',
+          });
+          this.salirDelViajeLocalmente();
+        } catch (err: any) {
+          console.error(err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error de GPS',
+            detail:
+              typeof err === 'string'
+                ? err
+                : 'No se pudo verificar la ubicación.',
+          });
+        } finally {
+          this.isLoading = false;
+        }
+      },
+    });
+  }
+
+  // ====================== LÓGICA DE HORARIOS ======================
+  calcularHoraPredeterminada(horaUltimoViaje?: string): string {
+    const ahora = new Date();
+    // Limite mínimo: Hora actual + 30 minutos
+    const limiteMinimo = new Date(ahora.getTime() + 30 * 60000);
+
+    if (horaUltimoViaje) {
+      const [uHoras, uMinutos] = horaUltimoViaje.split(':').map(Number);
+      const horaPropuesta = new Date();
+      horaPropuesta.setHours(uHoras, uMinutos, 0, 0);
+
+      // Regla: Solo verificamos que no pase de las 22:00 y que dé 30 min de margen
+      if (uHoras <= 22 && horaPropuesta >= limiteMinimo) {
+        return horaUltimoViaje;
+      }
+    }
+
+    let horasClave = limiteMinimo.getHours();
+    let minutosClave = limiteMinimo.getMinutes();
+
+    // Si la hora calculada se pasa de las 10:00 PM, la topamos a las 22:00 exactas
+    if (horasClave > 22 || (horasClave === 22 && minutosClave > 0)) {
+      horasClave = 22;
+      minutosClave = 0;
+    }
+
+    const hh = horasClave.toString().padStart(2, '0');
+    const mm = minutosClave.toString().padStart(2, '0');
+    return `${hh}:${mm}`;
+  }
+
+  validarFormatoHorario(horaIngresada: string): {
+    valido: boolean;
+    mensaje: string;
+  } {
+    if (!horaIngresada)
+      return { valido: false, mensaje: 'Por favor, selecciona una hora.' };
+
+    const ahora = new Date();
+    const [horas, minutos] = horaIngresada.split(':').map(Number);
+
+    const fechaHoraViaje = new Date();
+    fechaHoraViaje.setHours(horas, minutos, 0, 0);
+
+    const limiteMinimo = new Date(ahora.getTime() + 30 * 60000);
+
+    // 1. Validar únicamente el tope máximo (10:00 PM)
+    if (horas > 22 || (horas === 22 && minutos > 0)) {
+      return {
+        valido: false,
+        mensaje:
+          'El horario máximo para registrar llegadas a la universidad es a las 10:00 pm.',
+      };
+    }
+
+    // 2. Validar anticipación de 30 minutos (Protege contra viajes en el pasado)
+    if (fechaHoraViaje < limiteMinimo) {
+      return {
+        valido: false,
+        mensaje:
+          'El viaje debe programarse con al menos 30 min de anticipación.',
+      };
+    }
+
+    return { valido: true, mensaje: '' };
+  }
+
+  // ====================== LÓGICA PERMISO GPS ======================
+  verificarPermisoGPS() {
+    if (navigator.permissions) {
+      navigator.permissions
+        .query({ name: 'geolocation' })
+        .then((result) => {
+          this.permisoGpsActivo = result.state === 'granted';
+
+          // Esto escucha si el usuario cambia el permiso en tiempo real
+          result.onchange = () => {
+            this.permisoGpsActivo = result.state === 'granted';
+          };
+        })
+        .catch(() => {
+          this.permisoGpsActivo = false;
+        });
+    } else {
+      // Respaldo para navegadores antiguos o iOS Safari viejo
+      this.permisoGpsActivo = false;
+    }
+  }
+
+  // ====================== LÓGICA FORMULARIO NUEVO VIAJE ======================
 
   private validarFormulario(): boolean {
     const f = this.viajeForm;
@@ -650,7 +866,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'warn',
         summary: 'Formulario incompleto',
-        detail: 'Los lugares deben ser entre 1 y 4.',
+        detail: 'Los lugares disponibles deben estar entre 1 y 4.',
       });
       return false;
     }
@@ -694,7 +910,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
       .from('usuarios')
       .select('usuario_id, nombre, apellido, email')
       .or(
-        `nombre.ilike.%${texto}%,apellido.ilike.%${texto}%,email.ilike.%${texto}%`
+        `nombre.ilike.%${texto}%,apellido.ilike.%${texto}%,email.ilike.%${texto}%`,
       )
       .neq('usuario_id', this.usuarioId)
       .limit(10);
@@ -815,13 +1031,17 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
         this.viajeForm.codigoPostal = match[4];
       }
 
-      // Prellenar hora (extraer HH:MM de la fecha ISO)
+      // Prellenar hora (extraer HH:MM y pasar por el filtro inteligente)
+      let horaFormateadaBase = '';
       if (ultimoViaje.hora_salida) {
         const fecha = new Date(ultimoViaje.hora_salida);
         const horas = fecha.getHours().toString().padStart(2, '0');
         const minutos = fecha.getMinutes().toString().padStart(2, '0');
-        this.horaString = `${horas}:${minutos}`;
+        horaFormateadaBase = `${horas}:${minutos}`;
       }
+
+      // Aquí usamos la nueva función para garantizar que la hora sugerida sea válida HOY
+      this.horaString = this.calcularHoraPredeterminada(horaFormateadaBase);
 
       // Prellenar asientos (asegurando rango 1-4)
       let asientos = ultimoViaje.asientos_disponibles;

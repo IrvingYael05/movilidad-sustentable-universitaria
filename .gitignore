@@ -142,3 +142,6 @@ vite.config.ts.timestamp-*
 .angular/
 out-tsc/
 .vscode/
+
+# Archivos Propios
+BACKUP ECOMOVI V1 (QR Y GUARDIAS).sql

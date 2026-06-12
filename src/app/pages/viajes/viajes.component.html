@@ -1,5 +1,10 @@
-<!-- src/app/pages/viajes/viajes.component.html -->
 <div class="search-container">
+  <div class="text-center mb-4">
+    <h1 class="text-3xl font-bold m-0">Viajes</h1>
+    <p class="text-secondary mb-4 mt-2">
+      Explora los viajes disponibles y únete a alguno de la comunidad.
+    </p>
+  </div>
   <div class="search-input-group">
     <input
       type="text"
@@ -40,11 +45,14 @@
 
     <!-- Caso: Pasajero normal sin resultados -->
     <div *ngIf="!esConductorConViajeActivo">
-      <p class="font-semibold" *ngIf="searchTerm">
-        No se encontraron viajes
-      </p>
+      <p class="font-semibold" *ngIf="searchTerm">No se encontraron viajes</p>
       <small>
-        No hay viajes con lugares disponibles en este momento<span *ngIf="searchTerm"> para "<strong>{{ searchTerm }}</strong>"</span>.
+        No hay viajes con lugares disponibles en este momento<span
+          *ngIf="searchTerm"
+        >
+          para "<strong>{{ searchTerm }}</strong
+          >"</span
+        >.
       </small>
     </div>
   </div>

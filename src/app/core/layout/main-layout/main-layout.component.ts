@@ -117,10 +117,10 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     if (roles.includes('usuario') || roles.includes('conductor')) {
       items.push({ label: 'Viajes', routerLink: '/' });
       items.push({ label: 'Mi Viaje', routerLink: '/lista-viajes' });
-      items.push({ label: 'Acceso', routerLink: '/acceso-qr' });
+      items.push({ label: 'Mapa', routerLink: '/mapa' });
     } 
     else if (roles.includes('guardia')) {
-      items.push({ label: 'Escaner', routerLink: '/escanear-qr' });
+      items.push({ label: 'mapa', routerLink: '/mapa' });
     } 
 
     this.menuBarItems = items;

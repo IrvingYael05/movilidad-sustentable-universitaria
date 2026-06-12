@@ -167,3 +167,81 @@
 .modal-card .p-button.p-button-text {
   color: var(--text-color-secondary) !important;
 }
+
+/* --- SEARCH BAR (AHORA 100% RESPONSIVE) --- */
+.search-container {
+  padding: 1rem;
+  background-color: var(--surface-ground);
+  top: 0;
+  z-index: 10;
+
+  .search-input-group {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--surface-ground);
+    transition: all 0.2s ease;
+    max-width: 100%; /* ← NUEVO */
+    margin: 0 auto; /* ← NUEVO */
+
+    &:focus-within {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(36, 78, 124, 0.2);
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      outline: none;
+      background-color: transparent;
+      color: var(--text-color);
+
+      &::placeholder {
+        color: var(--text-color-secondary);
+      }
+
+      /* En móvil: letra más grande y cómoda */
+      @media (max-width: 576px) {
+        font-size: 0.9rem; /* Evita que iOS haga zoom al escribir */
+        padding: 1rem;
+      }
+    }
+
+    .search-icon {
+      padding: 0 1rem;
+      color: var(--primary-color);
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+  }
+}
+
+/* En móviles muy pequeños: que ocupe todo el ancho */
+@media (max-width: 576px) {
+  .search-container {
+    padding: 0.75rem;
+
+    .search-input-group {
+      border-radius: 50px; /* queda más bonito en móvil */
+    }
+  }
+}
+
+.search-clear {
+  padding: 0 1rem;
+  color: var(--text-color-secondary);
+  font-size: 1.2rem;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--primary-color);
+  }
+
+  @media (max-width: 576px) {
+    padding: 0 0.9rem;
+  }
+}

@@ -3,10 +3,9 @@ import { ViajesComponent } from './viajes/viajes.component';
 import { MiPerfilComponent } from './mi-perfil/mi-perfil.component';
 import { MiVehiculoComponent } from './mi-vehiculo/mi-vehiculo.component';
 import { ListaViajesComponent } from './nuevo-viaje/lista-viajes/lista-viajes.component';
-import { AccesoQrComponent } from './acceso-qr/acceso-qr.component';
 import { roleGuard } from '../shared/guards/role.guard';
-import { EscanearQrComponent } from './escanear-qr/escanear-qr.component';
 import { MetricasComponent } from './metricas/metricas.component';
+import { MapaEstacionamientoComponent } from '../shared/components/mapa-estacionamiento/mapa-estacionamiento.component';
 
 export default [
   {
@@ -34,16 +33,10 @@ export default [
     data: { roles: ['usuario', 'conductor'] },
   },
   {
-    path: 'acceso-qr',
-    component: AccesoQrComponent,
+    path: 'mapa',
+    component: MapaEstacionamientoComponent,
     canActivate: [roleGuard],
-    data: { roles: ['usuario', 'conductor'] },
-  },
-  {
-    path: 'escanear-qr',
-    component: EscanearQrComponent,
-    canActivate: [roleGuard],
-    data: { roles: ['guardia'] },
+    data: { roles: ['usuario', 'conductor', 'guardia'] },
   },
   {
     path: 'metricas',

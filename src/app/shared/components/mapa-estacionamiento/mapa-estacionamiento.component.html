@@ -1,69 +1,71 @@
-<div class="mapa-container">
-  <div class="mapa-layout-grid">
+<div class="mapa-page-container">
+  <div class="text-center mb-4">
+    <h1 class="text-3xl font-bold m-0">Mapa de Disponibilidad</h1>
+    <p class="text-secondary mt-1">
+      Consulta en tiempo real los lugares libres en el estacionamiento
+    </p>
+  </div>
 
-    <div class="area-fila-superior">
-      <div 
-        *ngFor="let espacio of espaciosDinamicos" 
-        class="espacio" 
-        [ngClass]="getClass(espacio)">
-        {{ getLabel(espacio) }}
+  <div class="mapa-card">
+    <div
+      class="visor-container"
+      (wheel)="onWheel($event)"
+      (mousedown)="onDragStart($event)"
+      (mousemove)="onDragMove($event)"
+      (mouseup)="onDragEnd()"
+      (mouseleave)="onDragEnd()"
+      (touchstart)="onDragStart($event)"
+      (touchmove)="onDragMove($event)"
+      (touchend)="onDragEnd()"
+    >
+      <div *ngIf="cargando" class="cargando-overlay">
+        <i class="pi pi-spin pi-spinner text-3xl"></i>
       </div>
+
+      <svg
+        class="lienzo-svg"
+        [style.transform]="
+          'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoom + ')'
+        "
+        width="800"
+        height="600"
+        viewBox="0 0 800 600"
+      >
+        <g *ngFor="let cajon of cajonesGraficos">
+          <polygon
+            [attr.points]="cajon.puntos"
+            [class]="cajon.disponible ? 'poligono-libre' : 'poligono-ocupado'"
+          ></polygon>
+
+          <text
+            [attr.x]="cajon.puntos.split(' ')[0].split(',')[0]"
+            [attr.y]="cajon.puntos.split(' ')[0].split(',')[1]"
+            class="texto-cajon"
+            dx="20"
+            dy="20"
+          >
+            {{ cajon.identificador }}
+          </text>
+        </g>
+      </svg>
     </div>
 
-    <div class="area-col-izquierda">
-      <div class="espacio dummy">16</div>
-      <div class="espacio dummy">17</div>
-      <div class="espacio dummy">18</div>
-      <div class="espacio dummy">19</div>
-      <div class="espacio dummy">20</div>
-    </div>
+    <div class="flex flex-column align-items-center mt-4">
+      <div class="flex gap-4 mb-2">
+        <div class="flex align-items-center gap-2">
+          <div class="cajita-leyenda libre"></div>
+          <span class="text-sm font-medium">Libre</span>
+        </div>
+        <div class="flex align-items-center gap-2">
+          <div class="cajita-leyenda ocupado"></div>
+          <span class="text-sm font-medium">Ocupado</span>
+        </div>
+      </div>
 
-    <div class="area-fila-central-1">
-      <div class="espacio dummy">21</div>
-      <div class="espacio dummy">22</div>
-      <div class="espacio dummy">23</div>
-      <div class="espacio dummy">24</div>
-      <div class="espacio dummy">25</div>
-      <div class="espacio dummy">26</div>
+      <span class="text-secondary text-xs mt-1">
+        <i class="pi pi-search-plus mr-1"></i> Arrastra para moverte y usa la
+        rueda o gestos para hacer zoom.
+      </span>
     </div>
-    
-    <div class="area-fila-central-2">
-      <div class="espacio dummy">27</div>
-      <div class="espacio dummy">28</div>
-      <div class="espacio dummy">29</div>
-      <div class="espacio dummy">30</div>
-      <div class="espacio dummy">31</div>
-      <div class="espacio dummy">32</div>
-    </div>
-
-    <div class="area-col-derecha">
-      <div class="espacio dummy">33</div>
-      <div class="espacio dummy">34</div>
-      <div class="espacio dummy">35</div>
-      <div class="espacio dummy">36</div>
-      <div class="espacio dummy">37</div>
-    </div>
-
-    <div class="area-fila-inferior">
-      <div class="espacio dummy">01</div>
-      <div class="espacio dummy">02</div>
-      <div class="espacio dummy">03</div>
-      <div class="espacio dummy">04</div>
-      <div class="espacio dummy">05</div>
-      <div class="espacio dummy">06</div>
-      <div class="espacio dummy">07</div>
-      <div class="espacio dummy">08</div>
-      <div class="espacio dummy">09</div>
-      <div class="espacio dummy">10</div>
-      <div class="espacio dummy">11</div>
-      <div class="espacio dummy">12</div>
-      <div class="espacio dummy">13</div>
-      <div class="espacio dummy">14</div>
-      <div class="espacio dummy">15</div>
-    </div>
-
-  </div> <div class="leyenda">
-    <span class="cuadro asignado"></span> Tu Espacio
-    <span class="cuadro ocupado"></span> Espacio Ocupado
   </div>
 </div>
