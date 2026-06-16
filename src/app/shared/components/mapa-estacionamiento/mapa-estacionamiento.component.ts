@@ -1,29 +1,31 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  inject,
-  HostListener,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 import { SupabaseService } from '../../data-access/supabase.service';
 
-interface EspacioBD {
-  espacio_id: number;
-  esta_disponible: boolean;
+interface ElementoEstatico {
+  tipo: string;
+  puntos: string;
+  texto: string;
+  centro_x: number;
+  centro_y: number;
 }
 
 interface CajonSVG {
   espacio_id: number;
   identificador: string;
-  puntos: string; // Coordenadas del polígono de Python
-  disponible: boolean; // Estado que viene de Supabase
+  puntos: string;
+  centro_x: number;
+  centro_y: number;
+  disponible?: boolean;
 }
 
 @Component({
   selector: 'app-mapa-estacionamiento',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './mapa-estacionamiento.component.html',
   styleUrls: ['./mapa-estacionamiento.component.scss'],
 })
@@ -40,27 +42,10 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
   startX = 0;
   startY = 0;
 
-  // Los cajones combinados (Coordenadas Python + Estado BD)
+  // Datos del Mapa
+  viewBoxConfig = '0 0 1000 800';
+  elementosEstaticos: ElementoEstatico[] = [];
   cajonesGraficos: CajonSVG[] = [];
-
-  // Simulamos la exportación de Python (En producción vendrá de un .json real)
-  private coordenadasPython = [
-    {
-      espacio_id: 1,
-      identificador: 'A1',
-      puntos: '100,100 200,100 220,250 80,250',
-    },
-    {
-      espacio_id: 2,
-      identificador: 'A2',
-      puntos: '210,100 310,100 330,250 230,250',
-    },
-    {
-      espacio_id: 3,
-      identificador: 'A3',
-      puntos: '320,100 420,100 440,250 340,250',
-    },
-  ];
 
   async ngOnInit() {
     await this.cargarEstadoYConstruirMapa();
@@ -73,21 +58,37 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
 
   async cargarEstadoYConstruirMapa() {
     try {
-      const { data } = await this.supabase
+      // 1. CARGAR EL ARCHIVO JSON
+      const response = await fetch('/coordenadas.json');
+      if (!response.ok) throw new Error('No se pudo cargar el archivo JSON.');
+      const mapaData = await response.json();
+
+      // 2. ASIGNAR LOS DATOS DEL JSON A LAS VARIABLES
+      this.viewBoxConfig = mapaData.config_visor.viewBox;
+      this.elementosEstaticos = mapaData.elementos_estaticos;
+      const coordenadasCajones: CajonSVG[] = mapaData.cajones;
+
+      // 3. OBTENER EL ESTADO DE LA BD
+      const { data, error } = await this.supabase
         .from('espaciosestacionamiento')
-        .select('espacio_id, esta_disponible');
+        .select('espacio_id, esta_disponible')
+        .eq('lote_id', 3);
+
+      if (error) throw error;
       const estadoBD = data || [];
 
-      // Fusionamos las coordenadas con el estado actual
-      this.cajonesGraficos = this.coordenadasPython.map((coord) => {
-        const bd = estadoBD.find((e: any) => e.espacio_id === coord.espacio_id);
+      // FUSIÓN
+      this.cajonesGraficos = coordenadasCajones.map((coord) => {
+        const registroBD = estadoBD.find(
+          (e: any) => e.espacio_id === coord.espacio_id,
+        );
         return {
           ...coord,
-          disponible: bd ? bd.esta_disponible : true,
+          disponible: registroBD ? registroBD.esta_disponible : true,
         };
       });
     } catch (error) {
-      console.error(error);
+      console.error('Error inicializando el mapa:', error);
     } finally {
       this.cargando = false;
     }
@@ -117,9 +118,8 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
     event.preventDefault();
     const zoomIn = event.deltaY < 0;
     this.zoom += zoomIn ? 0.1 : -0.1;
-    this.zoom = Math.max(0.5, Math.min(this.zoom, 2)); // Limitamos el zoom entre 0.5x y 3x
+    this.zoom = Math.max(0.5, Math.min(this.zoom, 3));
   }
-
   onDragStart(event: MouseEvent | TouchEvent) {
     this.isDragging = true;
     const clientX =
@@ -129,7 +129,6 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
     this.startX = clientX - this.panX;
     this.startY = clientY - this.panY;
   }
-
   onDragMove(event: MouseEvent | TouchEvent) {
     if (!this.isDragging) return;
     event.preventDefault();
@@ -140,7 +139,6 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
     this.panX = clientX - this.startX;
     this.panY = clientY - this.startY;
   }
-
   onDragEnd() {
     this.isDragging = false;
   }

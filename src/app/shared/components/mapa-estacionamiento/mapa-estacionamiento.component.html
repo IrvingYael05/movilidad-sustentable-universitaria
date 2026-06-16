@@ -1,3 +1,5 @@
+<p-toast position="top-right"></p-toast>
+
 <div class="mapa-page-container">
   <div class="text-center mb-4">
     <h1 class="text-3xl font-bold m-0">Mapa de Disponibilidad</h1>
@@ -27,10 +29,28 @@
         [style.transform]="
           'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoom + ')'
         "
-        width="800"
-        height="600"
-        viewBox="0 0 800 600"
+        width="100%"
+        height="100%"
+        [attr.viewBox]="viewBoxConfig"
       >
+        <g *ngFor="let el of elementosEstaticos">
+          <polygon
+            *ngIf="el.puntos"
+            [attr.points]="el.puntos"
+            [ngClass]="'estatico-' + el.tipo"
+          ></polygon>
+
+          <text
+            [attr.x]="el.centro_x"
+            [attr.y]="el.centro_y"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            [ngClass]="'texto-' + el.tipo"
+          >
+            {{ el.texto }}
+          </text>
+        </g>
+
         <g *ngFor="let cajon of cajonesGraficos">
           <polygon
             [attr.points]="cajon.puntos"
@@ -38,11 +58,11 @@
           ></polygon>
 
           <text
-            [attr.x]="cajon.puntos.split(' ')[0].split(',')[0]"
-            [attr.y]="cajon.puntos.split(' ')[0].split(',')[1]"
-            class="texto-cajon"
-            dx="20"
-            dy="20"
+            [attr.x]="cajon.centro_x"
+            [attr.y]="cajon.centro_y"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            [class]="cajon.disponible ? 'texto-cajon libre' : 'texto-cajon ocupado'"
           >
             {{ cajon.identificador }}
           </text>

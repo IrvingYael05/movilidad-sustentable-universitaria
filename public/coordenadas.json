@@ -1,0 +1,507 @@
+{
+  "lote": "Estacionamiento 3",
+  "config_visor": {
+    "viewBox": "0 0 1000 800"
+  },
+  "elementos_estaticos": [
+    {
+      "tipo": "titulo",
+      "puntos": "",
+      "texto": "Estacionamiento 3 - UTEQ",
+      "centro_x": 500,
+      "centro_y": 30
+    },
+    {
+      "tipo": "entrada",
+      "puntos": "350,600 650,600 650,640 350,640",
+      "texto": "Entrada / Pluma",
+      "centro_x": 500,
+      "centro_y": 620
+    }
+  ],
+  "cajones": [
+    {
+      "espacio_id": 1,
+      "identificador": "A3-1",
+      "puntos": "40,70 95,70 95,110 40,110",
+      "centro_x": 67.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 2,
+      "identificador": "A3-2",
+      "puntos": "120,70 175,70 175,110 120,110",
+      "centro_x": 147.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 3,
+      "identificador": "A3-3",
+      "puntos": "200,70 255,70 255,110 200,110",
+      "centro_x": 227.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 4,
+      "identificador": "A3-4",
+      "puntos": "280,70 335,70 335,110 280,110",
+      "centro_x": 307.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 5,
+      "identificador": "A3-5",
+      "puntos": "360,70 415,70 415,110 360,110",
+      "centro_x": 387.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 6,
+      "identificador": "A3-6",
+      "puntos": "440,70 495,70 495,110 440,110",
+      "centro_x": 467.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 7,
+      "identificador": "A3-7",
+      "puntos": "520,70 575,70 575,110 520,110",
+      "centro_x": 547.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 8,
+      "identificador": "A3-8",
+      "puntos": "600,70 655,70 655,110 600,110",
+      "centro_x": 627.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 9,
+      "identificador": "A3-9",
+      "puntos": "680,70 735,70 735,110 680,110",
+      "centro_x": 707.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 10,
+      "identificador": "A3-10",
+      "puntos": "760,70 815,70 815,110 760,110",
+      "centro_x": 787.5,
+      "centro_y": 90.0
+    },
+    {
+      "espacio_id": 11,
+      "identificador": "A3-11",
+      "puntos": "40,140 95,140 95,180 40,180",
+      "centro_x": 67.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 12,
+      "identificador": "A3-12",
+      "puntos": "120,140 175,140 175,180 120,180",
+      "centro_x": 147.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 13,
+      "identificador": "A3-13",
+      "puntos": "200,140 255,140 255,180 200,180",
+      "centro_x": 227.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 14,
+      "identificador": "A3-14",
+      "puntos": "280,140 335,140 335,180 280,180",
+      "centro_x": 307.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 15,
+      "identificador": "A3-15",
+      "puntos": "360,140 415,140 415,180 360,180",
+      "centro_x": 387.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 16,
+      "identificador": "A3-16",
+      "puntos": "440,140 495,140 495,180 440,180",
+      "centro_x": 467.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 17,
+      "identificador": "A3-17",
+      "puntos": "520,140 575,140 575,180 520,180",
+      "centro_x": 547.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 18,
+      "identificador": "A3-18",
+      "puntos": "600,140 655,140 655,180 600,180",
+      "centro_x": 627.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 19,
+      "identificador": "A3-19",
+      "puntos": "680,140 735,140 735,180 680,180",
+      "centro_x": 707.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 20,
+      "identificador": "A3-20",
+      "puntos": "760,140 815,140 815,180 760,180",
+      "centro_x": 787.5,
+      "centro_y": 160.0
+    },
+    {
+      "espacio_id": 21,
+      "identificador": "A3-21",
+      "puntos": "40,210 95,210 95,250 40,250",
+      "centro_x": 67.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 22,
+      "identificador": "A3-22",
+      "puntos": "120,210 175,210 175,250 120,250",
+      "centro_x": 147.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 23,
+      "identificador": "A3-23",
+      "puntos": "200,210 255,210 255,250 200,250",
+      "centro_x": 227.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 24,
+      "identificador": "A3-24",
+      "puntos": "280,210 335,210 335,250 280,250",
+      "centro_x": 307.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 25,
+      "identificador": "A3-25",
+      "puntos": "360,210 415,210 415,250 360,250",
+      "centro_x": 387.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 26,
+      "identificador": "A3-26",
+      "puntos": "440,210 495,210 495,250 440,250",
+      "centro_x": 467.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 27,
+      "identificador": "A3-27",
+      "puntos": "520,210 575,210 575,250 520,250",
+      "centro_x": 547.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 28,
+      "identificador": "A3-28",
+      "puntos": "600,210 655,210 655,250 600,250",
+      "centro_x": 627.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 29,
+      "identificador": "A3-29",
+      "puntos": "680,210 735,210 735,250 680,250",
+      "centro_x": 707.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 30,
+      "identificador": "A3-30",
+      "puntos": "760,210 815,210 815,250 760,250",
+      "centro_x": 787.5,
+      "centro_y": 230.0
+    },
+    {
+      "espacio_id": 31,
+      "identificador": "A3-31",
+      "puntos": "40,280 95,280 95,320 40,320",
+      "centro_x": 67.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 32,
+      "identificador": "A3-32",
+      "puntos": "120,280 175,280 175,320 120,320",
+      "centro_x": 147.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 33,
+      "identificador": "A3-33",
+      "puntos": "200,280 255,280 255,320 200,320",
+      "centro_x": 227.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 34,
+      "identificador": "A3-34",
+      "puntos": "280,280 335,280 335,320 280,320",
+      "centro_x": 307.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 35,
+      "identificador": "A3-35",
+      "puntos": "360,280 415,280 415,320 360,320",
+      "centro_x": 387.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 36,
+      "identificador": "A3-36",
+      "puntos": "440,280 495,280 495,320 440,320",
+      "centro_x": 467.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 37,
+      "identificador": "A3-37",
+      "puntos": "520,280 575,280 575,320 520,320",
+      "centro_x": 547.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 38,
+      "identificador": "A3-38",
+      "puntos": "600,280 655,280 655,320 600,320",
+      "centro_x": 627.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 39,
+      "identificador": "A3-39",
+      "puntos": "680,280 735,280 735,320 680,320",
+      "centro_x": 707.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 40,
+      "identificador": "A3-40",
+      "puntos": "760,280 815,280 815,320 760,320",
+      "centro_x": 787.5,
+      "centro_y": 300.0
+    },
+    {
+      "espacio_id": 41,
+      "identificador": "A3-41",
+      "puntos": "40,350 95,350 95,390 40,390",
+      "centro_x": 67.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 42,
+      "identificador": "A3-42",
+      "puntos": "120,350 175,350 175,390 120,390",
+      "centro_x": 147.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 43,
+      "identificador": "A3-43",
+      "puntos": "200,350 255,350 255,390 200,390",
+      "centro_x": 227.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 44,
+      "identificador": "A3-44",
+      "puntos": "280,350 335,350 335,390 280,390",
+      "centro_x": 307.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 45,
+      "identificador": "A3-45",
+      "puntos": "360,350 415,350 415,390 360,390",
+      "centro_x": 387.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 46,
+      "identificador": "A3-46",
+      "puntos": "440,350 495,350 495,390 440,390",
+      "centro_x": 467.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 47,
+      "identificador": "A3-47",
+      "puntos": "520,350 575,350 575,390 520,390",
+      "centro_x": 547.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 48,
+      "identificador": "A3-48",
+      "puntos": "600,350 655,350 655,390 600,390",
+      "centro_x": 627.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 49,
+      "identificador": "A3-49",
+      "puntos": "680,350 735,350 735,390 680,390",
+      "centro_x": 707.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 50,
+      "identificador": "A3-50",
+      "puntos": "760,350 815,350 815,390 760,390",
+      "centro_x": 787.5,
+      "centro_y": 370.0
+    },
+    {
+      "espacio_id": 51,
+      "identificador": "A3-51",
+      "puntos": "40,420 95,420 95,460 40,460",
+      "centro_x": 67.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 52,
+      "identificador": "A3-52",
+      "puntos": "120,420 175,420 175,460 120,460",
+      "centro_x": 147.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 53,
+      "identificador": "A3-53",
+      "puntos": "200,420 255,420 255,460 200,460",
+      "centro_x": 227.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 54,
+      "identificador": "A3-54",
+      "puntos": "280,420 335,420 335,460 280,460",
+      "centro_x": 307.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 55,
+      "identificador": "A3-55",
+      "puntos": "360,420 415,420 415,460 360,460",
+      "centro_x": 387.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 56,
+      "identificador": "A3-56",
+      "puntos": "440,420 495,420 495,460 440,460",
+      "centro_x": 467.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 57,
+      "identificador": "A3-57",
+      "puntos": "520,420 575,420 575,460 520,460",
+      "centro_x": 547.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 58,
+      "identificador": "A3-58",
+      "puntos": "600,420 655,420 655,460 600,460",
+      "centro_x": 627.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 59,
+      "identificador": "A3-59",
+      "puntos": "680,420 735,420 735,460 680,460",
+      "centro_x": 707.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 60,
+      "identificador": "A3-60",
+      "puntos": "760,420 815,420 815,460 760,460",
+      "centro_x": 787.5,
+      "centro_y": 440.0
+    },
+    {
+      "espacio_id": 61,
+      "identificador": "A3-61",
+      "puntos": "40,490 95,490 95,530 40,530",
+      "centro_x": 67.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 62,
+      "identificador": "A3-62",
+      "puntos": "120,490 175,490 175,530 120,530",
+      "centro_x": 147.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 63,
+      "identificador": "A3-63",
+      "puntos": "200,490 255,490 255,530 200,530",
+      "centro_x": 227.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 64,
+      "identificador": "A3-64",
+      "puntos": "280,490 335,490 335,530 280,530",
+      "centro_x": 307.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 65,
+      "identificador": "A3-65",
+      "puntos": "360,490 415,490 415,530 360,530",
+      "centro_x": 387.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 66,
+      "identificador": "A3-66",
+      "puntos": "440,490 495,490 495,530 440,530",
+      "centro_x": 467.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 67,
+      "identificador": "A3-67",
+      "puntos": "520,490 575,490 575,530 520,530",
+      "centro_x": 547.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 68,
+      "identificador": "A3-68",
+      "puntos": "600,490 655,490 655,530 600,530",
+      "centro_x": 627.5,
+      "centro_y": 510.0
+    },
+    {
+      "espacio_id": 69,
+      "identificador": "A3-69",
+      "puntos": "680,490 735,490 735,530 680,530",
+      "centro_x": 707.5,
+      "centro_y": 510.0
+    }
+  ]
+}
