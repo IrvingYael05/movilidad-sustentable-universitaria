@@ -99,7 +99,7 @@
 
 /* Estilo para las plumas de acceso / entradas */
 .estatico-entrada {
-  fill: var(--secondary-color);
+  fill: var(--success-color);
   stroke: var(--primary-color);
   stroke-width: 2;
   border-radius: 4px;
@@ -117,7 +117,7 @@
 .texto-titulo {
   font-family: inherit;
   font-weight: 800;
-  font-size: 24px;
+  font-size: 30px;
   fill: var(--text-color);
   letter-spacing: 1px;
   pointer-events: none;
