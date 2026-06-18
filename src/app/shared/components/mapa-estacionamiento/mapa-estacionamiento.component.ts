@@ -114,13 +114,32 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
   }
 
   // ====================== MOTOR DE FÍSICAS ======================
+  // Variables adicionales para el Pinch-to-Zoom
+  initialPinchDistance: number | null = null;
+
+  // Función matemática para calcular la distancia entre dos dedos
+  private getPinchDistance(touches: TouchList): number {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
   onWheel(event: WheelEvent) {
     event.preventDefault();
     const zoomIn = event.deltaY < 0;
     this.zoom += zoomIn ? 0.1 : -0.1;
     this.zoom = Math.max(0.5, Math.min(this.zoom, 3));
   }
+
   onDragStart(event: MouseEvent | TouchEvent) {
+    if (event instanceof TouchEvent && event.touches.length === 2) {
+      // MODO ZOOM TÁCTIL: Guardamos la distancia inicial de los dos dedos
+      this.initialPinchDistance = this.getPinchDistance(event.touches);
+      this.isDragging = false; // Desactivamos el paneo mientras hacemos zoom
+      return;
+    }
+
+    // MODO PANEO (1 dedo o Mouse)
     this.isDragging = true;
     const clientX =
       event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
@@ -129,7 +148,28 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
     this.startX = clientX - this.panX;
     this.startY = clientY - this.panY;
   }
+
   onDragMove(event: MouseEvent | TouchEvent) {
+    if (
+      event instanceof TouchEvent &&
+      event.touches.length === 2 &&
+      this.initialPinchDistance !== null
+    ) {
+      // MODO ZOOM TÁCTIL: Calculamos qué tanto se movieron los dedos
+      event.preventDefault(); // Evita que la pantalla completa del celular haga zoom
+      const currentDistance = this.getPinchDistance(event.touches);
+      const distanceDiff = currentDistance - this.initialPinchDistance;
+
+      // Ajustamos el zoom basado en la diferencia (sensibilidad del 1%)
+      this.zoom += distanceDiff * 0.01;
+      this.zoom = Math.max(0.5, Math.min(this.zoom, 3)); // Límite de zoom igual que en PC
+
+      // Actualizamos la distancia inicial para el siguiente milisegundo
+      this.initialPinchDistance = currentDistance;
+      return;
+    }
+
+    // MODO PANEO (1 dedo o Mouse)
     if (!this.isDragging) return;
     event.preventDefault();
     const clientX =
@@ -139,7 +179,9 @@ export class MapaEstacionamientoComponent implements OnInit, OnDestroy {
     this.panX = clientX - this.startX;
     this.panY = clientY - this.startY;
   }
+
   onDragEnd() {
     this.isDragging = false;
+    this.initialPinchDistance = null; // Reseteamos el zoom táctil
   }
 }
