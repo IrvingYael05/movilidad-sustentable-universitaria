@@ -1,64 +1,251 @@
 <div class="metricas-container">
-  <h2 class="page-title">Panel de Métricas y Sostenibilidad</h2>
-  <hr class="separator">
-
-  <div class="kpi-grid">
-    <div class="kpi-card parking">
-      <div class="kpi-title">
-        <i class="pi pi-car"></i> Ocupación de Estacionamiento
-      </div>
-      <div class="kpi-value">{{ ocupacionActual.ocupados }} / {{ ocupacionActual.total }}</div>
-      <div class="kpi-detail">
-        <span [ngClass]="{'text-danger': ocupacionActual.porcentaje > 80, 'text-success': ocupacionActual.porcentaje < 60}">
-          {{ ocupacionActual.porcentaje | number: '1.0-2' }}%
-        </span> Ocupado (Tiempo Real)
-      </div>
-    </div>
-    
-    <div class="kpi-card trips">
-      <div class="kpi-title">
-        <i class="pi pi-users"></i> Vehículos Ahorrados HOY
-      </div>
-      <div class="kpi-value">{{ vehiculosAhorradosHoy }}</div>
-      <div class="kpi-detail">Pasajeros transportados en viajes compartidos hoy</div>
+  <div
+    class="header-section flex justify-content-between align-items-center mb-5"
+  >
+    <div>
+      <h1>Dashboard Directivo AVM</h1>
+      <p>Telemetría de afluencia y uso de infraestructura</p>
     </div>
 
-    <div class="kpi-card prediction">
-      <div class="kpi-title">
-        <i class="pi pi-chart-line"></i> Proyección Vehículos Ahorrados
-      </div>
-      <div class="kpi-value">{{ vehiculosAhorradosProyeccion }}</div>
-      <div class="kpi-detail">Estimación para la próxima semana (Regresión Lineal)</div>
-    </div>
-    
-    <div class="kpi-card sustainability">
-      <div class="kpi-title">
-        <i class="pi pi-leaf"></i> CO2 Ahorrado (Acumulado)
-      </div>
-      <div class="kpi-value">{{ co2AhorradoAcumulado | number: '1.0-2' }} kg</div>
-      <div class="kpi-detail">Impacto total histórico</div>
-    </div>
-  </div>
-  
-  <hr class="separator">
+    <div class="controls-container flex gap-3 align-items-center">
+      <p-calendar
+        [(ngModel)]="rangoFechas"
+        selectionMode="range"
+        [readonlyInput]="true"
+        placeholder="Seleccionar rango de fechas"
+        (onClose)="
+          cargarMetricasSeccionA();
+          cargarMetricasSeccionB();
+          cargarMetricasSeccionC()
+        "
+        styleClass="w-full md:w-16rem"
+      ></p-calendar>
 
-  <div class="charts-row full-width">
-    <div class="chart-card large-chart">
-      <h3 class="chart-title">Tendencia de Viajes Compartidos por Día</h3>
-      <div class="chart-content" *ngIf="viajesChartData">
-        <app-chart-wrapper [chartData]="viajesChartData" chartType="line"></app-chart-wrapper>
-      </div>
-      <div *ngIf="!viajesChartData" class="loading-placeholder">No hay datos de viajes para mostrar.</div>
+      <p-button
+        icon="pi pi-download"
+        label="Exportar CSV"
+        (onClick)="exportarReporte()"
+        [disabled]="cargando"
+      ></p-button>
     </div>
   </div>
 
-  <div class="charts-row full-width">
-    <div class="chart-card large-chart">
-      <h3 class="chart-title">Reducción de CO2 (kg) y Sostenibilidad Semanal</h3>
-      <div class="chart-content" *ngIf="co2ChartData">
-        <app-chart-wrapper [chartData]="co2ChartData" chartType="bar"></app-chart-wrapper>
+  <!-- Sección A -->
+  <h2
+    style="
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    "
+  >
+    Analítica de Afluencia
+  </h2>
+
+  <div class="grid">
+    <!-- Métrica 1: Volumen Total de Ingresos -->
+    <div class="col-12 md:col-4">
+      <div class="metric-card">
+        <h3 class="card-title">Volumen Total de Ingresos</h3>
+
+        <div class="volumen-content">
+          <div
+            *ngIf="cargando"
+            class="pi pi-spin pi-spinner text-4xl"
+            style="color: var(--primary-color)"
+          ></div>
+          <span *ngIf="!cargando" class="numero-volumen">{{
+            volumenTotal
+          }}</span>
+          <span class="subtexto">En el rango seleccionado</span>
+        </div>
       </div>
-      <div *ngIf="!co2ChartData" class="loading-placeholder">No hay datos suficientes para calcular el impacto de CO2.</div>
+    </div>
+
+    <!-- Métrica 2: Modalidad (Pastel) -->
+    <div class="col-12 md:col-4">
+      <div class="metric-card">
+        <h3 class="card-title">Modalidad de Ingreso</h3>
+        <div class="chart-container">
+          <p-chart
+            type="pie"
+            [data]="dataModalidad"
+            [options]="pieChartOptions"
+            class="w-full"
+          ></p-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Métrica 3: Horas Pico (Barras) -->
+    <div class="col-12 md:col-4">
+      <div class="metric-card">
+        <h3 class="card-title">Distribución de Horas Pico</h3>
+        <div class="chart-container">
+          <p-chart
+            type="bar"
+            [data]="dataHorasPico"
+            [options]="barChartOptions"
+            class="w-full"
+          ></p-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección B -->
+  <h2
+    style="
+      color: var(--primary-color);
+      margin-top: 3rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    "
+  >
+    Analítica de Movilidad Compartida
+  </h2>
+
+  <div class="grid">
+    <div class="col-12 md:col-4">
+      <div class="metric-card">
+        <h3 class="card-title">Cajones Liberados Estimados</h3>
+        <div class="volumen-content">
+          <div
+            *ngIf="cargandoB"
+            class="pi pi-spin pi-spinner text-4xl"
+            style="color: var(--primary-color)"
+          ></div>
+          <span
+            *ngIf="!cargandoB"
+            class="numero-volumen"
+            style="color: var(--success-color)"
+            >{{ cajonesLiberados }}</span
+          >
+          <span class="subtexto">Espacios ahorrados al campus</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-4">
+      <div class="metric-card">
+        <h3 class="card-title">Ocupación Promedio</h3>
+        <div class="volumen-content">
+          <div
+            *ngIf="cargandoB"
+            class="pi pi-spin pi-spinner text-4xl"
+            style="color: var(--primary-color)"
+          ></div>
+          <div *ngIf="!cargandoB" class="flex align-items-end">
+            <span class="numero-volumen">{{ promedioOcupacion }}</span>
+            <span class="text-xl text-gray-500 font-bold mb-2 ml-2"
+              >/ auto</span
+            >
+          </div>
+          <span class="subtexto">Conductor + Pasajeros</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-4">
+      <div class="metric-card">
+        <h3 class="card-title">Estado de Viajes</h3>
+        <div class="chart-container">
+          <p-chart
+            type="doughnut"
+            [data]="dataEstadoViajes"
+            [options]="pieChartOptions"
+            class="w-full"
+          ></p-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección C -->
+  <h2
+    style="
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    "
+  >
+    Ocupación del Estacionamiento
+  </h2>
+
+  <div class="grid">
+    <div class="col-12 md:col-4">
+      <div
+        class="metric-card"
+        style="border-top: 4px solid var(--primary-color)"
+      >
+        <h3 class="card-title text-left">Ocupación Actual</h3>
+        <div class="volumen-content align-items-start pl-2">
+          <div
+            *ngIf="cargandoC"
+            class="pi pi-spin pi-spinner text-4xl"
+            style="color: var(--primary-color)"
+          ></div>
+          <div *ngIf="!cargandoC" class="flex align-items-end">
+            <span class="numero-volumen">{{
+              datosEstacionamiento.ocupacion_pct
+            }}</span>
+            <span class="text-3xl text-gray-800 font-bold mb-1 ml-1">%</span>
+          </div>
+          <span class="subtexto">De la capacidad total</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-4">
+      <div
+        class="metric-card"
+        style="border-top: 4px solid var(--success-color)"
+      >
+        <h3 class="card-title text-left">Cajones Disponibles</h3>
+        <div class="volumen-content align-items-start pl-2">
+          <div
+            *ngIf="cargandoC"
+            class="pi pi-spin pi-spinner text-4xl"
+            style="color: var(--primary-color)"
+          ></div>
+          <div *ngIf="!cargandoC" class="flex align-items-center gap-3">
+            <span class="numero-volumen" style="color: var(--success-color)">{{
+              datosEstacionamiento.libres
+            }}</span>
+            <i
+              class="pi pi-check-circle"
+              style="
+                font-size: 2.5rem;
+                color: var(--success-color);
+                opacity: 0.2;
+              "
+            ></i>
+          </div>
+          <span class="subtexto">Listos para usarse</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-4">
+      <div class="metric-card" style="border-top: 4px solid var(--error-color)">
+        <h3 class="card-title text-left">Cajones Ocupados</h3>
+        <div class="volumen-content align-items-start pl-2">
+          <div
+            *ngIf="cargandoC"
+            class="pi pi-spin pi-spinner text-4xl"
+            style="color: var(--primary-color)"
+          ></div>
+          <div *ngIf="!cargandoC" class="flex align-items-center gap-3">
+            <span class="numero-volumen" style="color: var(--error-color)">{{
+              datosEstacionamiento.ocupados
+            }}</span>
+            <i
+              class="pi pi-car"
+              style="font-size: 2.5rem; color: var(--error-color); opacity: 0.2"
+            ></i>
+          </div>
+          <span class="subtexto">Detectados por cámara</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { SupabaseService } from '../data-access/supabase.service';
 
 @Injectable({
@@ -9,6 +10,9 @@ export class GeocercaService {
 
   // ID del proceso de rastreo del GPS
   private watchId: number | null = null;
+
+  private distanciaSubject = new BehaviorSubject<number | null>(null);
+  public distanciaActual$ = this.distanciaSubject.asObservable();
 
   // Coordenadas exactas de la entrada de la UTEQ
   private UTEQ_LAT = 20.654167760512216;
@@ -52,7 +56,8 @@ export class GeocercaService {
             this.UTEQ_LNG,
           );
 
-          console.log(`Distancia actual al destino: ${distancia.toFixed(3)} km`);
+          // Notificamos a los suscriptores la nueva distancia
+          this.distanciaSubject.next(distancia);
 
           // Si la distancia es menor a los 150 metros
           if (distancia <= this.RADIO_KM) {
@@ -84,6 +89,7 @@ export class GeocercaService {
     if (this.watchId !== null) {
       navigator.geolocation.clearWatch(this.watchId);
       this.watchId = null;
+      this.distanciaSubject.next(null);
     }
   }
 

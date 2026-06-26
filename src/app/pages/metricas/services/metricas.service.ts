@@ -1,51 +1,75 @@
-// src/app/pages/metricas/services/metricas.service.ts
 import { Injectable, inject } from '@angular/core';
-import { SupabaseService } from '../../../shared/data-access/supabase.service'; // La ruta relativa es correcta
+import { SupabaseService } from '../../../shared/data-access/supabase.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MetricasService {
-  private supabase = inject(SupabaseService);
+  private supabase = inject(SupabaseService).supabaseClient;
 
-  /**
-   * Obtiene la ocupación actual del estacionamiento (en tiempo real).
-   */
-  async getOcupacionActual(): Promise<{ ocupados: number, total: number }> {
-    // 1. Contar total de espacios
-    const { count: totalSpaces } = await this.supabase.supabaseClient // ✅ CORRECCIÓN
-      .from('espaciosestacionamiento')
-      .select('*', { count: 'exact', head: true });
-
-    // 2. Contar asignaciones activas (liberado_en IS NULL)
-    const { count: activeAssignments } = await this.supabase.supabaseClient // ✅ CORRECCIÓN
-      .from('asignacionesestacionamiento')
-      .select('*', { count: 'exact', head: true })
-      .is('liberado_en', null);
-
-    return {
-      ocupados: activeAssignments || 0,
-      total: totalSpaces || 0,
-    };
+  // --- SECCIÓN A: AFLUENCIA ---
+  async getVolumenTotal(inicio: string, fin: string) {
+    const { data, error } = await this.supabase.rpc('rpc_volumen_ingresos', {
+      fecha_inicio: inicio,
+      fecha_fin: fin,
+    });
+    if (error) throw error;
+    return data;
   }
 
-  /**
-   * Obtiene los datos de viajes compartidos (pasajeros y viajes) para el cálculo de CO2 y regresión.
-   */
-  async getDatosHistoricosViajes(): Promise<{ pasajeros: { unido_en: string }[], viajes: { creado_en: string }[] }> {
-    // Fetch para Pasajeros (para CO2 y vehículos ahorrados)
-    const pasajerosResponse = await this.supabase.supabaseClient // ✅ CORRECCIÓN
-        .from('pasajerosviaje')
-        .select('unido_en');
+  async getHorasPico(inicio: string, fin: string) {
+    const { data, error } = await this.supabase.rpc('rpc_horas_pico', {
+      fecha_inicio: inicio,
+      fecha_fin: fin,
+    });
+    if (error) throw error;
+    return data;
+  }
 
-    // Fetch para Viajes (para tendencia de viajes)
-    const viajesResponse = await this.supabase.supabaseClient // ✅ CORRECCIÓN
-        .from('viajes')
-        .select('creado_en');
+  async getModalidadIngreso(inicio: string, fin: string) {
+    const { data, error } = await this.supabase.rpc('rpc_modalidad_ingreso', {
+      fecha_inicio: inicio,
+      fecha_fin: fin,
+    });
+    if (error) throw error;
+    return data;
+  }
 
-    return { 
-      pasajeros: pasajerosResponse.data as { unido_en: string }[] || [],
-      viajes: viajesResponse.data as { creado_en: string }[] || []
-    };
+  // --- SECCIÓN B: MOVILIDAD COMPARTIDA ---
+  async getPromedioOcupacion(inicio: string, fin: string) {
+    const { data, error } = await this.supabase.rpc('rpc_promedio_ocupacion', {
+      fecha_inicio: inicio,
+      fecha_fin: fin,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async getCajonesLiberados(inicio: string, fin: string) {
+    const { data, error } = await this.supabase.rpc('rpc_cajones_liberados', {
+      fecha_inicio: inicio,
+      fecha_fin: fin,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async getEstadoViajes(inicio: string, fin: string) {
+    const { data, error } = await this.supabase.rpc('rpc_estado_viajes', {
+      fecha_inicio: inicio,
+      fecha_fin: fin,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  // --- SECCIÓN C: MONITOR EN TIEMPO REAL ---
+  async getMonitorEstacionamiento(loteId: number) {
+    const { data, error } = await this.supabase.rpc(
+      'rpc_monitor_estacionamiento',
+      { p_lote_id: loteId },
+    );
+    if (error) throw error;
+    return data[0]; // Retorna solo el primer registro (el resumen del lote)
   }
 }

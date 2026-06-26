@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { GeocercaService } from '../../../shared/services/geocerca.service';
+import { Subscription } from 'rxjs';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -68,6 +69,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   private supabase = inject(SupabaseService);
   private messageService = inject(MessageService);
   private geocercaService = inject(GeocercaService);
+  private geocercaSubscription: Subscription | null = null;
 
   // Canales de Realtime
   private viajesChannel: any;
@@ -86,6 +88,7 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
   isLoading = true;
   isLoadingSolicitudes = false;
   esPasajero = false;
+  distanciaAlDestino: number | null = null;
 
   // Estado Formulario (Nuevo Viaje)
   viajeForm: ViajeForm = {
@@ -139,10 +142,17 @@ export class ListaViajesComponent implements OnInit, OnDestroy {
         life: 3000,
       });
     }
+
+    this.geocercaSubscription = this.geocercaService.distanciaActual$.subscribe(
+      (distancia) => {
+        this.distanciaAlDestino = distancia;
+      },
+    );
   }
 
   ngOnDestroy() {
     this.limpiarRealtimeSubscriptions();
+    this.geocercaSubscription?.unsubscribe();
   }
 
   // ==================== REALTIME SUBSCRIPTIONS ====================
